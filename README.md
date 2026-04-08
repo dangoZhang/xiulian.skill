@@ -1,72 +1,91 @@
-# portrait.skill
+<div align="center">
 
----
+# portrait.skill
 
 > "把你的运行卷宗投入炉中，照见你与 AI 的气脉、资质、境界与下一轮该如何破境。"
 
 当 AI 像小说里的灵气复苏一样席卷人间，有人只看见热闹，有人已经开始修行。
 
-![License](https://img.shields.io/badge/License-MIT-f4c542)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)
-![Codex](https://img.shields.io/badge/Codex-Skill-111111)
-![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-7C3AED)
-![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-8BC34A)
+[![License](https://img.shields.io/badge/License-MIT-f4c542)](./LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
+[![Codex](https://img.shields.io/badge/Codex-Skill-111111)](https://developers.openai.com/codex/skills)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-7C3AED)](https://claude.ai/code)
+[![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-8BC34A)](https://agentskills.io/)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/portrait.skill/archive/refs/heads/main.zip)
 
-提供你的运行原材料（Codex、Claude Code、OpenCode、Cursor、VS Code 会话文件）加上真实协作记录  
-在这场 AI 灵气复苏里，炼出一张真正能复测的修仙画像 / AI 协作能力证书  
-看清你和 AI 是如何配合、卡在哪一关、下一轮该如何闭关破境
+读取 Codex、Claude Code、OpenCode、Cursor、VS Code 的真实运行卷宗  
+炼出一张修仙画像，或一张 AI 协作能力证书  
+支持全量会话提炼、指定时间窗口、双周期对比、稳定高位等级判定
 
 ⚠️ 本项目用于个人协作复盘、成长追踪与方法训练，不用于伪造履历、冒充真人或输出隐私数据。
 
-[安装到-Agent](#安装到-agent) · [如何调用](#如何调用) · [效果示例](#效果示例) · [英文版](./README_EN.md)
+[安装](#安装) · [怎么用](#怎么用) · [支持来源](#支持的运行卷宗) · [效果示例](#效果示例) · [同类项目](#同类项目) · [英文版](./README_EN.md)
+
+</div>
 
 ---
 
-## 安装到 Agent
+## 安装
 
-这是一个给 Code Agent / LLM Agent 使用的 `skill`，不是面向最终用户手动敲命令的普通 Python 工具。
+这是一个给 Code Agent / LLM Agent 使用的 `skill`。正确路径是把仓库安装到 Agent 的技能目录，然后直接让 AI 调用它。
 
-正确的使用方式是：
+### 安装到 Codex
 
-1. 把这个仓库安装到你的 Code Agent 工具里
-2. 让 AI 读取本仓库中的 `SKILL.md`
-3. 由 AI 自己调用内部实现去扫描、炼化、对比运行卷宗
+```bash
+mkdir -p ~/.codex/skills
+git clone https://github.com/dangoZhang/portrait.skill.git ~/.codex/skills/portrait.skill
+```
 
-主入口是：
+安装后，可在 Codex 对话中直接点名 `$portrait.skill`，或直接要求它分析你的运行卷宗。
 
-- [SKILL.md](/Users/zty/my-project/xiuxianLLM/side-projects/portrait.skill/SKILL.md)
+### 安装到 Claude Code
 
-底层实现是：
+```bash
+mkdir -p ~/.claude/skills
+git clone https://github.com/dangoZhang/portrait.skill.git ~/.claude/skills/portrait.skill
+```
 
-- [portrait_skill/cli.py](/Users/zty/my-project/xiuxianLLM/side-projects/portrait.skill/portrait_skill/cli.py)
+如果你只想在当前项目启用，也可以安装到项目内：
 
-如果你的 Agent 工具支持“本地 skills / 自定义 skills / repo skills”，把整个 `portrait.skill` 目录加入对应技能目录即可。
+```bash
+mkdir -p .claude/skills
+git clone https://github.com/dangoZhang/portrait.skill.git .claude/skills/portrait.skill
+```
 
-## 如何调用
+### 下载仓库
 
-安装完成后，用户应该直接对 AI 说：
+- [GitHub 仓库](https://github.com/dangoZhang/portrait.skill)
+- [下载 ZIP](https://github.com/dangoZhang/portrait.skill/archive/refs/heads/main.zip)
+- [查看技能入口 SKILL.md](./SKILL.md)
+
+如果你的 Agent 需要显式准备 Python 环境，再进入 skill 目录执行：
+
+```bash
+python3 -m pip install -e .
+```
+
+---
+
+## 怎么用
+
+安装完成后，用户不需要手动敲底层命令，只需要直接对 Agent 说：
 
 - “请用 `portrait.skill` 炼化我最近一周的 Codex 卷宗。”
-- “请用 `portrait.skill` 给我生成修仙画像。”
+- “请用 `portrait.skill` 读取我全部 Codex 会话，排除低样本偏置后给我稳定高位等级。”
+- “请用 `portrait.skill` 炼化我 2026-04-01 到 2026-04-09 的会话。”
+- “请比较我 3 月和 4 月这两轮会话，看我有没有升级。”
+- “请给我修仙画像。”
 - “我不想看修仙背景，请直接给我 AI 协作能力证书。”
-- “请比较我 3 月和 4 月这两轮会话，看我有没有破境。”
-- “请读取我全部 Codex 会话，排除低样本偏置后给我稳定高位等级。”
 
-如果用户要指定时间范围，可以直接这样说：
+这个 skill 会由 Agent 自己完成：
 
-- “请炼化我 2026-04-01 到 2026-04-09 的 Codex 会话。”
-- “请只看最近两天，生成 AI 协作能力证书。”
-- “请汇总我这个项目周期内的全部会话，给我稳定高位等级。”
+1. 判断是读取单轮会话、提炼全部会话，还是比较两个周期。
+2. 自动发现 Codex / Claude Code / OpenCode / Cursor / VS Code 的本地会话文件。
+3. 读取全部或指定时间范围内的卷宗。
+4. 排除极少量消息样本，避免被异常会话带偏。
+5. 输出画像、证书与下一轮升级建议。
 
-如果用户要指定来源，可以直接这样说：
-
-- “请读取我的 Codex 卷宗。”
-- “请读取我的 Claude Code 会话文件。”
-- “请读取我的 Cursor / VS Code chatSessions 卷宗。”
-
-底层 CLI 仍然存在，但那是给 Agent 内部调用的实现细节，不是主交互方式。
-
-Agent 内部通常会调用类似这些命令：
+底层 CLI 仍然存在，但那是 Agent 的内部实现。常见内部调用形态如下：
 
 ```bash
 python3 -m portrait_skill.cli analyze --source codex --all --certificate both
@@ -74,18 +93,39 @@ python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 
 python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl --certificate both
 ```
 
+---
+
+## 支持的运行卷宗
+
+| 来源 | 默认发现路径 | 当前状态 |
+| --- | --- | --- |
+| Codex | `~/.codex/archived_sessions/*.jsonl`、`~/.codex/sessions/**/rollout-*.jsonl` | 最稳，支持自动发现、全量提炼、时间筛选 |
+| Claude Code | `~/.claude/projects/` 下常见 JSON / JSONL 会话文件 | 支持自动发现与手动投喂 |
+| OpenCode | `~/.local/share/opencode/project/`、`~/Library/Application Support/opencode/project/` | 支持自动发现与手动投喂 |
+| Cursor | 常见 `workspaceStorage/*/chatSessions/*.json` | 支持默认目录扫描 |
+| VS Code / Copilot Chat | 常见 `workspaceStorage/*/chatSessions/*.json` | 支持默认目录扫描 |
+
+聚合时支持：
+
+- 全量会话提炼
+- `since / until` 时间窗口
+- `min-messages` 小样本去偏置
+- 取稳定高位等级，减少极端少量会话误判
+
+---
+
 ## 效果示例
 
 你会得到两类结果：
 
 - 修仙画像：炼气、筑基、金丹、元婴、化神等境界判断
-- AI 协作能力证书：`L1-L8` 能力等级，以及执行、工具、承接、补救、闭环等能力判断
+- AI 协作能力证书：`L1-L8` 等级、能力类型、能力说明、能力标签、结论
 
-如果你喜欢修仙叙事，我们将为你在修仙世界里创作一张画像，让你看到自己如今的境界、气脉与破境方向。
+如果你喜欢修仙叙事，我们将为你在修仙世界里创作画像，让你看见自己如今的境界、气脉、资质与破境方向。
 
-如果你不喜欢修仙背景也没关系，我们将直接为你颁发一张 AI 协作能力证书，用更直接的方式告诉你，你和 AI 现在处在什么协作层级，强项和短板分别是什么。
+如果你不喜欢修仙背景也没关系，我们将为你颁发 AI 协作能力证书，用更直接的方式告诉你，你和 AI 现在处在什么协作层级。
 
-如果运行文件里带模型信息，还会额外标出：
+如果运行文件中带有模型信息，还会额外标出：
 
 - 灵根
 - 资质
@@ -100,26 +140,36 @@ python3 -m portrait_skill.cli analyze \
   --output examples/demo_report.md
 ```
 
-## 支持的卷宗
+- [查看示例报告](./examples/demo_report.md)
 
-- Codex：`~/.codex/archived_sessions/*.jsonl`、`~/.codex/sessions/**/rollout-*.jsonl`
-- Claude Code：导出的 JSON / JSONL 会话文件
-- OpenCode：JSON / JSONL 会话文件
-- Cursor：常见 `workspaceStorage/*/chatSessions/*.json`
-- VS Code / Copilot Chat：常见 `workspaceStorage/*/chatSessions/*.json`
-
-其中 `Codex` 当前最稳。其余来源支持默认目录发现和手动 `--path` 投喂，实际效果取决于会话文件 schema。
+---
 
 ## 你会得到什么
 
 - 当前等级
 - 核心标签
 - 判定依据
-- 下一轮闭关任务
-- 前后周期对比时的破境判断
+- 下一轮升级任务
+- 双周期对比时的突破判断
+
+---
 
 ## 隐私
 
-本项目不依赖服务端，默认本地运行。
+本项目默认本地运行，不依赖服务端。
 
-输出报告会自动把家目录脱敏成 `~`，其他绝对路径只显示文件名。公开演示时，仍建议只使用脱敏日志或合成样本。
+输出报告会自动把家目录脱敏成 `~`，其他绝对路径尽量缩短为文件名或最小必要片段。公开展示时，仍建议只使用脱敏日志或演示样本。
+
+---
+
+## 同类项目
+
+以下项目都可点击进入对应 GitHub 仓库：
+
+- [ex.skill](https://github.com/therealXiaomanChu/ex-skill)
+- [colleague-skill](https://github.com/titanwings/colleague-skill)
+- [portrait.skill](https://github.com/dangoZhang/portrait.skill)
+
+如果你是从这些项目点进来的，现在也可以直接下载本项目：
+
+- [立即下载 portrait.skill ZIP](https://github.com/dangoZhang/portrait.skill/archive/refs/heads/main.zip)
