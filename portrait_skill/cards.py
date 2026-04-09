@@ -128,11 +128,22 @@ def render_user_portrait_card(payload: dict[str, object]) -> str:
     display_name = _get_display_name(payload, track="user")
     generated_at = _format_generated_at(payload.get("generated_at"))
     level = str(certificate.get("level", "凡人"))
-    summary_lines = _user_portrait_verdict_lines(payload, level, fallback=str(persona.get("summary") or ""))
+    summary_lines = _wrap_block(
+        _user_portrait_verdict_lines(payload, level, fallback=str(persona.get("summary") or "")),
+        22.5,
+        limit=6,
+    )
     subtitle = str(persona.get("subtitle") or "")
     growth_value = _xianxia_guidance_text(
         _first_line(_as_list(certificate.get("growth_plan")), fallback="再炼一轮，稳住当前气脉，再冲下一境。")
     )
+    growth_lines = _wrap_block([growth_value], 21.5, limit=4)
+    summary_y = 704
+    summary_h = max(292, 146 + max(0, len(summary_lines) - 1) * 38)
+    growth_y = summary_y + summary_h + 38
+    growth_h = max(214, 146 + max(0, len(growth_lines) - 1) * 38)
+    footer_line_y = growth_y + growth_h + 82
+    footer_text_y = footer_line_y + 48
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -174,31 +185,30 @@ def render_user_portrait_card(payload: dict[str, object]) -> str:
     <rect x="236" y="174" width="728" height="1232" rx="28" stroke="#A56A2A" stroke-opacity="0.34" stroke-width="2" stroke-dasharray="10 10"/>
   </g>
 
-  <text x="600" y="250" fill="url(#ink)" font-size="34" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">画像</text>
-  <text x="600" y="324" fill="url(#ink)" font-size="100" text-anchor="middle" font-family="STKaiti, KaiTi, serif">修仙画像</text>
-  {_text_lines(_wrap_text(_card_subtitle(subtitle or "照见此身根骨、修为与机缘"), 22, limit=2), x=600, y=366, font_size=21, line_height=28, fill="#7B421B", anchor="middle", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif")}
+  <text x="600" y="266" fill="url(#ink)" font-size="34" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">画像</text>
+  <text x="600" y="346" fill="url(#ink)" font-size="100" text-anchor="middle" font-family="STKaiti, KaiTi, serif">修仙画像</text>
+  {_text_lines(_wrap_text(_card_subtitle(subtitle or "照见此身根骨、修为与机缘"), 22, limit=2), x=600, y=392, font_size=21, line_height=28, fill="#7B421B", anchor="middle", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif")}
   <g>
-    <circle cx="600" cy="540" r="126" fill="#6A2E13" fill-opacity="0.05" stroke="#7F3415" stroke-width="3"/>
-    <circle cx="600" cy="540" r="98" stroke="#8B3C19" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="8 10"/>
-    <text x="600" y="528" fill="#532410" font-size="92" text-anchor="middle" font-family="STKaiti, KaiTi, serif">{_escape(level)}</text>
-    <text x="600" y="576" fill="#6A3618" font-size="22" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="5">当前境界</text>
+    <circle cx="600" cy="556" r="126" fill="#6A2E13" fill-opacity="0.05" stroke="#7F3415" stroke-width="3"/>
+    <circle cx="600" cy="556" r="98" stroke="#8B3C19" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="8 10"/>
+    <text x="600" y="544" fill="#532410" font-size="92" text-anchor="middle" font-family="STKaiti, KaiTi, serif">{_escape(level)}</text>
+    <text x="600" y="592" fill="#6A3618" font-size="22" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="5">当前境界</text>
   </g>
 
   <g>
-    <rect x="214" y="676" width="772" height="292" rx="30" fill="#FFF7EA" fill-opacity="0.78" stroke="#A56A2A" stroke-opacity="0.24" stroke-width="2"/>
-    <text x="600" y="744" fill="#6B3817" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">仙途评语</text>
-    {_text_lines(summary_lines, x=600, y=810, font_size=28, line_height=38, fill="#4C2412", anchor="middle", family="STKaiti, KaiTi, serif", weight="700")}
+    <rect x="214" y="{summary_y}" width="772" height="{summary_h}" rx="30" fill="#FFF7EA" fill-opacity="0.78" stroke="#A56A2A" stroke-opacity="0.24" stroke-width="2"/>
+    <text x="600" y="{summary_y + 58}" fill="#8D5A28" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">仙途评语</text>
+    {_text_lines(summary_lines, x=600, y=summary_y + 126, font_size=28, line_height=38, fill="#4C2412", anchor="middle", family="STKaiti, KaiTi, serif", weight="700")}
   </g>
 
   <g>
-    <rect x="214" y="1012" width="772" height="228" rx="30" fill="#FFF6E4" fill-opacity="0.82" stroke="#A56A2A" stroke-opacity="0.22" stroke-width="2"/>
-    <text x="600" y="1066" fill="#6B3817" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">破境之法</text>
-    {_text_lines(_wrap_text(growth_value, 21, limit=3), x=600, y=1134, font_size=28, line_height=38, fill="#4F2812", anchor="middle", family="STKaiti, KaiTi, serif", weight="700")}
-    <text x="600" y="1196" fill="#81502A" font-size="18" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif">守住一条主线，再寻下一次破境</text>
+    <rect x="214" y="{growth_y}" width="772" height="{growth_h}" rx="30" fill="#FFF6E4" fill-opacity="0.82" stroke="#A56A2A" stroke-opacity="0.22" stroke-width="2"/>
+    <text x="600" y="{growth_y + 58}" fill="#8D5A28" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif" letter-spacing="4">破境之法</text>
+    {_text_lines(growth_lines, x=600, y=growth_y + 126, font_size=28, line_height=38, fill="#4F2812", anchor="middle", family="STKaiti, KaiTi, serif", weight="700")}
   </g>
 
-  <line x1="320" y1="1382" x2="880" y2="1382" stroke="#A56A2A" stroke-opacity="0.18" stroke-width="2"/>
-  <text x="600" y="1430" fill="#7A4B28" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif">{_escape(f'持有人 · {display_name}　　生成时间 · {generated_at}')}</text>
+  <line x1="320" y1="{footer_line_y}" x2="880" y2="{footer_line_y}" stroke="#A56A2A" stroke-opacity="0.18" stroke-width="2"/>
+  <text x="600" y="{footer_text_y}" fill="#7A4B28" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, serif">{_escape(f'持有人 · {display_name}　　生成时间 · {generated_at}')}</text>
 
 </svg>
 """
@@ -212,9 +222,23 @@ def render_assistant_certificate_card(payload: dict[str, object]) -> str:
     level = str(certificate.get("level", "L1"))
     theme = _as_dict(certificate.get("theme")) or get_ai_level_theme(level)
     ability = _ability_text(level, str(persona.get("subtitle") or ""))
-    verdict_lines = _assistant_verdict_lines(payload, ability)
-    token_period = _certificate_period_label(payload)
-    token_value = f"消耗 {_fmt_int(_extract_token_total(payload))} 枚令牌"
+    ability_lines = _wrap_text(ability, 13.6, limit=2)
+    verdict_lines = _wrap_block(_assistant_verdict_lines(payload), 23.2, limit=4)
+    usage_meta = _assistant_usage_meta(payload)
+    usage_text = _assistant_usage_text(payload)
+    panel_y = 392
+    ability_end_y = 872 + max(0, len(ability_lines) - 1) * 46
+    divider_y = ability_end_y + 62
+    verdict_label_y = divider_y + 54
+    verdict_text_y = verdict_label_y + 54
+    verdict_end_y = verdict_text_y + max(0, len(verdict_lines) - 1) * 36
+    usage_y = verdict_end_y + 58
+    usage_h = 126
+    panel_h = max(886, usage_y + usage_h + 42 - panel_y)
+    inner_h = panel_h - 60
+    dash_h = panel_h - 120
+    footer_line_y = panel_y + panel_h + 90
+    footer_text_y = footer_line_y + 48
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -259,28 +283,26 @@ def render_assistant_certificate_card(payload: dict[str, object]) -> str:
   <text x="600" y="308" fill="#10263A" font-size="70" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="700">AI 协作能力证书</text>
   <text x="600" y="356" fill="#566A7E" font-size="22" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">基于真实会话稳定定级</text>
   <g>
-    <rect x="238" y="392" width="724" height="886" rx="42" fill="{_escape(str(theme.get('panel_bg', '#162B49')))}"/>
-    <rect x="268" y="422" width="664" height="826" rx="32" stroke="{_escape(str(theme.get('accent', '#7EAEFF')))}" stroke-opacity="0.36" stroke-width="2"/>
+    <rect x="238" y="{panel_y}" width="724" height="{panel_h}" rx="42" fill="{_escape(str(theme.get('panel_bg', '#162B49')))}"/>
+    <rect x="268" y="422" width="664" height="{inner_h}" rx="32" stroke="{_escape(str(theme.get('accent', '#7EAEFF')))}" stroke-opacity="0.36" stroke-width="2"/>
+    <rect x="292" y="452" width="616" height="{dash_h}" rx="26" stroke="{_escape(str(theme.get('accent', '#7EAEFF')))}" stroke-opacity="0.22" stroke-width="2" stroke-dasharray="8 10"/>
     <rect x="454" y="468" width="292" height="56" rx="28" fill="#FFFFFF" fill-opacity="0.08"/>
     <text x="600" y="504" fill="#E3EBF3" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">协作能力等级</text>
-    <text x="600" y="690" fill="{_escape(str(theme.get('accent', '#7EAEFF')))}" font-size="248" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="800">{_escape(level)}</text>
-    <text x="600" y="754" fill="#F4F8FC" font-size="24" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="6">当前等级</text>
-    <line x1="344" y1="812" x2="856" y2="812" stroke="{_escape(str(theme.get('accent', '#7EAEFF')))}" stroke-opacity="0.22" stroke-width="2"/>
-    <text x="600" y="876" fill="#DDE6EE" font-size="21" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">能够</text>
-    {_text_lines(_wrap_text(ability, 13, limit=2), x=600, y=928, font_size=40, line_height=48, fill="#FFFFFF", anchor="middle", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="700")}
-    <line x1="324" y1="1024" x2="876" y2="1024" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2"/>
-    <text x="600" y="1084" fill="#DDE6EE" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">判词</text>
-    {_text_lines(verdict_lines, x=322, y=1146, font_size=26, line_height=36, fill="#F6FAFD", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
+    <text x="600" y="664" fill="{_escape(str(theme.get('accent', '#7EAEFF')))}" font-size="236" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="800">{_escape(level)}</text>
+    <text x="600" y="724" fill="#F4F8FC" font-size="24" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="6">当前等级</text>
+    <line x1="344" y1="774" x2="856" y2="774" stroke="{_escape(str(theme.get('accent', '#7EAEFF')))}" stroke-opacity="0.22" stroke-width="2"/>
+    <text x="600" y="828" fill="#DDE6EE" font-size="21" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">能够</text>
+    {_text_lines(ability_lines, x=600, y=872, font_size=38, line_height=46, fill="#FFFFFF", anchor="middle", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="700")}
+    <line x1="324" y1="{divider_y}" x2="876" y2="{divider_y}" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="2"/>
+    <text x="600" y="{verdict_label_y}" fill="#DDE6EE" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">判词</text>
+    {_text_lines(verdict_lines, x=324, y=verdict_text_y, font_size=25, line_height=36, fill="#F6FAFD", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
+    <rect x="272" y="{usage_y}" width="656" height="{usage_h}" rx="30" fill="#FFFFFF" fill-opacity="0.97"/>
+    <text x="600" y="{usage_y + 46}" fill="#5A6D81" font-size="18" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif">{_escape(_truncate_text(usage_meta, 34))}</text>
+    <text x="600" y="{usage_y + 98}" fill="#18314E" font-size="34" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">{_escape(_truncate_text(usage_text, 24))}</text>
   </g>
 
-  <g>
-    <rect x="286" y="1316" width="628" height="116" rx="30" fill="#FFFFFF" fill-opacity="0.96"/>
-    <text x="600" y="1360" fill="#5A6D81" font-size="18" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(_truncate_text(token_period, 30))}</text>
-    <text x="600" y="1412" fill="#18314E" font-size="32" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="700">{_escape(_truncate_text(token_value, 22))}</text>
-  </g>
-
-  <line x1="318" y1="1476" x2="882" y2="1476" stroke="#D4DDE6" stroke-width="2"/>
-  <text x="600" y="1524" fill="#72889C" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'持有人 · {display_name}　　生成时间 · {generated_at}')}</text>
+  <line x1="318" y1="{footer_line_y}" x2="882" y2="{footer_line_y}" stroke="#D4DDE6" stroke-width="2"/>
+  <text x="600" y="{footer_text_y}" fill="#72889C" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'持有人 · {display_name}　　生成时间 · {generated_at}')}</text>
 </svg>
 """
 
@@ -382,6 +404,24 @@ def _wrap_text(text: str, max_units: float, limit: int | None = None) -> list[st
         lines = lines[:limit]
     if limit and lines and len(lines) == limit and sum(_char_units(ch) for ch in cleaned) > sum(_char_units(ch) for line in lines for ch in line):
         lines[-1] = _truncate_text(lines[-1], max(2, int(max_units) - 2))
+    return lines
+
+
+def _wrap_block(items: list[str], max_units: float, limit: int) -> list[str]:
+    lines: list[str] = []
+    for item in items:
+        wrapped = _wrap_text(str(item), max_units)
+        if not wrapped:
+            continue
+        remaining = limit - len(lines)
+        if remaining <= 0:
+            break
+        if len(wrapped) <= remaining:
+            lines.extend(wrapped)
+            continue
+        lines.extend(wrapped[:remaining])
+        lines[-1] = _truncate_text(lines[-1], max(2, int(max_units) - 2))
+        break
     return lines
 
 
@@ -525,16 +565,20 @@ def _ability_text(level: str, value: str) -> str:
     return cleaned
 
 
-def _assistant_verdict_lines(payload: dict[str, object], ability: str) -> list[str]:
+def _assistant_verdict_lines(payload: dict[str, object]) -> list[str]:
+    insights = _insights(payload)
+    insight_lines = [str(item) for item in _as_list(insights.get("assistant_card_lines")) if str(item).strip()]
+    if insight_lines:
+        return insight_lines
     metrics = [item for item in _as_list(payload.get("assistant_metrics")) if isinstance(item, dict)]
     message_count = _extract_message_count(payload)
     tool_calls = _extract_tool_calls(payload)
     token_total = _fmt_int(_extract_token_total(payload))
     if not metrics:
         return [
-            f"已能{ability}。",
             "当前协作强度已可稳定承接。",
-            f"本轮 {message_count} 条消息，{tool_calls} 次工具，{token_total} 枚令牌。",
+            "当前样本已能看出基础执行能力。",
+            f"样本来自 {message_count} messages、{tool_calls} tool calls、{token_total} token。",
         ]
     ordered = sorted(metrics, key=lambda item: int(item.get("score", 0)), reverse=True)
     top = ordered[0]
@@ -544,14 +588,17 @@ def _assistant_verdict_lines(payload: dict[str, object], ability: str) -> list[s
     top_name = ASSISTANT_METRIC_LABELS.get(top_name_raw, top_name_raw or "强项")
     low_name = ASSISTANT_METRIC_LABELS.get(low_name_raw, low_name_raw or "短板")
     return [
-        f"已能{ability}。",
         f"{top_name}更稳，{_metric_behavior(top_name_raw, 'strong', track='assistant')}。",
-        f"{low_name}偏弱，{_metric_behavior(low_name_raw, 'weak', track='assistant')}。",
-        f"本轮 {message_count} 条消息，{tool_calls} 次工具，{token_total} 枚令牌。",
+        f"{low_name}仍需补强，{_metric_behavior(low_name_raw, 'weak', track='assistant')}。",
+        f"样本来自 {message_count} messages、{tool_calls} tool calls、{token_total} token。",
     ]
 
 
 def _user_portrait_verdict_lines(payload: dict[str, object], level: str, fallback: str) -> list[str]:
+    insights = _insights(payload)
+    insight_lines = [str(item) for item in _as_list(insights.get("user_card_lines")) if str(item).strip()]
+    if insight_lines:
+        return insight_lines
     metrics = [item for item in _as_list(payload.get("user_metrics")) if isinstance(item, dict)]
     if not metrics:
         return _wrap_text(fallback, 20, limit=4)
@@ -594,6 +641,27 @@ def _metric_behavior(name: str, polarity: str, track: str) -> str:
     if text:
         return text
     return "当前样本仍需继续观察"
+
+
+def _assistant_usage_meta(payload: dict[str, object]) -> str:
+    insights = _insights(payload)
+    value = str(insights.get("assistant_usage_meta") or "").strip()
+    if value:
+        return value
+    return f"{_extract_message_count(payload)} messages · {_extract_tool_calls(payload)} tool calls"
+
+
+def _assistant_usage_text(payload: dict[str, object]) -> str:
+    insights = _insights(payload)
+    value = str(insights.get("assistant_usage_text") or "").strip()
+    if value:
+        return value
+    total = _extract_token_total(payload)
+    return f"{_fmt_int(total)} token" if total else "token 未显"
+
+
+def _insights(payload: dict[str, object]) -> dict[str, object]:
+    return _as_dict(payload.get("insights"))
 
 
 def _escape(value: str) -> str:

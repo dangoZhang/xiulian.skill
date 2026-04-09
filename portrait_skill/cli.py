@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .analyzer import aggregate_analyses, analyze_transcript, compare_analyses
 from .cards import write_cards
+from .insights import build_aggregate_insights, build_analysis_insights
 from .memory import build_memory_summary, build_snapshot, load_previous_snapshot
 from .themes import get_ai_level_theme
 from .xianxia import derive_xianxia_profile
@@ -83,6 +84,7 @@ def main() -> None:
         _apply_display_name(transcript, args.username, track=args.certificate)
         analysis = analyze_transcript(transcript)
         payload = _to_json(analysis)
+        payload["insights"] = build_analysis_insights(analysis)
         scope_kind = "path"
         scope_label = f"{source}:单次记录"
     elif args.all or args.since or args.until or args.limit:
@@ -97,6 +99,7 @@ def main() -> None:
         for analysis in analyses:
             _apply_display_name(analysis.transcript, args.username, track=args.certificate)
         aggregate = aggregate_analyses(analyses, min_messages=args.min_messages)
+        aggregate["insights"] = build_aggregate_insights(analyses, aggregate)
         aggregate["display_name"] = _resolve_display_name_from_analyses(analyses, override=args.username, track=args.certificate)
         aggregate["time_window"] = {
             "since": args.since,
@@ -114,6 +117,7 @@ def main() -> None:
         _apply_display_name(transcript, args.username, track=args.certificate)
         analysis = analyze_transcript(transcript)
         payload = _to_json(analysis)
+        payload["insights"] = build_analysis_insights(analysis)
         scope_kind = "latest"
         scope_label = f"{source}:最近一次"
 
@@ -142,6 +146,7 @@ def main() -> None:
             certificate_choice=args.certificate,
             memory_summary=memory_summary,
             generated_at=generated_at,
+            insights=payload.get("insights"),
         )
     else:
         markdown = render_aggregate_markdown(
@@ -149,6 +154,7 @@ def main() -> None:
             certificate_choice=args.certificate,
             memory_summary=memory_summary,
             generated_at=generated_at,
+            insights=aggregate.get("insights"),
         )
 
     if args.output:
@@ -238,6 +244,7 @@ def _to_json(analysis):
         "assistant_metrics": [{"name": item.name, "score": item.score, "rationale": item.rationale} for item in analysis.assistant_metrics],
         "user_certificate": _certificate_to_json(analysis.user_certificate),
         "assistant_certificate": _certificate_to_json(analysis.assistant_certificate),
+        "insights": build_analysis_insights(analysis),
     }
 
 

@@ -577,7 +577,7 @@ def _build_assistant_certificate(score: int, metrics: list[MetricScore], transcr
     evidence = [
         f"当前最强项：{top[0].name} {top[0].score}/100，{top[0].rationale}",
         f"当前短板：{low[0].name} {low[0].score}/100，{low[0].rationale}",
-        f"工具调用累计 {transcript.tool_calls} 次。",
+        f"tool calls：{transcript.tool_calls}",
     ]
     growth_plan = _growth_plan(low[:2], user_track=False)
     return Certificate(

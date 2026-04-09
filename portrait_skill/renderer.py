@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .analyzer import infer_talent, infer_talent_from_models
+from .insights import build_analysis_insights
 from .parsers import redact_path
 from .models import Analysis, Certificate, MetricScore
 from .xianxia import derive_xianxia_profile
@@ -24,7 +25,9 @@ def render_markdown(
     certificate_choice: str = "both",
     memory_summary: dict[str, object] | None = None,
     generated_at: str | None = None,
+    insights: dict[str, object] | None = None,
 ) -> str:
+    insight_payload = insights or build_analysis_insights(analysis)
     talent = infer_talent(analysis.transcript)
     token_label = "消耗 token" if certificate_choice == "assistant" else "灵气流转"
     token_lines = _render_token_lines(analysis.transcript.token_usage, cultivation_label="修炼时长", token_label=token_label)
@@ -53,6 +56,9 @@ def render_markdown(
         sections.extend(["", _render_memory_summary(memory_summary, certificate_choice)])
     if certificate_choice in {"user", "both"}:
         sections.extend(["", _render_xianxia_profile(_analysis_xianxia_payload(analysis))])
+    insight_section = _render_insights_section(insight_payload)
+    if insight_section:
+        sections.extend(["", insight_section])
     sections.extend(
         [
             "",
@@ -96,7 +102,9 @@ def render_aggregate_markdown(
     certificate_choice: str = "both",
     memory_summary: dict[str, object] | None = None,
     generated_at: str | None = None,
+    insights: dict[str, object] | None = None,
 ) -> str:
+    insight_payload = insights or {}
     talent = infer_talent_from_models(aggregate.get("models", []))
     token_label = "累计消耗 token" if certificate_choice == "assistant" else "累计灵气流转"
     token_lines = _render_token_lines(aggregate.get("token_usage", {}), cultivation_label="累计修炼时长", token_label=token_label)
@@ -124,6 +132,9 @@ def render_aggregate_markdown(
         sections.extend(["", _render_memory_summary(memory_summary, certificate_choice)])
     if certificate_choice in {"user", "both"}:
         sections.extend(["", _render_xianxia_profile(aggregate)])
+    insight_section = _render_insights_section(insight_payload)
+    if insight_section:
+        sections.extend(["", insight_section])
     sections.extend(
         [
             "",
@@ -155,6 +166,30 @@ def _render_xianxia_profile(payload: dict[str, object]) -> str:
     for item in profile[:8]:
         detail = f"，{item['detail']}" if item.get("detail") else ""
         lines.append(f"- {item['term']}：`{item['value']}`{detail}")
+    return "\n".join(lines)
+
+
+def _render_insights_section(insights: dict[str, object]) -> str:
+    if not insights:
+        return ""
+    groups = [
+        ("### 用户如何与 AI 配合", insights.get("user_summary_lines")),
+        ("### AI 当前如何完成任务", insights.get("assistant_summary_lines")),
+        ("### 出图线索", insights.get("image_concepts")),
+        ("### 卡片取材依据", insights.get("report_basis_lines")),
+    ]
+    lines = ["## 交互方式与能力拆解"]
+    has_content = False
+    for title, items in groups:
+        text_items = _string_list(items)
+        if not text_items:
+            continue
+        has_content = True
+        lines.extend(["", title])
+        for item in text_items:
+            lines.append(f"- {item}")
+    if not has_content:
+        return ""
     return "\n".join(lines)
 
 
@@ -330,6 +365,12 @@ def _token_value(token_usage, key: str) -> int:
 
 def _fmt_int(value: int) -> str:
     return f"{value:,}"
+
+
+def _string_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item) for item in value if str(item).strip()]
 
 
 def _assistant_ability(level: str, value: str) -> str:
