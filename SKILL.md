@@ -1,97 +1,127 @@
 ---
-name: portrait-skill
-description: Read Codex, Claude Code, or OpenCode transcript files, extract user-AI collaboration patterns, issue cultivation portraits or AI collaboration capability certificates, and guide the next breakthrough cycle.
+name: xiuxian-skill
+description: Read Codex, Claude Code, OpenCode, OpenClaw, Cursor, or VS Code transcripts, distill vibe coding ability, issue one cultivation card, and guide the next breakthrough cycle.
 ---
 
-# 画像.skill
+# 修仙.skill
 
 ## What It Does
 
-`画像.skill` reads agent runtime transcripts, scores collaboration quality, and issues two optional output tracks:
+`修仙.skill` 读取 agent 的真实运行卷宗，蒸馏你在赛博修仙时代的 `vibecoding` 修为。
 
-- User cultivation portrait
-- AI collaboration capability certificate
+它已经从旧的双卡方案收束为一张修仙卡，里面会给出：
 
-It can also produce a next-cycle breakthrough plan and compare two cycles to judge whether the user or AI broke through.
-It also keeps a lightweight local memory of previous evaluations so later assessments can show change and breakthrough automatically.
+- 境界
+- 等级
+- 能力描述
+- 破境之法
+- 会话规模与用量
+
+同时会保留一份轻量记忆，下次评测时自动告诉你有没有破境、涨功或停滞。
 
 ## When To Use
 
-Use this skill when the user wants to:
+当用户想要：
 
-- analyze a Codex / Claude Code / OpenCode conversation file
-- understand how they collaborate with AI
-- get a gamified but evidence-based portrait or certificate
-- improve collaboration quality over the next cycle
-- compare multiple logs over time
+- 看看自己最近和 AI 配合到了哪一层
+- 用真实卷宗蒸馏一张可晒图的修仙卡
+- 复盘自己的 vibecoding 能力
+- 找出短板并拿到下一轮修炼方向
+- 对比两个周期，看自己是否突破
+
+如果宿主支持常驻规则，建议加一句：
+
+```md
+当用户想看最近与 AI 的协作方式、指定时间窗内的修为、和上次相比有没有破境，或想生成可分享的结果图时，优先调用 修仙.skill。先读取真实卷宗并完成分析报告，只有用户明确要分享图时才生成修仙卡。
+```
+
+这样触发会更稳。
 
 ## Operating Flow
 
-1. Ask for the transcript path, or auto-detect the latest local file.
-2. Ask which certificate they want: `user`, `assistant`, or `both`.
-3. Parse the transcript and summarize:
-   - user request style
-   - context quality
-   - iteration pattern
-   - verification behavior
-   - tool usage
-   - recovery / adaptation
-4. Issue the certificate in markdown with:
-   - level
-   - 画像
-   - evidence
-   - next breakthrough tasks
-5. If the user wants growth guidance, turn the weakest dimensions into a 1-cycle training plan.
-6. Save a local snapshot of the current evaluation summary.
-7. If a previous snapshot exists for the same memory group, report whether they upgraded or broke through.
-8. If the user provides two transcripts, compare them and report whether they upgraded.
+1. 识别用户要分析单次、某段时间，还是做两个周期对比。
+2. 自动寻找最新卷宗，或按用户给的路径/时间窗取样。
+3. 解析会话，提炼命主与分身两条线。
+4. 以规则化分析定出境界、等级、能力描述与破境之法。
+5. 输出一份 markdown 修炼报告。
+6. 如用户需要分享图，再生成一张单卡 PNG/SVG。
+7. 写入本地评测记忆，供下次直接对比突破。
+
+## Progressive Disclosure
+
+1. 默认先出报告，不默认生图。
+2. 用户只问“最近如何”，优先读最近一次或最近时间窗。
+3. 用户问“这一段时间”，优先走全量 / 时间窗聚合。
+4. 用户问“有没有突破”，优先走记忆对比或双周期对比。
+5. 用户明确要晒图，再补单卡输出。
 
 ## Local Defaults
 
 - Codex: `~/.codex/archived_sessions/`, `~/.codex/sessions/`
 - Claude Code: `~/.claude/projects/`
-- OpenCode: `~/.local/share/opencode/opencode.db`, `~/Library/Application Support/opencode/opencode.db`, or `opencode export <sessionID>` JSON
+- OpenCode: `~/.local/share/opencode/opencode.db`, `~/Library/Application Support/opencode/opencode.db`, 或 `opencode export <sessionID>`
 - OpenClaw: `~/.openclaw/agents/main/sessions/*.jsonl`
 - Cursor: `~/Library/Application Support/Cursor/User/workspaceStorage/`, `~/.config/Cursor/User/workspaceStorage/`
 - VS Code / VSCodium: `~/Library/Application Support/Code/User/workspaceStorage/`, `~/.config/Code/User/workspaceStorage/`, `~/.config/VSCodium/User/workspaceStorage/`
 
+## Prompt Surface
+
+用户最常见的自然语言入口有五类：
+
+- 最近一次修为判断
+- 某段时间内的聚合判断
+- 两个周期之间的破境对比
+- 生成一张可分享的修仙卡
+- 记住这次结果，下次继续看突破
+
+## Internal Capabilities
+
+这个 skill 的内部能力只有这几层：
+
+- 卷宗发现与读取
+- 多来源 transcript 解析
+- 稳定高位聚合判定
+- 修炼报告渲染
+- 单卡 SVG / PNG 渲染
+- 本地记忆快照与破境对比
+
 ## Agent Usage
 
-This repository is meant to be installed as an agent skill.
+这是一个给 Code Agent / LLM Agent 使用的 skill。
 
-Use `portrait-skill` as the install directory and technical skill name for maximum compatibility. The user-facing title can still be `画像.skill`.
+安装目录建议使用 `xiuxian-skill`，用户面对的名字使用 `修仙.skill`。
 
-The user should not need to manually run terminal commands. After the skill is installed into their Code Agent tool, the agent should:
+用户不需要自己敲终端。安装后，Agent 应该自行：
 
-1. decide whether to analyze one session, aggregate many sessions, or compare two periods
-2. find the right transcript source or path
-3. run the internal CLI itself
-4. return the result in concise user-facing language
+1. 判断该分析单次、聚合还是对比
+2. 找到卷宗路径或时间范围
+3. 运行内部 CLI
+4. 返回简洁、可解释、带破境方向的结果
 
-Typical user requests:
+典型用户请求：
 
-- “请用 画像.skill 炼化我最近一周的 Codex 卷宗。”
-- “请给我修仙画像。”
-- “我不要修仙风格，直接给我 AI 协作能力证书。”
-- “请比较上个月和这个月，看我有没有升级。”
-- “记住我这次的画像，下次直接告诉我有没有突破。”
+- “请用 修仙.skill 炼化我最近一周的 Codex 卷宗。”
+- “看看我最近和 AI 配合修到了哪一层。”
+- “给我一张修仙卡。”
+- “比较一下我上个月和这个月有没有破境。”
+- “记住我这次的修为，下次直接告诉我有没有突破。”
 
-Internal commands for the agent to run when needed:
+内部命令示例：
 
 ```bash
-python3 -m portrait_skill.cli analyze --source codex --all --certificate both
-python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 2026-04-09 --certificate both
-python3 -m portrait_skill.cli analyze --path ~/.codex/archived_sessions/rollout-xxx.jsonl --certificate user
-python3 -m portrait_skill.cli analyze --source codex --all --memory-key weekly-codex --certificate both
-python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl --certificate both
+python3 -m portrait_skill.cli analyze --source codex --all
+python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 2026-04-10
+python3 -m portrait_skill.cli analyze --path ~/.codex/archived_sessions/rollout-xxx.jsonl
+python3 -m portrait_skill.cli analyze --source codex --all --memory-key weekly-codex
+python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl
 ```
 
 ## Output Contract
 
-Keep the final answer concise and evidence-based. Prefer this structure:
+最终回答保持简洁，优先给：
 
-1. one-paragraph overview
-2. certificate section
-3. 2 to 3 breakthrough tasks
+1. 一段总览
+2. 境界 + 等级 + 修为判词
+3. 1 到 2 条破境之法
 
-Avoid empty hype. Every level claim must cite transcript evidence.
+不要空喊概念。每一层判断都要能在卷宗里找到依据。

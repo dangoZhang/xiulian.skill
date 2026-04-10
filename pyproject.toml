@@ -1,12 +1,13 @@
 [project]
-name = "portrait-skill"
+name = "xiuxian-skill"
 version = "0.1.0"
-description = "Analyze Codex, Claude Code, and OpenCode transcripts, then issue cultivation and AI capability certificates."
+description = "Read agent transcripts, distill vibe coding ability, and issue a shareable cultivation card."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
+xiuxian-skill = "portrait_skill.cli:main"
 portrait-skill = "portrait_skill.cli:main"
 
 [build-system]

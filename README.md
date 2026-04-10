@@ -1,8 +1,8 @@
 <div align="center">
 
-# 画像.skill
+# 修仙.skill
 
-> "AI浪潮，灵气复苏，看赛博修仙时代的你，修炼到了何种境界？"
+> "赛博修仙时代，你修炼到了何种境界？"
 
 [![License](https://img.shields.io/badge/License-MIT-f4c542)](./LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB)](https://www.python.org/)
@@ -11,12 +11,9 @@
 [![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-8BC34A)](https://agentskills.io/)
 [![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/portrait.skill/archive/refs/heads/main.zip)
 
-读取 Codex、Claude Code、OpenCode、OpenClaw、Cursor、Visual Studio Code 的真实运行记录  
-将你与 AI 的协作记录投入炉中，炼出你的一张赛博修仙画像  
-测出你的境界、灵根、资质与修炼时长，并能进一步指导突破方向  
-如果你不喜欢修仙叙事，也可以选择领取 AI 协作能力证书
-
-⚠️ 本项目用于个人协作复盘、成长追踪与方法训练，不用于伪造履历、不保存隐私数据。
+读取真实运行卷宗，蒸馏你的 `vibecoding` 修为  
+把全部会话或指定时间窗炼成一张可晒的修仙卡  
+自动记住上次评测，下次直接告诉你有没有破境
 
 </div>
 
@@ -25,22 +22,131 @@
 ## 效果示例
 
 <div align="center">
-  <img src="./assets/readme/realm-talisman.png" alt="修仙画像示意图" width="46%" />
-  <img src="./assets/readme/certificate-premium.png" alt="AI 协作能力证书示意图" width="46%" />
+  <img src="./assets/readme/xiuxian-card.png" alt="修仙.skill 单卡示意图" width="54%" />
 </div>
 
-左侧是修仙画像，右侧是 AI 协作能力证书。
+这是一张默认分享卡。它会把真实卷宗炼成一张可晒图的修仙修为录。
 
-**支持平台**
+## 一句话说明
+
+把你和 AI 的真实协作轨迹，炼成一张能晒、能复盘、能继续修炼的 `vibecoding` 修为卡。
+
+## 支持宿主
 
 [![Codex](https://img.shields.io/badge/Codex-111111?style=flat-square)](https://developers.openai.com/codex/skills)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-7C3AED?style=flat-square)](https://claude.ai/code)
 [![OpenCode](https://img.shields.io/badge/OpenCode-0F9D58?style=flat-square)](https://github.com/sst/opencode)
-[![OpenClaw](https://img.shields.io/badge/OpenClaw-C38B2D?style=flat-square)](https://github.com/bmorphism/openclaw)
-[![Cursor](https://img.shields.io/badge/Cursor-222222?style=flat-square)](https://www.cursor.com/)
-[![Visual Studio Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square)](https://code.visualstudio.com/)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-C38B2D?style=flat-square)](https://docs.openclaw.ai/tools/skills)
+[![Cursor](https://img.shields.io/badge/Cursor-222222?style=flat-square)](https://cursor.com/product)
+[![VS_Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square)](https://code.visualstudio.com/docs/copilot/customization/agent-skills?pubDate=20260108)
 
-仓库内自带一个最小样本：
+## 支持卷宗来源
+
+[![Codex](https://img.shields.io/badge/Codex-111111?style=flat-square)](https://developers.openai.com/codex/skills)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-7C3AED?style=flat-square)](https://claude.ai/code)
+[![OpenCode](https://img.shields.io/badge/OpenCode-0F9D58?style=flat-square)](https://github.com/sst/opencode)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-C38B2D?style=flat-square)](https://docs.openclaw.ai/tools/skills)
+[![Cursor](https://img.shields.io/badge/Cursor-222222?style=flat-square)](https://cursor.com/product)
+[![Visual Studio Code](https://img.shields.io/badge/VS_Code-007ACC?style=flat-square)](https://code.visualstudio.com/docs/copilot/customization/agent-skills?pubDate=20260108)
+
+## 这是什么
+
+`修仙.skill` 是一个给 Code Agent / LLM Agent 使用的 skill。
+
+它会读取 Codex、Claude Code、OpenCode、OpenClaw、Cursor、Visual Studio Code 的真实运行记录。
+
+默认既能读取最近一次，也能读取全部会话或指定时间窗。聚合时会过滤极小样本，并取稳定高位，不拿单次峰值冒充真实修为。
+
+然后蒸馏出：
+
+- 境界：你在赛博修仙里的修为层次
+- 等级：当前协作强度，对应洛谷式色阶
+- 能力：用修仙叙事解释你的 vibecoding 手段，并带上 AI 术语
+- 破境之法：下一轮该补哪一处，才能继续突破
+
+如果卷宗里带有模型与 token 信息，还会继续标出灵根、资质、炉主与耗材。
+
+## 为什么更容易出圈
+
+- 一张卡就够。大境界字 + 等级色 + 判词 + 破境之法，截图传播阻力低。
+- 取材来自真实卷宗，不靠自述，晒图时天然有“这是我真炼出来的”质感。
+- 会记住上次评测，下次能直接看到涨功、停滞还是破境，天然适合连续分享。
+
+## 你会得到什么
+
+- 一张 300dpi 的单卡 PNG / SVG，可直接发社交媒体
+- 一份 markdown 修炼报告，解释为什么你是这一层
+- 一组术语映射，知道哪些 AI 术语在修仙叙事里对应什么
+- 一组破境之法，知道下一轮该补哪一处
+
+## 安装
+
+优先用 open agent skills 生态的安装方式，分发阻力最低：
+
+```bash
+npx skills add https://github.com/dangoZhang/portrait.skill -a codex -a claude-code -a cursor -a opencode -a openclaw
+```
+
+如果宿主不走 `npx skills`，再手动放到对应目录。
+
+- Codex：`.agents/skills/` 或 `~/.codex/skills/`
+- Claude Code：`.claude/skills/` 或 `~/.claude/skills/`
+- OpenCode：`.agents/skills/` 或 `~/.config/opencode/skills/`
+- OpenClaw：`<workspace>/skills`、`<workspace>/.agents/skills`、`~/.agents/skills`、`~/.openclaw/skills`
+- Cursor：`.agents/skills/` 或 `~/.cursor/skills/`
+- VS Code / GitHub Copilot：`.github/skills/`、`.claude/skills/`、`~/.copilot/skills/`、`~/.claude/skills/`
+
+```bash
+mkdir -p ~/.codex/skills
+git clone https://github.com/dangoZhang/portrait.skill.git ~/.codex/skills/xiuxian-skill
+```
+
+```bash
+mkdir -p ~/.claude/skills
+git clone https://github.com/dangoZhang/portrait.skill.git ~/.claude/skills/xiuxian-skill
+```
+
+```bash
+mkdir -p ~/.openclaw/skills
+git clone https://github.com/dangoZhang/portrait.skill.git ~/.openclaw/skills/xiuxian-skill
+```
+
+VS Code / GitHub Copilot 官方会从 `.github/skills`、`.claude/skills`、`~/.copilot/skills`、`~/.claude/skills` 发现 skills。最稳妥的项目级放法是：
+
+```bash
+mkdir -p .github/skills
+git clone https://github.com/dangoZhang/portrait.skill.git .github/skills/xiuxian-skill
+```
+
+### 可选依赖
+
+```bash
+pip3 install -e .
+```
+
+## 使用
+
+装好后，用户不需要自己敲底层命令，直接对 Agent 说：
+
+- “给我看最近一周我和 AI 协作的修为。”
+- “炼一下我 2026-04-01 到 2026-04-10 的 Codex 卷宗。”
+- “给我一张能发朋友圈的修仙卡。”
+- “对比我上个月和这个月有没有破境。”
+- “记住我这次结果，下次直接告诉我有没有涨功。”
+
+如果宿主经常不主动触发，建议在 `AGENTS.md`、`CLAUDE.md` 或 Copilot instructions 里加一句：
+
+> 当用户想看最近与 AI 的协作方式、指定时间窗内的修为、和上次相比有没有破境，或想生成可分享的结果图时，优先调用 修仙.skill。先读取真实卷宗并完成分析报告，只有用户明确要分享图时才生成修仙卡。
+
+底层 CLI 仍可直接运行：
+
+```bash
+python3 -m portrait_skill.cli analyze --source codex --all
+python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 2026-04-10
+python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl
+```
+
+仓库内带一个最小样本：
 
 ```bash
 examples/demo_codex_session.jsonl
@@ -48,93 +154,46 @@ examples/demo_codex_session.jsonl
 
 - [查看示例报告](./examples/demo_report.md)
 
----
+## 默认会炼出什么
 
-## 安装
+- 一张 300dpi PNG / SVG 单卡
+- 一份 markdown 修炼报告
+- 一组判词：命主修行、分身手段、宣发取材
+- 一组破境之法：下一轮该怎么修
+- 一份本地记忆：下次直接看是否突破
 
-这是一个给 Code Agent / LLM Agent 使用的 `skill`。正确路径是把仓库安装到 Agent 的技能目录，然后直接让 AI 调用它。
+## 术语与宣发
 
-安装目录名建议使用 `portrait-skill`。
+- [AI 术语 / 修仙词表](./docs/lexicon.md)
+- [宣发分析与宣传帖](./docs/promo.md)
 
-### 安装到 Codex
+## 单卡生图 Prompt
 
-```bash
-mkdir -p ~/.codex/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.codex/skills/portrait-skill
-```
+仓库内附带一份给用户自己的 LLM / 生图模型使用的单卡 prompt：
 
-安装后，可在 Codex 对话中直接点名 `$portrait-skill`，或直接要求它分析你的运行卷宗。
+- [xiuxian-card.prompt.md](./assets/prompts/xiuxian-card.prompt.md)
 
-### 安装到 Claude Code / OpenCode
+这份 prompt 已明确要求：
 
-```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.claude/skills/portrait-skill
-```
+- 用修仙小说叙事
+- 境界、等级、能力描述放在同一张卡里
+- 能力描述要保留括号中的 AI 术语
+- 所有边框都必须落在最后一行文字以下
 
-OpenCode 支持直接读取 `~/.claude/skills/<name>/SKILL.md`，这里同样可用。
+## 境界与等级
 
-### 安装到 OpenClaw
-
-```bash
-mkdir -p ~/.openclaw/workspace/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.openclaw/workspace/skills/portrait-skill
-```
-
-如果你只想在当前项目启用，也可以安装到项目内：
-
-```bash
-mkdir -p .claude/skills
-git clone https://github.com/dangoZhang/portrait.skill.git .claude/skills/portrait-skill
-```
-
-### 依赖（可选）
-
-```bash
-pip3 install -e .
-```
-
----
-
-## 使用
-
-安装完成后，用户不需要手动敲底层命令，只需要直接对 Agent 说：
-
-- “给我一个我与 AI 协作的画像。”
-- “我最近使用 AI 的境界如何？”
-- “帮我看看我这周和 AI 配合得怎么样。”
-- “把我最近一段时间的 Codex 会话炼一下，看看我到了哪一层。”
-- “我不想看修仙背景，直接给我 AI 协作能力证书。”
-- “比较一下我上个月和这个月，看看我和 AI 的配合有没有升级。”
-
-底层 CLI 是 Agent 的内部实现。常见内部调用形态如下：
-
-```bash
-python3 -m portrait_skill.cli analyze --source codex --all --certificate both
-python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 2026-04-09 --certificate both
-python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl --certificate both
-```
-
----
-
-## 境界等级对应表
-
-| 综合分段 | 修仙境界 | 证书等级 | 这一层的人，不一样在哪 |
+| 综合分段 | 境界 | 等级 | 这一层的人，不一样在哪 |
 | --- | --- | --- | --- |
-| 0-11 | 凡人 | L1 | 还把 AI 当玩具，不当生产力 |
-| 12-23 | 感气 | L2 | 开始知道提问方式会改变结果 |
-| 24-35 | 炼气 | L3 | 已经有 prompt 手感，能稳定做简单任务 |
-| 36-47 | 筑基 | L4 | 开始有固定 workflow，同类任务能反复跑通 |
-| 48-59 | 金丹 | L5 | 开始把自己的做法封成 skill / 模板 / 模块 |
-| 60-69 | 元婴 | L6 | 开始拥有“能替自己先干一段活”的分身 |
-| 70-77 | 化神 | L7 | 能同时调多个 agent、多个工具协同完成任务 |
-| 78-85 | 炼虚 | L8 | 不再做单任务优化，开始做能力层和世界模型 |
-| 86-91 | 合体 | L9 | 人负责判断和担责，agent 负责执行和回流 |
-| 92-96 | 大乘 | L10 | 能把自己的方法复制给团队或客户 |
-| 97-98 | 渡劫 | L11 | 经得住真实业务、客户、异常、合规检验 |
-| 99-100 | 飞升 | L12 | 工作方式已经被 AI 重写，不再只是“会用工具” |
----
-更多修仙元素和AI能力对应关系等你在画像中探索！
+| 0-11 | 凡人 | L1 | 仍在试手，AI 还没真正入炉 |
+| 12-23 | 感气 | L2 | 开始知道问法会改变结果 |
+| 24-35 | 炼气 | L3 | 已能稳定炼成简单差事 |
+| 36-47 | 筑基 | L4 | 常见路数可重复跑通 |
+| 48-59 | 金丹 | L5 | 开始把常用术式封成法门 |
+| 60-69 | 元婴 | L6 | 分身已能先替你行过一段路 |
+| 70-77 | 化神 | L7 | 可同时役使多具分身与法器 |
+| 78-85 | 炼虚 | L8 | 开始经营能力层与系统层章法 |
+| 86-91 | 合体 | L9 | 能进入真实场域并持续回流 |
+| 92-100 | 大乘 | L10 | 法门已可复制给团队或客户 |
 
 ## License
 

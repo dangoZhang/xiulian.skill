@@ -373,12 +373,12 @@ def _build_aggregate_certificate(
     low = sorted(metrics, key=lambda item: item.score)
     if track == "user":
         persona_title = f"{level}协作修士"
-        title = "修仙画像"
+        title = "修为判定"
         subtitle = REALM_DESCRIPTIONS[level]
         summary = f"这是你在多场真实协作里的稳定层次。当前已到 {level}，补齐短板后再看下一次突破。"
     else:
         persona_title = f"{level} 协作等级"
-        title = "AI 协作能力证书"
+        title = "等级判定"
         subtitle = AI_LEVEL_DESCRIPTIONS[level]
         summary = "这是 AI 在长期协作样本里的稳定等级，不取单次峰值。"
     return {
@@ -555,7 +555,7 @@ def _build_user_certificate(score: int, metrics: list[MetricScore], transcript: 
     growth_plan = _growth_plan(low[:2], user_track=True)
     return Certificate(
         track="user",
-        title="修仙画像",
+        title="修为判定",
         level=level,
         score=score,
         persona=persona,
@@ -582,7 +582,7 @@ def _build_assistant_certificate(score: int, metrics: list[MetricScore], transcr
     growth_plan = _growth_plan(low[:2], user_track=False)
     return Certificate(
         track="assistant",
-        title="AI 协作能力证书",
+        title="等级判定",
         level=level,
         score=score,
         persona=persona,

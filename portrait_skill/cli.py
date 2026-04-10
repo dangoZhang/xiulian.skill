@@ -29,15 +29,15 @@ from .renderer import render_aggregate_markdown, render_comparison_markdown, ren
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="portrait-skill",
-        description="Issue cultivation portraits and AI capability portraits from agent transcripts.",
+        prog="xiuxian-skill",
+        description="Read agent transcripts, distill vibe coding ability, and issue a cultivation report.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     scan = subparsers.add_parser("scan", help="Show default transcript locations and latest detected files.")
     scan.add_argument("--source", choices=["codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code", "all"], default="all")
 
-    analyze = subparsers.add_parser("analyze", help="Analyze a transcript and print a markdown certificate.")
+    analyze = subparsers.add_parser("analyze", help="Analyze a transcript and print a cultivation report.")
     analyze.add_argument("--path", help="Transcript path. If omitted, use the latest file for --source.")
     analyze.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
     analyze.add_argument("--certificate", choices=["user", "assistant", "both"], default="both")
@@ -53,7 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--json-output", help="Write structured JSON summary to a file.")
     analyze.add_argument("--card-dir", help="Write shareable SVG cards to this directory.")
 
-    compare = subparsers.add_parser("compare", help="Compare two transcripts and judge whether the user or AI broke through.")
+    compare = subparsers.add_parser("compare", help="Compare two transcripts and judge whether this cycle broke through.")
     compare.add_argument("--before", required=True, help="Previous-cycle transcript path.")
     compare.add_argument("--after", help="Current-cycle transcript path. If omitted, use latest file for --source.")
     compare.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
