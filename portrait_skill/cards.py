@@ -9,6 +9,11 @@ from .parsers import default_display_name
 from .themes import get_ai_level_theme
 
 
+BASE_FONT_SIZE = 30
+BIG_FONT_SIZE = BASE_FONT_SIZE * 3
+BASE_LINE_HEIGHT = 42
+
+
 def write_cards(payload: dict[str, object], output_dir: str | Path, certificate_choice: str = "both") -> dict[str, str]:
     del certificate_choice
     target_dir = Path(output_dir).expanduser().resolve()
@@ -26,33 +31,58 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
     generated_at = _format_generated_at(payload.get("generated_at"))
     realm = str(insights.get("realm") or "凡人")
     rank = str(insights.get("rank") or "L1")
-    ability_lines = _wrap_block([str(insights.get("ability_text") or "仍在引气试手。")], 25.0, limit=4)
+    ability_text = str(insights.get("card_ability_text") or insights.get("ability_text") or "仍在引气试手。")
+    ability_lines = _wrap_block([ability_text], 34.0, limit=5)
     verdict_source = _string_list(insights.get("card_verdict_lines")) or _string_list(insights.get("verdict_lines"))
-    verdict_lines = _wrap_block(verdict_source, 24.5, limit=6)
-    breakthrough_lines = _wrap_block(_string_list(insights.get("breakthrough_lines")), 24.5, limit=4)
+    verdict_lines = _wrap_block(verdict_source, 34.0, limit=3)
+    breakthrough_source = _string_list(insights.get("card_breakthrough_lines")) or _string_list(insights.get("breakthrough_lines"))
+    breakthrough_lines = _wrap_block([_join_prose(breakthrough_source)], 34.0, limit=3)
     theme = get_ai_level_theme(rank)
 
     model_name = _primary_model(payload)
-    sample_name = _sample_name(payload)
-    ability_panel_y = 694
-    ability_panel_h = max(348, 170 + len(ability_lines) * 40 + len(verdict_lines) * 32)
-    break_panel_y = ability_panel_y + ability_panel_h + 28
-    break_panel_h = max(188, 112 + len(breakthrough_lines) * 30)
-    footer_chip_y = break_panel_y + break_panel_h + 34
-    footer_text_y = footer_chip_y + 96
-    verdict_y = 970 + max(0, len(ability_lines) - 1) * 42
-    breakthrough_y = break_panel_y + 110
+    paper_x = 88
+    paper_y = 60
+    paper_w = 1024
+    paper_h = 1480
+    content_x = 148
+    content_w = 904
+    header_y = 154
+    slogan_y = 204
+    hero_x = 148
+    hero_y = 252
+    hero_w = 904
+    hero_h = 284
+    hero_mid_x = hero_x + hero_w / 2
+    left_col_mid = hero_x + hero_w / 4
+    right_col_mid = hero_x + hero_w * 3 / 4
+    label_y = hero_y + 52
+    big_y = hero_y + 184
+    current_y = 592
+
+    ability_label_y = current_y
+    ability_text_y = ability_label_y + 72
+    ability_end_y = ability_text_y + max(0, len(ability_lines) - 1) * BASE_LINE_HEIGHT
+    divider_1_y = ability_end_y + 44
+
+    verdict_label_y = divider_1_y + 44
+    verdict_text_y = verdict_label_y + 72
+    verdict_end_y = verdict_text_y + max(0, len(verdict_lines) - 1) * BASE_LINE_HEIGHT
+    divider_2_y = verdict_end_y + 44
+
+    breakthrough_label_y = divider_2_y + 44
+    breakthrough_text_y = breakthrough_label_y + 72
+    breakthrough_end_y = breakthrough_text_y + max(0, len(breakthrough_lines) - 1) * BASE_LINE_HEIGHT
+    divider_3_y = breakthrough_end_y + 44
+
+    meta_1_y = divider_3_y + 72
+    meta_2_y = meta_1_y + 58
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="bg" x1="74" y1="52" x2="1134" y2="1544" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="96" y1="72" x2="1104" y2="1528" gradientUnits="userSpaceOnUse">
       <stop stop-color="{_escape(str(theme.get("bg_from", "#1B1B1B")))}"/>
       <stop offset="1" stop-color="{_escape(str(theme.get("bg_to", "#101820")))}"/>
     </linearGradient>
-    <radialGradient id="halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(926 246) rotate(141) scale(344 232)">
-      <stop stop-color="{_escape(str(theme.get("halo", "#8EC5FF")))}" stop-opacity="0.24"/>
-      <stop offset="1" stop-color="{_escape(str(theme.get("halo", "#8EC5FF")))}" stop-opacity="0"/>
-    </radialGradient>
     <filter id="shadow" x="102" y="88" width="996" height="1458" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
       <feFlood flood-opacity="0" result="BackgroundImageFix"/>
       <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
@@ -65,56 +95,46 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   </defs>
 
   <rect width="1200" height="1600" rx="48" fill="url(#bg)"/>
-  <ellipse cx="926" cy="246" rx="280" ry="188" fill="url(#halo)"/>
 
   <g filter="url(#shadow)">
-    <rect x="154" y="120" width="892" height="1368" rx="38" fill="#F7F4EC"/>
-    <rect x="182" y="146" width="836" height="1316" rx="30" stroke="#FFFFFF" stroke-opacity="0.82" stroke-width="4"/>
-    <rect x="182" y="146" width="836" height="128" rx="30" fill="{_escape(str(theme.get("accent", "#8EC5FF")))}"/>
-    <rect x="210" y="304" width="780" height="338" rx="34" fill="{_escape(str(theme.get("panel_bg", "#162B49")))}"/>
-    <rect x="210" y="{ability_panel_y}" width="780" height="{ability_panel_h}" rx="32" fill="#FFFDF8"/>
-    <rect x="210" y="{break_panel_y}" width="780" height="{break_panel_h}" rx="28" fill="{_escape(str(theme.get("soft_panel", "#F7F4EC")))}"/>
+    <rect x="{paper_x}" y="{paper_y}" width="{paper_w}" height="{paper_h}" rx="40" fill="{_escape(str(theme.get("soft_panel", "#F7F4EC")))}"/>
   </g>
+  <rect x="{paper_x}" y="{paper_y}" width="{paper_w}" height="10" rx="5" fill="{_escape(str(theme.get("accent", "#8EC5FF")))}"/>
+  <rect x="{hero_x}" y="{hero_y}" width="{hero_w}" height="{hero_h}" rx="28" fill="#1B2732" stroke="#314554" stroke-width="2"/>
+  <line x1="{hero_mid_x}" y1="{hero_y + 42}" x2="{hero_mid_x}" y2="{hero_y + hero_h - 42}" stroke="#324A5D" stroke-width="2"/>
 
-  <text x="600" y="202" fill="#12202E" font-size="28" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">修仙.skill</text>
-  <text x="600" y="246" fill="#12202E" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">蒸馏你的 vibecoding 修为</text>
+  <text x="600" y="{header_y}" fill="#17212B" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif" font-weight="700">修仙.skill</text>
+  <text x="600" y="{slogan_y}" fill="#2B3640" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="600">蒸馏你的vibecoding能力</text>
 
-  <text x="318" y="382" fill="#F8F3EA" font-size="22" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">当前境界</text>
-  <text x="318" y="500" fill="#FFFFFF" font-size="128" font-family="STKaiti, KaiTi, serif">{_escape(realm)}</text>
-  <text x="318" y="556" fill="#DCE9F7" font-size="20" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">赛博修仙中的修为层次</text>
+  {_label_pill(int(left_col_mid - 60), label_y - 32, 120, "境界", theme)}
+  <text x="{left_col_mid}" y="{big_y}" fill="#FFFFFF" font-size="{BIG_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif">{_escape(realm)}</text>
 
-  <rect x="748" y="366" width="188" height="84" rx="42" fill="#FFFFFF" fill-opacity="0.12"/>
-  <text x="842" y="402" fill="#DCE9F7" font-size="18" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">修为等级</text>
-  <text x="842" y="540" fill="{_escape(str(theme.get("accent", "#8EC5FF")))}" font-size="120" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="800">{_escape(rank)}</text>
-  <text x="842" y="592" fill="#DCE9F7" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">参考洛谷色阶</text>
+  {_label_pill(int(right_col_mid - 60), label_y - 32, 120, "等级", theme)}
+  <text x="{right_col_mid}" y="{big_y}" fill="{_escape(str(theme.get("accent", "#8EC5FF")))}" font-size="{BIG_FONT_SIZE}" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">{_escape(rank)}</text>
 
-  <text x="250" y="758" fill="#7A633F" font-size="19" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">蒸馏能力</text>
-  {_text_lines(ability_lines, x=250, y=822, font_size=33, line_height=42, fill="#1C1A16", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="700")}
-  <line x1="250" y1="{868 + max(0, len(ability_lines) - 1) * 42}" x2="950" y2="{868 + max(0, len(ability_lines) - 1) * 42}" stroke="#E8DFCF" stroke-width="2"/>
-  <text x="250" y="{914 + max(0, len(ability_lines) - 1) * 42}" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">判词</text>
-  {_text_lines(verdict_lines, x=250, y=verdict_y, font_size=26, line_height=32, fill="#2A241C", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
+  {_label_pill(content_x, ability_label_y - 32, 292, "vibecoding能力", theme)}
+  {_text_lines(ability_lines, x=content_x, y=ability_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#241D17", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
+  <line x1="{content_x}" y1="{divider_1_y}" x2="{content_x + content_w}" y2="{divider_1_y}" stroke="#D7C8B3" stroke-width="2"/>
+  {_label_pill(content_x, verdict_label_y - 32, 120, "判词", theme)}
+  {_text_lines(verdict_lines, x=content_x, y=verdict_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#1C160F", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
 
-  <text x="250" y="{break_panel_y + 52}" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">破境之法</text>
-  {_text_lines(breakthrough_lines, x=250, y=breakthrough_y, font_size=28, line_height=30, fill="#241F18", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="600")}
+  <line x1="{content_x}" y1="{divider_2_y}" x2="{content_x + content_w}" y2="{divider_2_y}" stroke="#D7C8B3" stroke-width="2"/>
+  {_label_pill(content_x, breakthrough_label_y - 32, 176, "突破方向", theme)}
+  {_text_lines(breakthrough_lines, x=content_x, y=breakthrough_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#1C160F", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
 
-  {_chip(210, footer_chip_y, 246, "炉主", model_name, theme)}
-  {_chip(477, footer_chip_y, 246, "耗材", _token_name(payload), theme)}
-  {_chip(744, footer_chip_y, 246, "样本", sample_name, theme)}
+  <line x1="{content_x}" y1="{divider_3_y}" x2="{content_x + content_w}" y2="{divider_3_y}" stroke="#D7C8B3" stroke-width="2"/>
+  <text x="600" y="{meta_1_y}" fill="#544334" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">法器 { _escape(model_name) }  |  tokens { _escape(_token_name(payload)) }</text>
+  <text x="600" y="{meta_2_y}" fill="#5F4B39" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">称呼 { _escape(display_name) }  |  生成于 { _escape(generated_at) }</text>
 
-  <line x1="254" y1="{footer_text_y - 28}" x2="946" y2="{footer_text_y - 28}" stroke="#DDD1BE" stroke-width="2"/>
-  <text x="254" y="{footer_text_y}" fill="#8E7C61" font-size="17" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'命主 · {display_name}')}</text>
-  <text x="946" y="{footer_text_y}" fill="#8E7C61" font-size="17" text-anchor="end" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'起炉时间 · {generated_at}')}</text>
 </svg>
 """
 
 
-def _chip(x: int, y: int, width: int, title: str, value: str, theme: dict[str, str]) -> str:
+def _label_pill(x: int, y: int, width: int, title: str, theme: dict[str, str]) -> str:
     return f"""
   <g>
-    <rect x="{x}" y="{y}" width="{width}" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
-    <rect x="{x}" y="{y}" width="{width}" height="6" rx="3" fill="{_escape(str(theme.get('accent', '#8EC5FF')))}"/>
-    <text x="{x + 22}" y="{y + 34}" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(title)}</text>
-    <text x="{x + 22}" y="{y + 62}" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">{_escape(_truncate_text(value, 24))}</text>
+    <rect x="{x}" y="{y}" width="{width}" height="44" rx="22" fill="{_escape(str(theme.get('accent_dark', '#2F7F55')))}" stroke="#FFFFFF" stroke-width="2"/>
+    <text x="{x + width / 2}" y="{y + 30}" fill="#FFFFFF" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(title)}</text>
   </g>"""
 
 
@@ -200,6 +220,15 @@ def _wrap_block(items: list[str], max_units: float, limit: int) -> list[str]:
     return lines
 
 
+def _join_prose(items: list[str]) -> str:
+    cleaned = []
+    for item in items:
+        text = " ".join((item or "").split())
+        if text:
+            cleaned.append(text)
+    return "".join(cleaned)
+
+
 def _truncate_text(text: str, limit_units: int) -> str:
     total = 0.0
     result = []
@@ -216,16 +245,28 @@ def _truncate_text(text: str, limit_units: int) -> str:
 def _tokenize_for_wrap(text: str) -> list[str]:
     tokens: list[str] = []
     i = 0
+    suffix_punctuation = "，。！？；：、）》」』】)"
     while i < len(text):
         char = text[i]
         if char in "（(":
             closing = "）" if char == "（" else ")"
             end = text.find(closing, i + 1)
             if end != -1:
-                tokens.append(text[i : end + 1])
+                segment = text[i : end + 1]
+                if tokens:
+                    prefix = tokens.pop()
+                    while tokens and _is_single_cjk_token(prefix) and _is_single_cjk_token(tokens[-1]) and len(prefix) < 4:
+                        prefix = tokens.pop() + prefix
+                    tokens.append(prefix + segment)
+                else:
+                    tokens.append(segment)
                 i = end + 1
                 continue
         if char.isspace():
+            i += 1
+            continue
+        if char in suffix_punctuation and tokens:
+            tokens[-1] += char
             i += 1
             continue
         if ord(char) < 128:
@@ -238,6 +279,10 @@ def _tokenize_for_wrap(text: str) -> list[str]:
         tokens.append(char)
         i += 1
     return [token for token in tokens if token]
+
+
+def _is_single_cjk_token(token: str) -> bool:
+    return len(token) == 1 and ord(token) >= 128 and token not in "，。！？；：、）》」』】)"
 
 
 def _split_long_token(token: str, max_units: float) -> list[str]:
@@ -313,7 +358,21 @@ def _primary_model(payload: dict[str, object]) -> str:
     models = transcript.get("models")
     if isinstance(models, list) and models:
         return _truncate_text(str(models[0]).replace("openai/", "").replace("anthropic/", ""), 24)
-    return "未识炉主"
+    return _source_platform(payload)
+
+
+def _source_platform(payload: dict[str, object]) -> str:
+    transcript = _as_dict(payload.get("transcript"))
+    source = str(transcript.get("source") or payload.get("source") or "").lower()
+    labels = {
+        "codex": "Codex",
+        "claude": "Claude Code",
+        "opencode": "OpenCode",
+        "openclaw": "OpenClaw",
+        "cursor": "Cursor",
+        "vscode": "VS Code",
+    }
+    return labels.get(source, "本地平台")
 
 
 def _sample_name(payload: dict[str, object]) -> str:
@@ -330,7 +389,7 @@ def _token_name(payload: dict[str, object]) -> str:
     transcript = _as_dict(payload.get("transcript"))
     usage = _as_dict(transcript.get("token_usage")) or _as_dict(payload.get("token_usage"))
     total = int(usage.get("total_tokens") or 0)
-    return f"{total:,} token" if total else "token 未显"
+    return f"{total:,}" if total else "未显"
 
 
 def _get_display_name(payload: dict[str, object]) -> str:

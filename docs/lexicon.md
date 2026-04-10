@@ -14,17 +14,17 @@
 | session | 会话 / 一场闭关 | 聚合多轮时优先写“会话”，叙事层可写“闭关” |
 | time window | 时间窗 / 某段闭关周期 | 公开用法优先写“时间窗” |
 | prompt / prompting | 起手问法 / 起手法诀 | 首次出现建议保留 `prompt` |
-| context | 根基 / 来路 / 边界 | 指用户提供的背景、约束、路径、环境 |
-| workflow | 法门 / 章法 | 首次出现建议保留 `workflow` |
+| context | 上下文 / 来路 / 边界 | 优先用常见中文写法，指用户提供的背景、约束、路径、环境 |
+| workflow | 工作流 / 法门 | 优先用“工作流”，修仙叙事里可写“法门” |
 | skill | skill / 法门 | 产品名里保留 `skill`，叙事里可写“法门” |
-| tool | 法器 | 报告叙事可写“法器”，技术层保留 `tool` |
+| tool | 工具 / 法器 | 优先用“工具”，叙事层可写“法器” |
 | tool call | tool call / 分身落子 | 卡片底部样本规模里保留 `tool calls` |
 | multi-agent orchestration | 役使多具分身 | 仅用于高等级能力描述 |
-| verification | 收功 / 回验 | 与验收、测试、检查相关 |
+| verification | 验证 / 收功 | 与验收、测试、检查相关 |
 | feedback loop | 回流 / 反馈回路 | 高等级能力描述里保留 `feedback loop` |
 | model | 炉主模型 / 炉主 | 模型名本体不要翻译 |
 | provider | 来路 | 只做辅助说明，不抢主叙事 |
-| token | 耗材 / 灵气 | 卡片与报告里保留 `token` 数；修仙说明可配“耗材”“灵气” |
+| token | tokens / 灵气 | 卡片与报告里优先保留 `tokens`；修仙说明可配“灵气” |
 | capability design | 炼器炼法 | L8 以上能力描述可用 |
 | system thinking | 经营章法 | L8 以上能力描述可用 |
 | team enablement | 传法同门 | L10 场景可用 |
@@ -48,18 +48,18 @@
 
 ## L1-L10 能力写法骨架
 
-| 等级 | 修仙写法 | 保留的 AI 术语 |
+| 等级 | 更顺的写法 | 常见 AI 说法 |
 | --- | --- | --- |
-| L1 | 只得引气试手，偶能一问一答 | `single-turn prompting` |
-| L2 | 已知换咒会变招，开始觉察问法之力 | `prompt steering` |
-| L3 | 可循浅法炼成小事，手上已有几分火候 | `task completion` / `prompt iteration` |
-| L4 | 可沿熟路反复行功，常见差事已能稳定跑通 | `workflow reuse` / `multi-step execution` |
-| L5 | 可把常用术式收束成法门，遇同类卷宗不必从头起炉 | `skill abstraction` / `reusable workflow` |
-| L6 | 可先替命主行过一段路，再回呈实果 | `delegated execution` / `proactive implementation` |
-| L7 | 可役使多具分身并驱法器，同炉炼化一件整差 | `multi-agent orchestration` / `tool use` |
-| L8 | 可炼器亦可炼法，开始经营整套修行章法 | `capability design` / `system thinking` |
-| L9 | 可入真实场域来回行功，边做边回流经验 | `production loop` / `feedback loop` |
-| L10 | 可将法门传与同门，复制到团队与客户场景 | `team enablement` / `workflow transfer` |
+| L1 | 还停留在单轮提问，大多还在试。 | 单轮提问 |
+| L2 | 开始会调 prompt，知道换问法会改结果。 | prompt 调整 |
+| L3 | 能独立做成小任务，也会边做边补要求。 | 任务完成 / 迭代修正 |
+| L4 | 已经会把常见来回沉淀成工作流，熟悉任务能稳定推进到多步完成。 | 工作流 / 多步完成 |
+| L5 | 会把重复打法炼成可复用套路，同类问题不必每次从零开始。 | 复用 / skill 化 |
+| L6 | 会让 AI 先做一段，再回来收方向和结果。 | 委托执行 |
+| L7 | 能同时调动多 Agent 和工具，把整件事拆开并行推进。 | 多 Agent / 工具调用 |
+| L8 | 开始搭能力、搭流程，重心不只是一件件做任务。 | 能力设计 / 系统打法 |
+| L9 | 能把这套协作带进真实项目，并根据反馈继续修。 | 真实项目 / 反馈回路 |
+| L10 | 能把自己的方法沉淀下来，再稳定复制给团队。 | 团队复制 / 工作流迁移 |
 
 ## 高风险 / 已废弃词
 
@@ -82,3 +82,7 @@
 - `assistant_certificate`
 
 它们只是兼容旧命名，不代表当前品牌叙事。
+
+## 卡片专用扩展
+
+- [修仙卡术语对照表](./card-lexicon.md)

@@ -4,85 +4,143 @@ from .models import Analysis, Certificate, Message
 
 USER_BEHAVIOR_TEXT = {
     "目标清晰度": {
-        "strong": "道心定得住，起手就能点明所求",
-        "weak": "题眼还不够收束，时有旁枝牵神",
+        "strong": "开头就能把想做什么说清楚",
+        "weak": "目标还不够收束，AI 需要边做边猜",
     },
     "上下文供给": {
-        "strong": "根基交代得足，来路、边界、卷宗都摆得清楚",
-        "weak": "来路与边界仍薄，分身得边做边猜",
+        "strong": "路径、背景和边界给得够，AI 更容易直接落地",
+        "weak": "背景和边界给得偏少，AI 容易在细节上反复确认",
     },
     "迭代修正力": {
-        "strong": "一见偏航便肯回炉，修法不僵",
-        "weak": "回炉修正偏慢，常卡在第一口气",
+        "strong": "发现方向偏了会立刻补充要求，把任务拉回正轨",
+        "weak": "发现偏航后的修正还不够快，容易在错误方向上多走几步",
     },
     "验收意识": {
-        "strong": "收功时肯看实证，火候稳",
-        "weak": "收功火候未足，验收与回看仍薄",
+        "strong": "会主动要结果、证据和验证方式",
+        "weak": "还不够主动要证据和验收，容易停在“看起来差不多”",
     },
     "协作节奏": {
-        "strong": "往返有序，气脉相接，能一路推到落地",
-        "weak": "往返气机仍乱，前后呼应不够稳",
+        "strong": "一来一回接得顺，事情能持续往前推",
+        "weak": "往返节奏还不够稳，容易在中途掉线",
     },
 }
 
 ASSISTANT_BEHAVIOR_TEXT = {
     "执行落地": {
-        "strong": "肯先落子再回话，能把差事推向成形",
-        "weak": "落子偏慢，仍有停在空谈处的时刻",
+        "strong": "能先动手，再汇报，推进感比较强",
+        "weak": "还有停在解释里的时候，落地速度不够稳定",
     },
     "工具调度": {
-        "strong": "会役使外器外法，一并催动进度",
-        "weak": "役器仍少，法器与分身还未尽展",
+        "strong": "会主动读文件、跑命令、查信息，能把工具真正用起来",
+        "weak": "工具调用还不够积极，很多本可直接验证的事没有立刻去做",
     },
     "验证闭环": {
-        "strong": "会自带回验与收功，结果更稳",
-        "weak": "回验仍薄，收功时还欠一锤定音",
+        "strong": "会说明改了什么、怎么验证、还有什么没验",
+        "weak": "对“改了什么、怎么验证、还有什么没验”交代得还不够完整",
     },
     "上下文承接": {
-        "strong": "能续住主线气脉，不易走散",
-        "weak": "续脉仍有松动，长回合里易失焦点",
+        "strong": "能续住主线，不容易跑偏",
+        "weak": "回合一长就容易丢主线，承接还不够稳",
     },
     "补救适配": {
-        "strong": "遇阻能换法换势，继续破局",
-        "weak": "遇阻时转身仍慢，补漏不够及时",
+        "strong": "遇到阻力会缩范围、换打法、继续推进",
+        "weak": "遇到阻力后的调整还不够快",
     },
+}
+
+USER_CARD_BEHAVIOR_TEXT = {
+    "目标清晰度": {"strong": "开头能说清要做什么", "weak": "目标还不够收束"},
+    "上下文供给": {"strong": "背景和边界给得够", "weak": "背景和边界还给得不够"},
+    "迭代修正力": {"strong": "发现偏了会及时补要求", "weak": "偏了以后补得还不够快"},
+    "验收意识": {"strong": "会主动盯验证和证据", "weak": "还不够主动要证据和验收"},
+    "协作节奏": {"strong": "一来一回接得顺", "weak": "往返节奏还不够稳"},
+}
+
+ASSISTANT_CARD_BEHAVIOR_TEXT = {
+    "执行落地": {"strong": "会先动手再汇报", "weak": "落地速度还不够稳"},
+    "工具调度": {"strong": "会主动用工具推进", "weak": "工具用得还不够积极"},
+    "验证闭环": {"strong": "会把验证和回报交代清楚", "weak": "对“改了什么、怎么验证、还有什么没验”交代得还不够完整"},
+    "上下文承接": {"strong": "能续住主线不乱跑", "weak": "回合一长容易丢主线"},
+    "补救适配": {"strong": "遇阻也会换路继续推", "weak": "遇阻后的调整还不够快"},
 }
 
 USER_XIANXIA_STRONG = {
-    "目标清晰度": "道心坚定",
-    "上下文供给": "根基稳固",
-    "迭代修正力": "悟性渐开",
-    "验收意识": "收功谨慎",
-    "协作节奏": "气机相合",
+    "目标清晰度": "目标表达",
+    "上下文供给": "上下文铺垫",
+    "迭代修正力": "迭代修正",
+    "验收意识": "结果验证",
+    "协作节奏": "协作节奏",
 }
 
 USER_XIANXIA_WEAK = {
-    "目标清晰度": "道心未定",
-    "上下文供给": "根基浮动",
-    "迭代修正力": "悟性未开",
-    "验收意识": "收功不稳",
-    "协作节奏": "气机不顺",
+    "目标清晰度": "目标表达",
+    "上下文供给": "上下文铺垫",
+    "迭代修正力": "迭代修正",
+    "验收意识": "结果验证",
+    "协作节奏": "协作节奏",
 }
 
 ASSISTANT_XIANXIA = {
-    "执行落地": "术法落地",
-    "工具调度": "驭器调度",
-    "验证闭环": "收功回验",
-    "上下文承接": "续脉承题",
-    "补救适配": "转圜破局",
+    "执行落地": "执行推进",
+    "工具调度": "工具调用",
+    "验证闭环": "回看确认",
+    "上下文承接": "上下文承接",
+    "补救适配": "补救适配",
+}
+
+USER_AI_TERMS = {
+    "目标清晰度": "目标表达",
+    "上下文供给": "上下文信息",
+    "迭代修正力": "迭代修正",
+    "验收意识": "结果验证",
+    "协作节奏": "协作节奏",
+}
+
+ASSISTANT_AI_TERMS = {
+    "执行落地": "执行推进",
+    "工具调度": "工具调用",
+    "验证闭环": "回看确认",
+    "上下文承接": "上下文承接",
+    "补救适配": "补救适配",
 }
 
 ABILITY_LIBRARY = {
-    "L1": "只得引气试手，偶能一问一答（single-turn prompting）",
-    "L2": "已知换咒会变招，开始觉察问法之力（prompt steering）",
-    "L3": "可循浅法炼成小事，手上已有几分火候（task completion / prompt iteration）",
-    "L4": "可沿熟路反复行功，常见差事已能稳定跑通（workflow reuse / multi-step execution）",
-    "L5": "可把常用术式收束成法门，遇同类卷宗不必从头起炉（skill abstraction / reusable workflow）",
-    "L6": "可先替命主行过一段路，再回呈实果（delegated execution / proactive implementation）",
-    "L7": "可役使多具分身并驱法器，同炉炼化一件整差（multi-agent orchestration / tool use）",
-    "L8": "可炼器亦可炼法，开始经营整套修行章法（capability design / system thinking）",
-    "L9": "可入真实场域来回行功，边做边回流经验（production loop / feedback loop）",
-    "L10": "可将法门传与同门，复制到团队与客户场景（team enablement / workflow transfer）",
+    "L1": "还停留在单轮提问，能把问题问出去，但大多还要靠反复试。",
+    "L2": "开始会调 prompt 了，知道换一种问法，回答就会跟着变。",
+    "L3": "能独立跑完小任务，也会根据结果继续补充要求，把事做成。",
+    "L4": "已经会把常见来回沉淀成工作流，熟悉的任务通常能沿着上下文稳定推进到多步完成。",
+    "L5": "会把重复打法炼成可复用套路，同类问题不必每次都从零开始。",
+    "L6": "会让 AI 先代做一段，再回来核对方向和结果，协作已经开始成形。",
+    "L7": "能同时调动多 Agent 和工具，把一件完整差事拆开并行推进。",
+    "L8": "开始设计能力和流程，不只是在完成任务，而是在搭一套可持续的方法。",
+    "L9": "能把这套协作带进真实项目，边做边根据反馈修正方法。",
+    "L10": "能把自己的方法传给团队，让别人也能复现同样的推进质量。",
+}
+
+CARD_ABILITY_LIBRARY = {
+    "L1": "还停留在单轮提问，更多时候还要靠反复试。",
+    "L2": "已经会调 prompt，知道换一种问法，回答就会变。",
+    "L3": "能跑完小任务，也会根据结果继续补充要求。",
+    "L4": "已经会把常见来回沉淀成工作流，熟悉任务通常能稳定推进到多步完成。",
+    "L5": "会把重复打法炼成可复用套路，同类问题不必每次从零开始。",
+    "L6": "会让 AI 先代做一段，再回来核对方向和结果。",
+    "L7": "能同时调动多 Agent 和工具，把一件完整差事拆开并行推进。",
+    "L8": "开始设计能力和流程，正在搭一套可持续的方法。",
+    "L9": "能把这套协作带进真实项目，并根据反馈持续修正。",
+    "L10": "能把自己的方法传给团队，让别人也能稳定复现。",
+}
+
+CARD_VERDICT_LIBRARY = {
+    "L1": "这一层还在摸门，能问出问题，但稳定性还没真正出来。",
+    "L2": "这一层开始知道问法会改结果，已经脱离纯撞运气。",
+    "L3": "这一层已经能独立做成小事，也知道边做边补要求。",
+    "L4": "这一层已经会把常见来回沉淀成工作流，熟悉任务通常能稳定推进到多步完成。",
+    "L5": "这一层开始有自己的套路，同类任务不必每次都从零起手。",
+    "L6": "这一层已经懂得让 AI 先做一段，再回来收方向和结果。",
+    "L7": "这一层已经能同时调动多 Agent 和工具，把整件事拆开并行推进。",
+    "L8": "这一层开始搭方法、搭流程，重心已经不只是一件件做任务。",
+    "L9": "这一层能把协作带进真实项目，并根据反馈持续修正做法。",
+    "L10": "这一层已经能把方法沉淀下来，再稳定复制给团队使用。",
 }
 
 IMAGE_CONCEPT_GROUPS = {
@@ -148,40 +206,67 @@ def _build_insights(
 
     realm = _certificate_value(user_certificate, "level", "凡人")
     rank = _certificate_value(assistant_certificate, "level", "L1")
-    ability_text = _ability_text(rank)
+    level_ability_text = _ability_text(rank)
+    card_level_ability_text = _card_ability_text(rank)
     user_top_name = USER_XIANXIA_STRONG.get(user_top["name"], user_top["name"])
     user_low_name = USER_XIANXIA_WEAK.get(user_low["name"], user_low["name"])
     assistant_top_name = ASSISTANT_XIANXIA.get(assistant_top["name"], assistant_top["name"])
     assistant_low_name = ASSISTANT_XIANXIA.get(assistant_low["name"], assistant_low["name"])
 
+    ability_text = _compose_ability_summary(
+        level_text=level_ability_text,
+        user_top_name=user_top_name,
+        assistant_top_name=assistant_top_name,
+        user_low_name=user_low_name,
+        assistant_low_name=assistant_low_name,
+        user_top_text=_metric_behavior(user_top["name"], "strong", track="user"),
+        assistant_top_text=_metric_behavior(assistant_top["name"], "strong", track="assistant"),
+        user_low_text=_metric_behavior(user_low["name"], "weak", track="user"),
+        assistant_low_text=_metric_behavior(assistant_low["name"], "weak", track="assistant"),
+    )
+    card_ability_text = _compose_card_ability_summary(
+        level_text=card_level_ability_text,
+        user_top_name=user_top_name,
+        assistant_top_name=assistant_top_name,
+        user_low_name=user_low_name,
+        assistant_low_name=assistant_low_name,
+        user_top_text=_metric_card_behavior(user_top["name"], "strong", track="user"),
+        assistant_top_text=_metric_card_behavior(assistant_top["name"], "strong", track="assistant"),
+        user_low_text=_metric_card_behavior(user_low["name"], "weak", track="user"),
+        assistant_low_text=_metric_card_behavior(assistant_low["name"], "weak", track="assistant"),
+    )
     verdict_lines = [
-        f"观此番行迹，已至{realm}，修为列{rank}。",
-        f"所长在{user_top_name}与{assistant_top_name}，命主这边{_metric_behavior(user_top['name'], 'strong', track='user')}；分身这边{_metric_behavior(assistant_top['name'], 'strong', track='assistant')}。",
-        f"关隘在{user_low_name}与{assistant_low_name}，命主这边{_metric_behavior(user_low['name'], 'weak', track='user')}；分身这边{_metric_behavior(assistant_low['name'], 'weak', track='assistant')}。",
+        f"这轮样本看下来，你现在落在{realm}，对应 {rank}。",
+        _card_verdict(rank),
     ]
     card_verdict_lines = [
-        f"已至{realm}，修为列{rank}。",
-        f"命主长在{user_top_name}，分身长在{assistant_top_name}。",
-        f"眼下短在{user_low_name}与{assistant_low_name}，宜先补收功与回验。",
+        f"当前落在{realm} / {rank}。",
+        _card_verdict(rank),
     ]
     breakthrough_lines = _merge_growth_lines(user_certificate, assistant_certificate)
+    card_breakthrough_lines = [
+        "下一轮先把目标、边界和验收写在前面，再让 AI 动手；"
+        "每轮结束都补一句：改了什么、怎么验证、还有什么没验。"
+    ]
 
     return {
         "realm": realm,
         "rank": rank,
         "ability_text": ability_text,
-        "usage_line": f"{_fmt_int(total_tokens)} token · {total_messages} messages · {tool_calls} tool calls" if total_tokens else f"{total_messages} messages · {tool_calls} tool calls",
+        "card_ability_text": card_ability_text,
+        "usage_line": f"{_fmt_int(total_tokens)} tokens · {total_messages} 条消息 · {tool_calls} 次工具调用" if total_tokens else f"{total_messages} 条消息 · {tool_calls} 次工具调用",
         "verdict_lines": verdict_lines,
         "card_verdict_lines": card_verdict_lines,
         "breakthrough_lines": breakthrough_lines,
+        "card_breakthrough_lines": card_breakthrough_lines,
         "user_summary_lines": [
-            f"命主当前最稳的是“{user_top_name}”，{user_top['rationale']}",
-            f"拖住上限的是“{user_low_name}”，{user_low['rationale']}",
+            f"你这轮最稳的是“{user_top_name}”，{user_top['rationale']}",
+            f"最拖后腿的是“{user_low_name}”，{user_low['rationale']}",
         ],
         "assistant_summary_lines": [
-            f"分身当前最稳的是“{assistant_top_name}”，{assistant_top['rationale']}",
-            f"最该补的是“{assistant_low_name}”，{assistant_low['rationale']}",
-            f"蒸馏出的 vibecoding 修为可概括为：{ability_text}",
+            f"AI 这轮最稳的是“{assistant_top_name}”，{assistant_top['rationale']}",
+            f"AI 最该补的是“{assistant_low_name}”，{assistant_low['rationale']}",
+            f"这轮蒸馏出来的 vibecoding 能力可以概括为：{level_ability_text}",
         ],
         "image_concepts": image_concepts,
         "report_basis_lines": [
@@ -197,18 +282,18 @@ def _merge_growth_lines(user_certificate, assistant_certificate) -> list[str]:
         cleaned = _xianxiaize_growth(item)
         if cleaned and cleaned not in merged:
             merged.append(cleaned)
-    return merged[:2] or ["守住一条主线，下轮只修一处短板，再图破境。"]
+    return merged[:2] or ["先守住一条主线，把最短的那块板补上，再看下一轮能不能破境。"]
 
 
 def _xianxiaize_growth(text: str) -> str:
     cleaned = " ".join((text or "").split())
     replacements = {
-        "要求 AI 说明“改了什么、怎么验、哪里还没验”": "每次收功，都把改动、回验与未尽之处交代清楚。",
-        "鼓励 AI 先读仓库、跑命令、看真实日志，再给方案": "先探卷宗与来路，再起法阵，不可空谈起手。",
-        "让 AI 在下一轮任务里强制执行“实现 -> 验证 -> 回报”节奏": "下轮行功只许走“落子、回验、回报”三步法。",
-        "每一轮收功时，都要附上看得见的凭据": "每次收功，都要留下看得见的实证。",
-        "下次闭关前，先把诉求写成“目标 + 约束 + 输出物 + 验收”四段式": "下次起手前，先写明所求、边界、产物与验收。",
-        "待下一轮问答结束，再来看境界变化": "待下一轮行功毕，再观是否破境。",
+        "要求 AI 说明“改了什么、怎么验、哪里还没验”": "每轮结束都把改了什么、怎么验证、哪里还没验交代清楚。",
+        "鼓励 AI 先读仓库、跑命令、看真实日志，再给方案": "先读仓库、跑命令、看日志，再给方案，别一上来只讲思路。",
+        "让 AI 在下一轮任务里强制执行“实现 -> 验证 -> 回报”节奏": "下一轮强制走“实现 -> 验证 -> 回报”三步，不要停在半路。",
+        "每一轮收功时，都要附上看得见的凭据": "每轮结束都留下看得见的验证结果。",
+        "下次闭关前，先把诉求写成“目标 + 约束 + 输出物 + 验收”四段式": "下次起手前，先把目标、边界、输出物和验收写清楚。",
+        "待下一轮问答结束，再来看境界变化": "等下一轮做完，再回来看自己有没有破境。",
     }
     for src, dst in replacements.items():
         cleaned = cleaned.replace(src, dst)
@@ -240,6 +325,49 @@ def _metric_behavior(name: str, polarity: str, track: str) -> str:
     return mapping.get(name, {}).get(polarity, "当前样本仍需继续观察。")
 
 
+def _metric_card_behavior(name: str, polarity: str, track: str) -> str:
+    mapping = USER_CARD_BEHAVIOR_TEXT if track == "user" else ASSISTANT_CARD_BEHAVIOR_TEXT
+    return mapping.get(name, {}).get(polarity, _metric_behavior(name, polarity, track))
+
+
+def _compose_ability_summary(
+    *,
+    level_text: str,
+    user_top_name: str,
+    assistant_top_name: str,
+    user_low_name: str,
+    assistant_low_name: str,
+    user_top_text: str,
+    assistant_top_text: str,
+    user_low_text: str,
+    assistant_low_text: str,
+) -> str:
+    return (
+        f"{level_text}"
+        f" 这轮最亮眼的是{user_top_name}和{assistant_top_name}：你这边{user_top_text}，AI 这边{assistant_top_text}。"
+        f" 眼下最该补的是{user_low_name}和{assistant_low_name}：你这边{user_low_text}，AI 这边{assistant_low_text}。"
+    )
+
+
+def _compose_card_ability_summary(
+    *,
+    level_text: str,
+    user_top_name: str,
+    assistant_top_name: str,
+    user_low_name: str,
+    assistant_low_name: str,
+    user_top_text: str,
+    assistant_top_text: str,
+    user_low_text: str,
+    assistant_low_text: str,
+) -> str:
+    return (
+        f"{level_text}"
+        f" 这轮亮点在{user_top_name}和{assistant_top_name}：你这边{user_top_text}，AI 这边{assistant_top_text}。"
+        f" 最该补的是{user_low_name}和{assistant_low_name}：你这边{user_low_text}，AI 这边{assistant_low_text}。"
+    )
+
+
 def _certificate_value(certificate, key: str, default: str) -> str:
     if isinstance(certificate, Certificate):
         return str(getattr(certificate, key, default))
@@ -259,7 +387,17 @@ def _certificate_list(certificate, key: str) -> list[str]:
 
 
 def _ability_text(rank: str) -> str:
-    return ABILITY_LIBRARY.get(rank, "已得一门可用法门（workflow practice）")
+    return ABILITY_LIBRARY.get(rank, "已经形成一套顺手可复用的协作做法。")
+
+
+def _card_ability_text(rank: str) -> str:
+    return CARD_ABILITY_LIBRARY.get(rank, "已经形成一套顺手可复用的协作做法。")
+
+
+def _card_verdict(rank: str) -> str:
+    return CARD_VERDICT_LIBRARY.get(rank, "这一层已经有稳定可复用的协作做法。")
+
+
 
 
 def _image_concepts(messages: list[Message]) -> list[str]:

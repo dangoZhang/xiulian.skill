@@ -47,11 +47,11 @@ def derive_xianxia_profile(payload: dict[str, object]) -> list[dict[str, str]]:
         {
             "term": "来路",
             "value": _compose_lingmai(source, primary_model, providers),
-            "detail": "模型平台与主炉来路",
+            "detail": "运行平台与主用模型",
         },
         {
             "term": "灵气",
-            "value": f"{_fmt_int(total_tokens)} 枚令牌" if total_tokens else "灵气未显",
+            "value": f"{_fmt_int(total_tokens)} tokens" if total_tokens else "tokens 未显",
             "detail": _period_label(payload),
         },
         {
@@ -67,12 +67,12 @@ def derive_xianxia_profile(payload: dict[str, object]) -> list[dict[str, str]]:
         {
             "term": "分身",
             "value": _tool_call_phrase(tool_calls),
-            "detail": "可供役使的分身痕迹",
+            "detail": "本轮工具调用情况",
         },
         {
             "term": "历练",
             "value": _review_phrase(message_count, sessions_used),
-            "detail": "从对话与记录中看其行止",
+            "detail": "本轮纳入的真实样本",
         },
     ]
     if _has_method_sediment(subtitle):
@@ -96,34 +96,29 @@ def derive_xianxia_profile(payload: dict[str, object]) -> list[dict[str, str]]:
 
 def _compose_lingmai(source: str, primary_model: str, providers: list[str]) -> str:
     source_text = {
-        "codex": "本地",
-        "claude": "外门",
-        "opencode": "外门",
-        "openclaw": "外门",
-        "cursor": "外门",
-        "vscode": "本地",
-    }.get(source.lower(), "未知")
-    if primary_model or providers:
-        return source_text
+        "codex": "Codex",
+        "claude": "Claude Code",
+        "opencode": "OpenCode",
+        "openclaw": "OpenClaw",
+        "cursor": "Cursor",
+        "vscode": "VS Code",
+    }.get(source.lower(), source or "未知")
+    if primary_model:
+        return f"{source_text} · {primary_model}"
     return source_text
 
 
 def _tool_call_phrase(tool_calls: int) -> str:
     if tool_calls <= 0:
-        return "此轮尚未外放分身"
-    if tool_calls == 1:
-        return "役使一具分身"
-    if tool_calls <= 9:
-        numerals = "零一二三四五六七八九"
-        return f"役使{numerals[tool_calls]}具分身"
-    return f"役使 {tool_calls} 具分身"
+        return "工具未调用"
+    return f"工具调用 {tool_calls} 次"
 
 
 def _review_phrase(message_count: int, sessions_used: Any) -> str:
     if isinstance(sessions_used, int) and sessions_used > 1:
-        return f"历经 {sessions_used} 场问答"
+        return f"纳入 {sessions_used} 场会话"
     if message_count > 0:
-        return f"历经 {message_count} 条对话"
+        return f"{message_count} 条对话"
     return "初经问答"
 
 
