@@ -27,12 +27,12 @@
     <rect x="182" y="146" width="836" height="1316" rx="30" stroke="#FFFFFF" stroke-opacity="0.82" stroke-width="4"/>
     <rect x="182" y="146" width="836" height="128" rx="30" fill="#59BFE0"/>
     <rect x="210" y="304" width="780" height="338" rx="34" fill="#1C323C"/>
-    <rect x="210" y="694" width="780" height="410" rx="32" fill="#FFFDF8"/>
-    <rect x="210" y="1132" width="780" height="188" rx="28" fill="#EEF6F8"/>
+    <rect x="210" y="694" width="780" height="348" rx="32" fill="#FFFDF8"/>
+    <rect x="210" y="1070" width="780" height="188" rx="28" fill="#EEF6F8"/>
   </g>
 
   <text x="600" y="202" fill="#12202E" font-size="28" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">修仙.skill</text>
-  <text x="600" y="246" fill="#12202E" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">蒸馏你的 vibe coding 修为</text>
+  <text x="600" y="246" fill="#12202E" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">蒸馏你的 vibecoding 修为</text>
 
   <text x="318" y="382" fill="#F8F3EA" font-size="22" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">当前境界</text>
   <text x="318" y="500" fill="#FFFFFF" font-size="128" font-family="STKaiti, KaiTi, serif">金丹</text>
@@ -44,36 +44,37 @@
   <text x="842" y="592" fill="#DCE9F7" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">参考洛谷色阶</text>
 
   <text x="250" y="758" fill="#7A633F" font-size="19" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">蒸馏能力</text>
-  <text x="250" y="822" fill="#1C1A16" font-size="34" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="700"><tspan x="250" dy="0">可沿熟路反复行功，常见差事已能稳定跑通（work</tspan><tspan x="250" dy="42">flow reuse / multi-step execution）</tspan></text>
+  <text x="250" y="822" fill="#1C1A16" font-size="33" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="700"><tspan x="250" dy="0">可沿熟路反复行功，常见差事已能稳定跑通</tspan><tspan x="250" dy="42">（workflow reuse / multi-step execution）</tspan></text>
   <line x1="250" y1="910" x2="950" y2="910" stroke="#E8DFCF" stroke-width="2"/>
   <text x="250" y="956" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">判词</text>
-  <text x="250" y="1012" fill="#2A241C" font-size="26" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="500"><tspan x="250" dy="0">观此番行迹，已至金丹，修为列L4。</tspan><tspan x="250" dy="32">所长在气机相合与转圜破局，往返有序，气脉相接</tspan><tspan x="250" dy="32">，能一路推到落地，遇阻能换法换势，继续破局。</tspan><tspan x="250" dy="32">关隘在收功不稳与收功回验，收功火候未足，验收</tspan><tspan x="250" dy="32">与回看仍薄，回验仍薄，收功时还欠一锤定音。</tspan></text>
+  <text x="250" y="1012" fill="#2A241C" font-size="26" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="500"><tspan x="250" dy="0">已至金丹，修为列L4。</tspan><tspan x="250" dy="32">命主长在气机相合，分身长在转圜破局。</tspan><tspan x="250" dy="32">眼下短在收功不稳与收功回验，宜先补收功与回验。</tspan></text>
 
-  <text x="250" y="1184" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">破境之法</text>
-  <text x="250" y="1242" fill="#241F18" font-size="28" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="600"><tspan x="250" dy="0">每次收功，都要留下看得见的实证。</tspan><tspan x="250" dy="30">下次起手前，先写明所求、边界、产物与验收。</tspan></text>
+  <text x="250" y="1122" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">破境之法</text>
+  <text x="250" y="1180" fill="#241F18" font-size="28" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="600"><tspan x="250" dy="0">每次收功，都要留下看得见的实证。</tspan><tspan x="250" dy="30">下次起手前，先写明所求、边界、产物与验收。</tspan></text>
 
   
   <g>
-    <rect x="210" y="1354" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
-    <rect x="210" y="1354" width="246" height="6" rx="3" fill="#59BFE0"/>
-    <text x="232" y="1388" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">炉主</text>
-    <text x="232" y="1416" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">未识炉主</text>
+    <rect x="210" y="1292" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
+    <rect x="210" y="1292" width="246" height="6" rx="3" fill="#59BFE0"/>
+    <text x="232" y="1326" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">炉主</text>
+    <text x="232" y="1354" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">未识炉主</text>
   </g>
   
   <g>
-    <rect x="477" y="1354" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
-    <rect x="477" y="1354" width="246" height="6" rx="3" fill="#59BFE0"/>
-    <text x="499" y="1388" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">耗材</text>
-    <text x="499" y="1416" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">2,892 token</text>
+    <rect x="477" y="1292" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
+    <rect x="477" y="1292" width="246" height="6" rx="3" fill="#59BFE0"/>
+    <text x="499" y="1326" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">耗材</text>
+    <text x="499" y="1354" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">2,892 token</text>
   </g>
   
   <g>
-    <rect x="744" y="1354" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
-    <rect x="744" y="1354" width="246" height="6" rx="3" fill="#59BFE0"/>
-    <text x="766" y="1388" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">样本</text>
-    <text x="766" y="1416" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">4 messages · 2 tool calls</text>
+    <rect x="744" y="1292" width="246" height="74" rx="22" fill="#FFFFFF" fill-opacity="0.9"/>
+    <rect x="744" y="1292" width="246" height="6" rx="3" fill="#59BFE0"/>
+    <text x="766" y="1326" fill="#7A633F" font-size="16" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">样本</text>
+    <text x="766" y="1354" fill="#231F1A" font-size="22" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">4 messages · 2 tool calls</text>
   </g>
 
-  <line x1="254" y1="1422" x2="946" y2="1422" stroke="#DDD1BE" stroke-width="2"/>
-  <text x="600" y="1450" fill="#8E7C61" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">命主 · 张道友　　起炉时间 · 2026-04-10 10:41</text>
+  <line x1="254" y1="1360" x2="946" y2="1360" stroke="#DDD1BE" stroke-width="2"/>
+  <text x="254" y="1388" fill="#8E7C61" font-size="17" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">命主 · 张道友</text>
+  <text x="946" y="1388" fill="#8E7C61" font-size="17" text-anchor="end" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">起炉时间 · 2026-04-10 11:57</text>
 </svg>

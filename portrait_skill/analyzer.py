@@ -141,7 +141,7 @@ def analyze_transcript(transcript: Transcript) -> Analysis:
         f"工具调用 {transcript.tool_calls} 次。"
     )
     if transcript.token_usage.total_tokens:
-        overview += f" 累计消耗 {transcript.token_usage.total_tokens} token。"
+        overview += f"累计消耗 {transcript.token_usage.total_tokens} token。"
     return Analysis(
         transcript=transcript,
         user_metrics=user_metrics,
@@ -224,7 +224,7 @@ def aggregate_analyses(analyses: list[Analysis], min_messages: int = 8) -> dict[
         f"工具调用 {total_tool_calls} 次。"
     )
     if total_tokens:
-        overview += f" 累计消耗 {total_tokens} token。"
+        overview += f"累计消耗 {total_tokens} token。"
     if dropped:
         overview += f" 另有 {dropped} 场低样本会话因消息数低于 {min_messages} 被排除。"
 

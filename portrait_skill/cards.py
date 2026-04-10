@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from html import escape
 from pathlib import Path
+import re
 import subprocess
 
 from .parsers import default_display_name
@@ -25,9 +26,10 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
     generated_at = _format_generated_at(payload.get("generated_at"))
     realm = str(insights.get("realm") or "凡人")
     rank = str(insights.get("rank") or "L1")
-    ability_lines = _wrap_block([str(insights.get("ability_text") or "仍在引气试手。")], 22.5, limit=4)
-    verdict_lines = _wrap_block(_string_list(insights.get("verdict_lines")), 22.5, limit=6)
-    breakthrough_lines = _wrap_block(_string_list(insights.get("breakthrough_lines")), 22.5, limit=4)
+    ability_lines = _wrap_block([str(insights.get("ability_text") or "仍在引气试手。")], 25.0, limit=4)
+    verdict_source = _string_list(insights.get("card_verdict_lines")) or _string_list(insights.get("verdict_lines"))
+    verdict_lines = _wrap_block(verdict_source, 24.5, limit=6)
+    breakthrough_lines = _wrap_block(_string_list(insights.get("breakthrough_lines")), 24.5, limit=4)
     theme = get_ai_level_theme(rank)
 
     model_name = _primary_model(payload)
@@ -75,7 +77,7 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   </g>
 
   <text x="600" y="202" fill="#12202E" font-size="28" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">修仙.skill</text>
-  <text x="600" y="246" fill="#12202E" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">蒸馏你的 vibe coding 修为</text>
+  <text x="600" y="246" fill="#12202E" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">蒸馏你的 vibecoding 修为</text>
 
   <text x="318" y="382" fill="#F8F3EA" font-size="22" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">当前境界</text>
   <text x="318" y="500" fill="#FFFFFF" font-size="128" font-family="STKaiti, KaiTi, serif">{_escape(realm)}</text>
@@ -87,7 +89,7 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   <text x="842" y="592" fill="#DCE9F7" font-size="20" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">参考洛谷色阶</text>
 
   <text x="250" y="758" fill="#7A633F" font-size="19" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">蒸馏能力</text>
-  {_text_lines(ability_lines, x=250, y=822, font_size=34, line_height=42, fill="#1C1A16", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="700")}
+  {_text_lines(ability_lines, x=250, y=822, font_size=33, line_height=42, fill="#1C1A16", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="700")}
   <line x1="250" y1="{868 + max(0, len(ability_lines) - 1) * 42}" x2="950" y2="{868 + max(0, len(ability_lines) - 1) * 42}" stroke="#E8DFCF" stroke-width="2"/>
   <text x="250" y="{914 + max(0, len(ability_lines) - 1) * 42}" fill="#7A633F" font-size="18" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" letter-spacing="4">判词</text>
   {_text_lines(verdict_lines, x=250, y=verdict_y, font_size=26, line_height=32, fill="#2A241C", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
@@ -100,7 +102,8 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   {_chip(744, footer_chip_y, 246, "样本", sample_name, theme)}
 
   <line x1="254" y1="{footer_text_y - 28}" x2="946" y2="{footer_text_y - 28}" stroke="#DDD1BE" stroke-width="2"/>
-  <text x="600" y="{footer_text_y}" fill="#8E7C61" font-size="17" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'命主 · {display_name}　　起炉时间 · {generated_at}')}</text>
+  <text x="254" y="{footer_text_y}" fill="#8E7C61" font-size="17" text-anchor="start" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'命主 · {display_name}')}</text>
+  <text x="946" y="{footer_text_y}" fill="#8E7C61" font-size="17" text-anchor="end" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(f'起炉时间 · {generated_at}')}</text>
 </svg>
 """
 
@@ -141,25 +144,40 @@ def _wrap_text(text: str, max_units: float, limit: int | None = None) -> list[st
     cleaned = " ".join((text or "").split())
     if not cleaned:
         return []
+    tokens = _tokenize_for_wrap(cleaned)
     lines: list[str] = []
     current = ""
     current_units = 0.0
-    for char in cleaned:
-        char_units = _char_units(char)
-        if current and current_units + char_units > max_units:
-            lines.append(current)
-            current = char
-            current_units = char_units
+    for token in tokens:
+        token_units = _text_units(token)
+        if token_units > max_units:
+            for segment in _split_long_token(token, max_units):
+                segment_units = _text_units(segment)
+                if current and current_units + segment_units > max_units:
+                    lines.append(current)
+                    current = ""
+                    current_units = 0.0
+                    if limit and len(lines) >= limit:
+                        break
+                current += segment
+                current_units += segment_units
             if limit and len(lines) >= limit:
                 break
             continue
-        current += char
-        current_units += char_units
+        if current and current_units + token_units > max_units:
+            lines.append(current)
+            current = token
+            current_units = token_units
+            if limit and len(lines) >= limit:
+                break
+            continue
+        current += token
+        current_units += token_units
     if current and (not limit or len(lines) < limit):
         lines.append(current)
     if limit and len(lines) > limit:
         lines = lines[:limit]
-    if limit and lines and len(lines) == limit and sum(_char_units(ch) for ch in cleaned) > sum(_char_units(ch) for line in lines for ch in line):
+    if limit and lines and len(lines) == limit and _text_units(cleaned) > sum(_text_units(line) for line in lines):
         lines[-1] = _truncate_text(lines[-1], max(2, int(max_units) - 2))
     return lines
 
@@ -193,6 +211,93 @@ def _truncate_text(text: str, limit_units: int) -> str:
         result.append(char)
         total += units
     return "".join(result)
+
+
+def _tokenize_for_wrap(text: str) -> list[str]:
+    tokens: list[str] = []
+    i = 0
+    while i < len(text):
+        char = text[i]
+        if char in "（(":
+            closing = "）" if char == "（" else ")"
+            end = text.find(closing, i + 1)
+            if end != -1:
+                tokens.append(text[i : end + 1])
+                i = end + 1
+                continue
+        if char.isspace():
+            i += 1
+            continue
+        if ord(char) < 128:
+            j = i + 1
+            while j < len(text) and ord(text[j]) < 128 and text[j] not in "（(":
+                j += 1
+            tokens.append(text[i:j].rstrip())
+            i = j
+            continue
+        tokens.append(char)
+        i += 1
+    return [token for token in tokens if token]
+
+
+def _split_long_token(token: str, max_units: float) -> list[str]:
+    parts: list[str] = []
+    working = token
+    if token.startswith(("（", "(")) and token.endswith(("）", ")")):
+        opener, closer = token[0], token[-1]
+        inner = token[1:-1]
+        inner_parts = _split_ascii_segment(inner, max_units - 1.2)
+        for index, part in enumerate(inner_parts):
+            prefix = opener if index == 0 else ""
+            suffix = closer if index == len(inner_parts) - 1 else ""
+            parts.append(f"{prefix}{part}{suffix}")
+        return parts
+    if re.fullmatch(r"[\x00-\x7F]+", token):
+        return _split_ascii_segment(working, max_units)
+    return _split_cjk_segment(working, max_units)
+
+
+def _split_ascii_segment(text: str, max_units: float) -> list[str]:
+    words = re.findall(r"\S+\s*", text)
+    if not words:
+        return [text]
+    parts: list[str] = []
+    current = ""
+    current_units = 0.0
+    for word in words:
+        word_units = _text_units(word)
+        if current and current_units + word_units > max_units:
+            parts.append(current.rstrip())
+            current = word
+            current_units = word_units
+            continue
+        current += word
+        current_units += word_units
+    if current.strip():
+        parts.append(current.rstrip())
+    return parts or [text]
+
+
+def _split_cjk_segment(text: str, max_units: float) -> list[str]:
+    parts: list[str] = []
+    current = ""
+    current_units = 0.0
+    for char in text:
+        char_units = _char_units(char)
+        if current and current_units + char_units > max_units:
+            parts.append(current)
+            current = char
+            current_units = char_units
+            continue
+        current += char
+        current_units += char_units
+    if current:
+        parts.append(current)
+    return parts or [text]
+
+
+def _text_units(text: str) -> float:
+    return sum(_char_units(char) for char in text)
 
 
 def _char_units(char: str) -> float:

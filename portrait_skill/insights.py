@@ -156,8 +156,13 @@ def _build_insights(
 
     verdict_lines = [
         f"观此番行迹，已至{realm}，修为列{rank}。",
-        f"所长在{user_top_name}与{assistant_top_name}，{_metric_behavior(user_top['name'], 'strong', track='user')}，{_metric_behavior(assistant_top['name'], 'strong', track='assistant')}。",
-        f"关隘在{user_low_name}与{assistant_low_name}，{_metric_behavior(user_low['name'], 'weak', track='user')}，{_metric_behavior(assistant_low['name'], 'weak', track='assistant')}。",
+        f"所长在{user_top_name}与{assistant_top_name}，命主这边{_metric_behavior(user_top['name'], 'strong', track='user')}；分身这边{_metric_behavior(assistant_top['name'], 'strong', track='assistant')}。",
+        f"关隘在{user_low_name}与{assistant_low_name}，命主这边{_metric_behavior(user_low['name'], 'weak', track='user')}；分身这边{_metric_behavior(assistant_low['name'], 'weak', track='assistant')}。",
+    ]
+    card_verdict_lines = [
+        f"已至{realm}，修为列{rank}。",
+        f"命主长在{user_top_name}，分身长在{assistant_top_name}。",
+        f"眼下短在{user_low_name}与{assistant_low_name}，宜先补收功与回验。",
     ]
     breakthrough_lines = _merge_growth_lines(user_certificate, assistant_certificate)
 
@@ -167,6 +172,7 @@ def _build_insights(
         "ability_text": ability_text,
         "usage_line": f"{_fmt_int(total_tokens)} token · {total_messages} messages · {tool_calls} tool calls" if total_tokens else f"{total_messages} messages · {tool_calls} tool calls",
         "verdict_lines": verdict_lines,
+        "card_verdict_lines": card_verdict_lines,
         "breakthrough_lines": breakthrough_lines,
         "user_summary_lines": [
             f"命主当前最稳的是“{user_top_name}”，{user_top['rationale']}",
