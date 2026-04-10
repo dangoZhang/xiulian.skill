@@ -24,12 +24,12 @@ from .parsers import (
     redact_path,
     summarize_locations,
 )
-from .renderer import render_aggregate_markdown, render_comparison_markdown, render_markdown
+from .renderer import render_aggregate_markdown, render_coaching_markdown, render_comparison_markdown, render_markdown
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="xiuxian-skill",
+        prog="xiulian-skill",
         description="Read agent transcripts, distill vibe coding ability, and issue a cultivation report.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -62,6 +62,18 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--output", help="Write markdown comparison report to a file.")
     compare.add_argument("--json-output", help="Write structured comparison JSON to a file.")
 
+    coach = subparsers.add_parser("coach", help="Generate a focused breakthrough coaching plan from transcripts.")
+    coach.add_argument("--path", help="Transcript path. If omitted, use the latest file for --source.")
+    coach.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
+    coach.add_argument("--username", help="Display name for the coaching output.")
+    coach.add_argument("--all", action="store_true", help="Aggregate all detected sessions for the source.")
+    coach.add_argument("--since", help="Only include sessions on/after this date or datetime. Example: 2026-04-01")
+    coach.add_argument("--until", help="Only include sessions on/before this date or datetime. Example: 2026-04-09")
+    coach.add_argument("--limit", type=int, help="Cap the number of sessions after filtering.")
+    coach.add_argument("--min-messages", type=int, default=8, help="Exclude tiny sessions below this message count in aggregate mode.")
+    coach.add_argument("--output", help="Write markdown coaching plan to a file.")
+    coach.add_argument("--json-output", help="Write structured coaching JSON to a file.")
+
     return parser
 
 
@@ -75,6 +87,10 @@ def main() -> None:
 
     if args.command == "compare":
         _handle_compare(args)
+        return
+
+    if args.command == "coach":
+        _handle_coach(args)
         return
 
     generated_at = _generated_at()
@@ -205,6 +221,71 @@ def _handle_compare(args) -> None:
         output_path = Path(args.json_output).expanduser().resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(comparison, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _handle_coach(args) -> None:
+    generated_at = _generated_at()
+    source = normalize_source(args.source)
+    if args.path:
+        transcript = load_transcript(args.path, source=source)
+        _apply_display_name(transcript, args.username, track="user")
+        analysis = analyze_transcript(transcript)
+        insights = build_analysis_insights(analysis)
+        payload = {
+            "display_name": analysis.transcript.display_name,
+            "source": analysis.transcript.source,
+            "insights": insights,
+            "generated_at": generated_at,
+        }
+    elif args.all or args.since or args.until or args.limit:
+        if source == "auto":
+            source = "codex"
+        since = parse_date_bound(args.since)
+        until = parse_date_bound(args.until, is_end=True)
+        refs = _list_transcript_refs(source, since=since, until=until, limit=args.limit)
+        if not refs:
+            raise SystemExit("No sessions matched the requested source/time window.")
+        analyses = [analyze_transcript(load_transcript(ref, source=source)) for ref in refs]
+        for analysis in analyses:
+            _apply_display_name(analysis.transcript, args.username, track="user")
+        aggregate = aggregate_analyses(analyses, min_messages=args.min_messages)
+        payload = {
+            "display_name": _resolve_display_name_from_analyses(analyses, override=args.username, track="user"),
+            "source": source,
+            "insights": build_aggregate_insights(analyses, aggregate),
+            "generated_at": generated_at,
+        }
+    else:
+        if source == "auto":
+            source = "codex"
+        transcript = load_transcript(_latest_ref(source), source=source)
+        _apply_display_name(transcript, args.username, track="user")
+        analysis = analyze_transcript(transcript)
+        payload = {
+            "display_name": analysis.transcript.display_name,
+            "source": analysis.transcript.source,
+            "insights": build_analysis_insights(analysis),
+            "generated_at": generated_at,
+        }
+
+    markdown = render_coaching_markdown(
+        "修炼.skill 突破教练",
+        display_name=str(payload.get("display_name") or "道友"),
+        source=str(payload.get("source") or source),
+        generated_at=generated_at,
+        insights=payload["insights"],
+    )
+    if args.output:
+        output_path = Path(args.output).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(markdown, encoding="utf-8")
+    else:
+        print(markdown)
+
+    if args.json_output:
+        output_path = Path(args.json_output).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def _handle_scan(source: str) -> None:

@@ -159,6 +159,59 @@ IMAGE_CONCEPT_NOTES = {
     "生图约束": "如果交给模型生图，必须明确最后一行文字下方仍要保留完整安全边距。",
 }
 
+COACHING_PLAYBOOK = {
+    "目标清晰度": {
+        "focus": "起手先把目标写成一句清楚的话，别让 AI 自己猜主线。",
+        "drill": "每次开局前先写三行：目标、边界、验收，再让 AI 开始做。",
+        "prompt": "先别展开实现，先帮我把这次任务整理成：目标、边界、输出物、验收标准。",
+    },
+    "上下文供给": {
+        "focus": "先把路径、环境、日志和约束给够，后面会顺很多。",
+        "drill": "下一轮开局固定附上文件路径、运行环境、相关报错和已有尝试。",
+        "prompt": "我先给你完整上下文，你先复述关键信息，再开始动手。",
+    },
+    "迭代修正力": {
+        "focus": "别等偏太远才回头，看到苗头不对就立刻补要求。",
+        "drill": "每轮看到结果不对时，只补一条最关键修正，别一次塞太多。",
+        "prompt": "先基于刚才结果，指出偏差最大的地方，再按这个点重做一轮。",
+    },
+    "验收意识": {
+        "focus": "把“看起来差不多”改成“拿出证据再算完成”。",
+        "drill": "每轮结束都追问一次：证据在哪，怎么验的，还有什么没验。",
+        "prompt": "这轮先别总结，先给我验证结果、验证方式，以及还没验证的部分。",
+    },
+    "协作节奏": {
+        "focus": "保持短回合推进，一轮只解决一个最关键问题。",
+        "drill": "把任务拆成 2 到 4 个连续小回合，每回合只追一个目标。",
+        "prompt": "把这件事拆成三个连续回合，我们一次只推进一个最关键问题。",
+    },
+    "执行落地": {
+        "focus": "优先让 AI 动手，而不是先写一大段解释。",
+        "drill": "每轮开头都明确要求：先做、再验、最后回报。",
+        "prompt": "直接开始做，先别讲大段方案。做完后告诉我改了什么、怎么验证的。",
+    },
+    "工具调度": {
+        "focus": "能读文件、跑命令、看日志的事，就别靠猜。",
+        "drill": "只要涉及代码或环境，第一轮先要求 AI 读取文件、运行命令、检查日志。",
+        "prompt": "先读相关文件并跑一遍必要命令，再给我判断，不要只凭经验猜。",
+    },
+    "验证闭环": {
+        "focus": "把收尾补全，别停在“改完了”，要停在“证实了”。",
+        "drill": "每轮结尾固定追问三件事：改了什么、怎么验证、还有什么风险。",
+        "prompt": "收尾时固定按这三项回报：改了什么、怎么验证、还有什么没验或有风险。",
+    },
+    "上下文承接": {
+        "focus": "长回合里反复点名主线，防止 AI 漂走。",
+        "drill": "每两轮重申一次当前目标和不该动的边界。",
+        "prompt": "先用两句话复述当前主线和边界，确认没跑偏再继续。",
+    },
+    "补救适配": {
+        "focus": "遇阻时快速缩范围、换打法，不要原地拧。",
+        "drill": "出现阻塞时，先让 AI 提三个缩范围方案，再选最短路径继续。",
+        "prompt": "现在卡住了，先给我三个最省时间的绕开方案，再选一个继续推进。",
+    },
+}
+
 
 def build_analysis_insights(analysis: Analysis) -> dict[str, object]:
     return _build_insights(
@@ -248,6 +301,10 @@ def _build_insights(
         "下一轮先把目标、边界和验收写在前面，再让 AI 动手；"
         "每轮结束都补一句：改了什么、怎么验证、还有什么没验。"
     ]
+    coaching_focus_lines, coaching_drill_lines, coaching_prompt_lines, coaching_cycle_lines = _build_coaching_plan(
+        user_low["name"],
+        assistant_low["name"],
+    )
 
     return {
         "realm": realm,
@@ -259,6 +316,10 @@ def _build_insights(
         "card_verdict_lines": card_verdict_lines,
         "breakthrough_lines": breakthrough_lines,
         "card_breakthrough_lines": card_breakthrough_lines,
+        "coaching_focus_lines": coaching_focus_lines,
+        "coaching_drill_lines": coaching_drill_lines,
+        "coaching_prompt_lines": coaching_prompt_lines,
+        "coaching_cycle_lines": coaching_cycle_lines,
         "user_summary_lines": [
             f"你这轮最稳的是“{user_top_name}”，{user_top['rationale']}",
             f"最拖后腿的是“{user_low_name}”，{user_low['rationale']}",
@@ -328,6 +389,35 @@ def _metric_behavior(name: str, polarity: str, track: str) -> str:
 def _metric_card_behavior(name: str, polarity: str, track: str) -> str:
     mapping = USER_CARD_BEHAVIOR_TEXT if track == "user" else ASSISTANT_CARD_BEHAVIOR_TEXT
     return mapping.get(name, {}).get(polarity, _metric_behavior(name, polarity, track))
+
+
+def _build_coaching_plan(user_low_name: str, assistant_low_name: str) -> tuple[list[str], list[str], list[str], list[str]]:
+    names = []
+    for name in [user_low_name, assistant_low_name]:
+        if name and name not in names:
+            names.append(name)
+    focus_lines: list[str] = []
+    drill_lines: list[str] = []
+    prompt_lines: list[str] = []
+    for name in names:
+        plan = COACHING_PLAYBOOK.get(name)
+        if not plan:
+            continue
+        focus_lines.append(f"{name}：{plan['focus']}")
+        drill_lines.append(plan["drill"])
+        prompt_lines.append(plan["prompt"])
+    if not focus_lines:
+        focus_lines = ["先守住当前最稳的一条主线，再补最短的那块板。"]
+    if not drill_lines:
+        drill_lines = ["下一轮开局先写清目标、边界和验收，再让 AI 动手。"]
+    if not prompt_lines:
+        prompt_lines = ["先帮我把这次任务整理成目标、边界、验收，再开始执行。"]
+    cycle_lines = [
+        "第 1 步：先定目标、边界、验收。",
+        "第 2 步：让 AI 直接执行，并强制读文件、跑命令或查日志。",
+        "第 3 步：收尾只看三件事，改了什么、怎么验证、还有什么没验。",
+    ]
+    return focus_lines[:2], drill_lines[:3], prompt_lines[:3], cycle_lines
 
 
 def _compose_ability_summary(

@@ -1,6 +1,6 @@
 <div align="center">
 
-# 修仙.skill
+# 修炼.skill
 
 > "赛博修仙时代，你修炼到了何种境界？"
 
@@ -9,11 +9,11 @@
 [![Codex](https://img.shields.io/badge/Codex-Skill-111111)](https://developers.openai.com/codex/skills)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-7C3AED)](https://claude.ai/code)
 [![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-8BC34A)](https://agentskills.io/)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/portrait.skill/archive/refs/heads/main.zip)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/修炼.skill/archive/refs/heads/main.zip)
 
-读取真实运行卷宗，蒸馏你的 `vibecoding` 修为  
-把全部会话或指定时间窗炼成一张可晒的修仙卡  
-自动记住上次评测，下次直接告诉你有没有破境
+读取真实运行卷宗，蒸馏你的 `vibecoding` 能力  
+把全部会话或指定时间窗炼成一张可晒的修炼卡  
+不只告诉你现在在哪一层，还继续带你突破下一层
 
 </div>
 
@@ -22,14 +22,24 @@
 ## 效果示例
 
 <div align="center">
-  <img src="./assets/readme/xiuxian-card.png" alt="修仙.skill 单卡示意图" width="54%" />
+  <img src="./assets/readme/xiulian-card.png" alt="修炼.skill 单卡示意图" width="54%" />
 </div>
 
-这是一张默认分享卡。它会把真实卷宗炼成一张可晒图的修仙修为录。
+这是一张默认分享卡。它会把真实卷宗炼成一张可晒图的 vibecoding 修炼录。
 
 ## 一句话说明
 
-把你和 AI 的真实协作轨迹，炼成一张能晒、能复盘、能继续修炼的 `vibecoding` 修为卡。
+把你和 AI 的真实协作轨迹，炼成一张能晒、能复盘、还能继续带你突破的 `vibecoding` 修炼卡。
+
+## 为什么是 vibecoding
+
+这个 skill 关心的不是你会不会聊天，而是你会不会把 AI 真正带进工作流。
+
+- 起手能不能把目标、边界和验收讲清楚
+- 中途会不会让 AI 真读文件、跑命令、查日志
+- 收尾会不会追着要验证结果、风险和没验完的地方
+
+这些才是真正决定 `vibecoding` 上限的东西。`修炼.skill` 做的，就是把这些行为从卷宗里蒸馏出来，再告诉你下一轮该怎么练。
 
 ## 支持宿主
 
@@ -51,7 +61,7 @@
 
 ## 这是什么
 
-`修仙.skill` 是一个给 Code Agent / LLM Agent 使用的 skill。
+`修炼.skill` 是一个给 Code Agent / LLM Agent 使用的 skill。
 
 它会读取 Codex、Claude Code、OpenCode、OpenClaw、Cursor、Visual Studio Code 的真实运行记录。
 
@@ -64,19 +74,22 @@
 - vibecoding能力：把这一层能做什么、这轮亮点和眼下短板讲清楚
 - 判词：只定你现在在哪一层，以及这一层通常意味着什么
 - 破境之法：下一轮该补哪一处，才能继续突破
+- 突破教练：直接给你下一轮训练重点、可复制提示词和训练节奏
 
-如果卷宗里带有模型与 token 信息，还会继续标出灵根、资质、炉主与耗材。
+如果卷宗里带有模型与 token 信息，还会继续标出平台、模型与耗材。
 
 ## 为什么更容易出圈
 
 - 一张卡就够。大境界字 + 等级色 + 判词 + 破境之法，截图传播阻力低。
 - 取材来自真实卷宗，不靠自述，晒图时天然有“这是我真炼出来的”质感。
-- 会记住上次评测，下次能直接看到涨功、停滞还是破境，天然适合连续分享。
+- 会记住上次评测，下次能直接看到涨功、停滞还是破境。
+- 不只会判断，还会继续带练。你可以直接让它给出下一轮训练法和可复制提示词。
 
 ## 你会得到什么
 
 - 一张 300dpi 的单卡 PNG / SVG，可直接发社交媒体
 - 一份 markdown 修炼报告，解释为什么你是这一层
+- 一份突破教练计划，告诉你下一轮先补什么、怎么练、怎么问
 - 一组术语映射，知道哪些 AI 术语在修仙叙事里对应什么
 - 一组破境之法，知道下一轮该补哪一处
 
@@ -85,7 +98,7 @@
 优先用 open agent skills 生态的安装方式，分发阻力最低：
 
 ```bash
-npx skills add https://github.com/dangoZhang/portrait.skill -a codex -a claude-code -a cursor -a opencode -a openclaw
+npx skills add https://github.com/dangoZhang/修炼.skill -a codex -a claude-code -a cursor -a opencode -a openclaw
 ```
 
 如果宿主不走 `npx skills`，再手动放到对应目录。
@@ -99,24 +112,24 @@ npx skills add https://github.com/dangoZhang/portrait.skill -a codex -a claude-c
 
 ```bash
 mkdir -p ~/.codex/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.codex/skills/xiuxian-skill
+git clone https://github.com/dangoZhang/修炼.skill.git ~/.codex/skills/xiulian-skill
 ```
 
 ```bash
 mkdir -p ~/.claude/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.claude/skills/xiuxian-skill
+git clone https://github.com/dangoZhang/修炼.skill.git ~/.claude/skills/xiulian-skill
 ```
 
 ```bash
 mkdir -p ~/.openclaw/skills
-git clone https://github.com/dangoZhang/portrait.skill.git ~/.openclaw/skills/xiuxian-skill
+git clone https://github.com/dangoZhang/修炼.skill.git ~/.openclaw/skills/xiulian-skill
 ```
 
 VS Code / GitHub Copilot 官方会从 `.github/skills`、`.claude/skills`、`~/.copilot/skills`、`~/.claude/skills` 发现 skills。最稳妥的项目级放法是：
 
 ```bash
 mkdir -p .github/skills
-git clone https://github.com/dangoZhang/portrait.skill.git .github/skills/xiuxian-skill
+git clone https://github.com/dangoZhang/修炼.skill.git .github/skills/xiulian-skill
 ```
 
 ### 可选依赖
@@ -131,18 +144,20 @@ pip3 install -e .
 
 - “给我看最近一周我和 AI 协作的修为。”
 - “炼一下我 2026-04-01 到 2026-04-10 的 Codex 卷宗。”
-- “给我一张能发朋友圈的修仙卡。”
+- “给我一张能发朋友圈的修炼卡。”
 - “对比我上个月和这个月有没有破境。”
 - “记住我这次结果，下次直接告诉我有没有涨功。”
+- “继续带我突破，给我下一轮训练计划和可直接复制的提示词。”
 
 如果宿主经常不主动触发，建议在 `AGENTS.md`、`CLAUDE.md` 或 Copilot instructions 里加一句：
 
-> 当用户想看最近与 AI 的协作方式、指定时间窗内的修为、和上次相比有没有破境，或想生成可分享的结果图时，优先调用 修仙.skill。先读取真实卷宗并完成分析报告，只有用户明确要分享图时才生成修仙卡。
+> 当用户想看最近与 AI 的协作方式、指定时间窗内的修为、和上次相比有没有破境，或想生成可分享的结果图时，优先调用 修炼.skill。先读取真实卷宗并完成分析报告；用户如果想继续提升，再继续输出下一轮训练法与可复制提示词。
 
 底层 CLI 仍可直接运行：
 
 ```bash
 python3 -m portrait_skill.cli analyze --source codex --all
+python3 -m portrait_skill.cli coach --source codex --all
 python3 -m portrait_skill.cli analyze --source codex --since 2026-04-01 --until 2026-04-10
 python3 -m portrait_skill.cli compare --before ./cycle-1.jsonl --after ./cycle-2.jsonl
 ```
@@ -159,6 +174,7 @@ examples/demo_codex_session.jsonl
 
 - 一张 300dpi PNG / SVG 单卡
 - 一份 markdown 修炼报告
+- 一份突破教练计划
 - 一组判词：命主修行、分身手段、宣发取材
 - 一组破境之法：下一轮该怎么修
 - 一份本地记忆：下次直接看是否突破
@@ -166,14 +182,14 @@ examples/demo_codex_session.jsonl
 ## 术语与宣发
 
 - [AI 术语 / 修仙词表](./docs/lexicon.md)
-- [修仙卡术语对照表](./docs/card-lexicon.md)
+- [修炼卡术语对照表](./docs/card-lexicon.md)
 - [宣发分析与宣传帖](./docs/promo.md)
 
 ## 单卡生图 Prompt
 
 仓库内附带一份给用户自己的 LLM / 生图模型使用的单卡 prompt：
 
-- [xiuxian-card.prompt.md](./assets/prompts/xiuxian-card.prompt.md)
+- [xiulian-card.prompt.md](./assets/prompts/xiulian-card.prompt.md)
 
 这份 prompt 已明确要求：
 

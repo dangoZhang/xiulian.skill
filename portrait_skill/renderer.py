@@ -18,7 +18,7 @@ def render_markdown(
     insight_payload = insights or build_analysis_insights(analysis)
     talent = infer_talent(analysis.transcript)
     sections = [
-        "# 修仙.skill 修炼报告",
+        "# 修炼.skill 修炼报告",
         "",
         "## 炼化概览",
         analysis.overview,
@@ -42,6 +42,7 @@ def render_markdown(
     sections.extend(["", _render_cultivation_judgement(insight_payload)])
     sections.extend(["", _render_xianxia_profile(_analysis_xianxia_payload(analysis))])
     sections.extend(["", _render_insights_section(insight_payload)])
+    sections.extend(["", _render_coaching_section(insight_payload)])
     sections.extend(
         [
             "",
@@ -65,7 +66,7 @@ def render_aggregate_markdown(
     insight_payload = insights or {}
     talent = infer_talent_from_models(aggregate.get("models", []))
     sections = [
-        "# 修仙.skill 炼化总报告",
+        "# 修炼.skill 炼化总报告",
         "",
         "## 炼化概览",
         str(aggregate["overview"]),
@@ -90,6 +91,7 @@ def render_aggregate_markdown(
     sections.extend(["", _render_xianxia_profile(aggregate)])
     if insight_payload:
         sections.extend(["", _render_insights_section(insight_payload)])
+        sections.extend(["", _render_coaching_section(insight_payload)])
     sections.extend(
         [
             "",
@@ -109,7 +111,7 @@ def render_comparison_markdown(
 ) -> str:
     del certificate_choice
     sections = [
-        "# 修仙.skill 破境报告",
+        "# 修炼.skill 破境报告",
         "",
         "## 对比概览",
         str(comparison["overview"]),
@@ -153,6 +155,49 @@ def _render_insights_section(insights: dict[str, object]) -> str:
         ("### 单卡依据", insights.get("report_basis_lines")),
     ]
     lines = ["## 炼化拆解"]
+    has_content = False
+    for title, items in groups:
+        values = _string_list(items)
+        if not values:
+            continue
+        has_content = True
+        lines.extend(["", title])
+        for item in values:
+            lines.append(f"- {item}")
+    return "\n".join(lines) if has_content else ""
+
+
+def render_coaching_markdown(
+    title: str,
+    *,
+    display_name: str,
+    source: str,
+    generated_at: str | None,
+    insights: dict[str, object],
+) -> str:
+    sections = [
+        f"# {title}",
+        "",
+        "## 当前定位",
+        f"- 命主：`{display_name or '道友'}`",
+        f"- 来源：`{source}`",
+        f"- 境界：`{insights.get('realm', '凡人')}`",
+        f"- 等级：`{insights.get('rank', 'L1')}`",
+    ]
+    if generated_at:
+        sections.append(f"- 生成时间：`{generated_at}`")
+    sections.extend(["", _render_coaching_section(insights)])
+    return "\n".join(sections).strip() + "\n"
+
+
+def _render_coaching_section(insights: dict[str, object]) -> str:
+    groups = [
+        ("### 下一轮先补什么", insights.get("coaching_focus_lines")),
+        ("### 具体怎么练", insights.get("coaching_drill_lines")),
+        ("### 可直接对 AI 说", insights.get("coaching_prompt_lines")),
+        ("### 建议节奏", insights.get("coaching_cycle_lines")),
+    ]
+    lines = ["## 继续突破"]
     has_content = False
     for title, items in groups:
         values = _string_list(items)

@@ -1,4 +1,4 @@
-"""portrait.skill package."""
+"""修炼.skill package."""
 
 __all__ = ["__version__"]
 
