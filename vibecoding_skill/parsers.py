@@ -216,6 +216,9 @@ def parse_codex(path: Path) -> Transcript:
 
 
 def parse_generic(path: Path, source: str) -> Transcript:
+    if path.suffix.lower() == ".jsonl":
+        return _parse_generic_jsonl(path, source)
+
     messages: list[Message] = []
     tool_calls = 0
     raw_event_count = 0
@@ -261,6 +264,84 @@ def parse_generic(path: Path, source: str) -> Transcript:
         models.extend(model_hits)
         providers.extend(provider_hits)
         token_usage = _merge_token_usage(token_usage, _token_usage_from_any(obj))
+    return Transcript(
+        source=source,
+        path=path,
+        messages=messages,
+        tool_calls=tool_calls,
+        raw_event_count=raw_event_count,
+        models=sorted(set(models)),
+        providers=sorted(set(providers)),
+        token_usage=token_usage,
+        display_name=_infer_display_name_from_messages(messages),
+    )
+
+
+def _parse_generic_jsonl(path: Path, source: str) -> Transcript:
+    messages: list[Message] = []
+    tool_calls = 0
+    raw_event_count = 0
+    models: list[str] = []
+    providers: list[str] = []
+    token_usage = TokenUsage()
+
+    pair_messages: list[Message] = []
+    pair_tool_calls = 0
+    pair_raw_events = 0
+    pair_models: list[str] = []
+    pair_providers: list[str] = []
+    pair_token_usage = TokenUsage()
+
+    for item in iter_jsonl(path):
+        if not isinstance(item, dict):
+            continue
+
+        if source in {"cursor", "vscode"}:
+            turn_messages, turn_tools, turn_events = _extract_pair_turns(item)
+            if turn_messages:
+                pair_messages.extend(turn_messages)
+                pair_tool_calls += turn_tools
+                pair_raw_events += turn_events
+                model_hits, provider_hits = _collect_models(item)
+                pair_models.extend(model_hits)
+                pair_providers.extend(provider_hits)
+                pair_token_usage = _merge_token_usage(pair_token_usage, _collect_token_usage(item))
+
+        for obj in _walk_objects(item):
+            if not isinstance(obj, dict):
+                continue
+            raw_event_count += 1
+            role = _extract_role(obj)
+            text = _extract_text(obj)
+            if role in {"user", "assistant"} and text:
+                messages.append(
+                    Message(
+                        role=role,
+                        text=text,
+                        timestamp=_extract_timestamp(obj),
+                        meta={"keys": sorted(obj.keys())[:12]},
+                    )
+                )
+            if _looks_like_tool_call(obj):
+                tool_calls += 1
+            model_hits, provider_hits = _extract_model_info(obj)
+            models.extend(model_hits)
+            providers.extend(provider_hits)
+            token_usage = _merge_token_usage(token_usage, _token_usage_from_any(obj))
+
+    if source in {"cursor", "vscode"} and pair_messages:
+        return Transcript(
+            source=source,
+            path=path,
+            messages=pair_messages,
+            tool_calls=pair_tool_calls,
+            raw_event_count=pair_raw_events,
+            models=sorted(set(pair_models)),
+            providers=sorted(set(pair_providers)),
+            token_usage=pair_token_usage,
+            display_name=_infer_display_name_from_messages(pair_messages),
+        )
+
     return Transcript(
         source=source,
         path=path,
@@ -557,16 +638,15 @@ def _token_usage_from_payload(payload: dict[str, object]) -> TokenUsage:
 
 
 def _token_usage_from_any(obj: dict[str, object]) -> TokenUsage:
+    usage = TokenUsage()
     for key in ("total_token_usage", "last_token_usage", "usage", "token_usage", "tokens"):
         value = obj.get(key)
         if isinstance(value, dict):
-            usage = _token_usage_from_mapping(value)
-            if usage.total_tokens:
-                return usage
+            usage = _merge_token_usage(usage, _token_usage_from_mapping(value))
     nested = obj.get("info")
     if isinstance(nested, dict):
-        return _token_usage_from_payload({"info": nested})
-    return TokenUsage()
+        usage = _merge_token_usage(usage, _token_usage_from_payload({"info": nested}))
+    return usage
 
 
 def _token_usage_from_mapping(obj: dict[str, object]) -> TokenUsage:
@@ -592,13 +672,41 @@ def _token_usage_from_mapping(obj: dict[str, object]) -> TokenUsage:
 
 
 def _merge_token_usage(current: TokenUsage, candidate: TokenUsage) -> TokenUsage:
-    return TokenUsage(
-        input_tokens=max(current.input_tokens, candidate.input_tokens),
-        cached_input_tokens=max(current.cached_input_tokens, candidate.cached_input_tokens),
-        output_tokens=max(current.output_tokens, candidate.output_tokens),
-        reasoning_output_tokens=max(current.reasoning_output_tokens, candidate.reasoning_output_tokens),
-        total_tokens=max(current.total_tokens, candidate.total_tokens),
+    base = current
+    fallback = candidate
+    if _token_usage_rank(candidate) > _token_usage_rank(current):
+        base = candidate
+        fallback = current
+    merged = TokenUsage(
+        input_tokens=base.input_tokens or fallback.input_tokens,
+        cached_input_tokens=base.cached_input_tokens or fallback.cached_input_tokens,
+        output_tokens=base.output_tokens or fallback.output_tokens,
+        reasoning_output_tokens=base.reasoning_output_tokens or fallback.reasoning_output_tokens,
+        total_tokens=base.total_tokens or fallback.total_tokens,
     )
+    if not merged.total_tokens:
+        merged.total_tokens = max(
+            merged.input_tokens + merged.output_tokens + merged.reasoning_output_tokens,
+            merged.input_tokens + merged.cached_input_tokens + merged.output_tokens + merged.reasoning_output_tokens,
+            merged.cached_input_tokens + merged.output_tokens + merged.reasoning_output_tokens,
+        )
+    return merged
+
+
+def _token_usage_rank(usage: TokenUsage) -> tuple[int, int, int]:
+    populated = sum(
+        1
+        for value in (
+            usage.input_tokens,
+            usage.cached_input_tokens,
+            usage.output_tokens,
+            usage.reasoning_output_tokens,
+            usage.total_tokens,
+        )
+        if value
+    )
+    component_sum = usage.input_tokens + usage.cached_input_tokens + usage.output_tokens + usage.reasoning_output_tokens
+    return (usage.total_tokens, populated, component_sum)
 
 
 def _to_int(value: object) -> int:

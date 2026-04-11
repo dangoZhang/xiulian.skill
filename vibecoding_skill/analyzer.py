@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 from statistics import mean, median
 
 from .models import Analysis, Certificate, MetricScore, Persona, Transcript
@@ -98,26 +99,53 @@ LEVEL_TABLES = {
 }
 
 METHOD_SEDIMENT_TOKENS = ["skill", "workflow", "模板", "模块", "sop", "章法", "复用", "标准化"]
+GOAL_TOKENS = ["目标", "想要", "希望", "需要", "实现", "修复", "新增", "生成", "重写", "改成"]
+CONSTRAINT_TOKENS = ["约束", "限制", "必须", "不要", "保留", "兼容", "只能", "优先", "默认", "格式", "风格"]
+ACCEPTANCE_TOKENS = ["验收", "验证", "测试", "跑通", "确认", "证明", "结果", "输出物", "可用", "正常工作", "review", "检查"]
+ITERATION_TOKENS = ["继续", "再", "改", "补", "调整", "优化", "重写", "进一步", "迭代", "打磨", "删掉", "增强"]
+REPO_TOKENS = ["readme", "agents.md", "skill.md", "pyproject.toml", "package.json", "仓库", "目录", "repo", "git", "commit", "pr", "issue"]
+CONTEXT_TOKENS = ["环境", "日志", "模型", "provider", "token", "session", "会话", "运行", "路径", "截图", "数据", "文件", "样例", "示例", "db", "jsonl"]
+HANDOFF_TOKENS = ["继续上次", "继续维护", "上次", "沿用", "记住", "记忆", "历史", "上一轮", "下一轮", "跨周期", "snapshot", "history", "handoff", "交接"]
+DELEGATION_TOKENS = ["agent", "delegate", "并行", "同时", "分身", "多个工具", "多个 agent", "多 agent", "交给 ai", "交给 agent", "异步", "后台"]
+WORKFLOW_TOKENS = METHOD_SEDIMENT_TOKENS + ["自动化", "导出", "bundle", "安装", "发布", "示例", "分享"]
+EXECUTION_TOKENS = ["我先", "我会先", "先检查", "先读", "先跑", "接下来", "正在", "已完成", "已更新", "已修复", "开始做", "先做", "验证后", "回报"]
+VERIFICATION_TOKENS = ["验证", "测试", "跑通", "编译", "compile", "build", "smoke", "检查", "确认", "git status", "通过", "失败", "风险", "没验", "证据"]
+TOOL_TOKENS = ["tool", "工具", "读文件", "跑命令", "web", "search", "grep", "rg", "sed", "git", "python", "node", "mcp", "connector", "browser"]
+ADAPTATION_TOKENS = ["改成", "回退", "兼容", "降级", "缩小范围", "最小", "兜底", "fallback", "备选", "补救", "绕过", "换方案", "切换", "重排"]
+FRICTION_TOKENS = ["报错", "失败", "不对", "太难", "卡住", "问题", "异常", "冲突", "超出", "重叠", "看不清"]
+TEACHING_TOKENS = ["分享", "导出", "给别人", "团队", "客户", "安装", "示例", "教程", "文档", "readme", "skill"]
+CONTEXT_CARRY_TOKENS = ["刚才", "上一轮", "上一步", "这轮", "沿用", "继续", "基于刚才", "根据刚才", "延续"]
+PLAN_TOKENS = ["步骤", "拆成", "分成", "分步", "阶段", "计划", "todo", "milestone", "roadmap", "下一步"]
+
+PATH_LIKE_PATTERN = re.compile(
+    r"(?:~?/[\w./-]+|[A-Za-z]:\\[\w.\\/-]+|[\w.-]+\.(?:py|ts|tsx|js|jsx|md|json|jsonl|yml|yaml|toml|sql|sh|svg|png))"
+)
+COMMAND_PATTERN = re.compile(
+    r"\b(?:python3?|pytest|uv|npm|pnpm|yarn|npx|git|rg|sed|cat|ls|make|cargo|go test|bun|node)\b"
+)
+STRUCTURED_PATTERN = re.compile(r"(?:\n|^\s*[-*]\s+|^\s*\d+\.\s+|：\s*$)", re.MULTILINE)
+ASCII_TERM_PATTERN = re.compile(r"[A-Za-z][A-Za-z0-9._/-]{2,}")
 
 
 def analyze_transcript(transcript: Transcript) -> Analysis:
     user_messages = [item for item in transcript.messages if item.role == "user"]
     assistant_messages = [item for item in transcript.messages if item.role == "assistant"]
+    signals = _extract_transcript_signals(transcript, user_messages, assistant_messages)
 
     user_metrics = [
-        MetricScore("目标清晰度", _score_clarity(user_messages), _explain_clarity(user_messages)),
-        MetricScore("上下文供给", _score_context(user_messages), _explain_context(user_messages)),
-        MetricScore("迭代修正力", _score_iteration(user_messages), _explain_iteration(user_messages)),
-        MetricScore("验收意识", _score_verification(transcript, assistant_messages), _explain_verification(transcript)),
-        MetricScore("协作节奏", _score_collaboration(user_messages, assistant_messages), _explain_collaboration(user_messages, assistant_messages)),
+        MetricScore("目标清晰度", _score_clarity(user_messages, signals), _explain_clarity(user_messages, signals)),
+        MetricScore("上下文供给", _score_context(user_messages, signals), _explain_context(user_messages, signals)),
+        MetricScore("迭代修正力", _score_iteration(user_messages, signals), _explain_iteration(user_messages, signals)),
+        MetricScore("验收意识", _score_verification(transcript, assistant_messages, signals), _explain_verification(transcript, signals)),
+        MetricScore("协作节奏", _score_collaboration(user_messages, assistant_messages, signals), _explain_collaboration(user_messages, assistant_messages, signals)),
     ]
 
     assistant_metrics = [
-        MetricScore("执行落地", _score_execution(assistant_messages), _explain_execution(assistant_messages)),
-        MetricScore("工具调度", _score_tooling(transcript), _explain_tooling(transcript)),
-        MetricScore("验证闭环", _score_verification(transcript, assistant_messages), _explain_verification(transcript)),
-        MetricScore("上下文承接", _score_context_retention(user_messages, assistant_messages), _explain_context_retention(user_messages, assistant_messages)),
-        MetricScore("补救适配", _score_recovery(user_messages, assistant_messages), _explain_recovery(user_messages, assistant_messages)),
+        MetricScore("执行落地", _score_execution(assistant_messages, signals), _explain_execution(assistant_messages, signals)),
+        MetricScore("工具调度", _score_tooling(transcript, signals), _explain_tooling(transcript, signals)),
+        MetricScore("验证闭环", _score_verification(transcript, assistant_messages, signals), _explain_verification(transcript, signals)),
+        MetricScore("上下文承接", _score_context_retention(user_messages, assistant_messages, signals), _explain_context_retention(user_messages, assistant_messages, signals)),
+        MetricScore("补救适配", _score_recovery(user_messages, assistant_messages, signals), _explain_recovery(user_messages, assistant_messages, signals)),
     ]
 
     raw_user_score = round(mean(metric.score for metric in user_metrics)) if user_metrics else 0
@@ -133,6 +161,7 @@ def analyze_transcript(transcript: Transcript) -> Analysis:
             tool_calls=transcript.tool_calls,
             session_count=1,
             method_sediment=method_sediment,
+            signals=signals,
         ),
     )
     assistant_score = _cap_score_by_capability(
@@ -144,6 +173,7 @@ def analyze_transcript(transcript: Transcript) -> Analysis:
             tool_calls=transcript.tool_calls,
             session_count=1,
             method_sediment=method_sediment,
+            signals=signals,
         ),
     )
 
@@ -216,6 +246,7 @@ def aggregate_analyses(analyses: list[Analysis], min_messages: int = 8) -> dict[
     models = _merge_unique(item for analysis in pool for item in analysis.transcript.models)
     providers = _merge_unique(item for analysis in pool for item in analysis.transcript.providers)
     method_sediment = any(_has_method_sediment(item.transcript.messages) for item in pool)
+    aggregate_signals = _aggregate_signals(pool)
     user_score = _cap_score_by_capability(
         "user",
         raw_user_score,
@@ -226,6 +257,7 @@ def aggregate_analyses(analyses: list[Analysis], min_messages: int = 8) -> dict[
             tool_calls=total_tool_calls,
             session_count=len(pool),
             method_sediment=method_sediment,
+            signals=aggregate_signals,
         ),
     )
     assistant_score = _cap_score_by_capability(
@@ -237,6 +269,7 @@ def aggregate_analyses(analyses: list[Analysis], min_messages: int = 8) -> dict[
             tool_calls=total_tool_calls,
             session_count=len(pool),
             method_sediment=method_sediment,
+            signals=aggregate_signals,
         ),
     )
 
@@ -386,12 +419,97 @@ def _stable_high_score(scores: list[int]) -> int:
     return max(round(median(ordered)), high_quantile)
 
 
+def _extract_transcript_signals(transcript: Transcript, user_messages, assistant_messages) -> dict[str, int]:
+    return {
+        "user_structured": _count_structured_messages(user_messages),
+        "assistant_structured": _count_structured_messages(assistant_messages),
+        "user_goal_hits": _count_messages_with_tokens(user_messages, GOAL_TOKENS),
+        "user_constraint_hits": _count_messages_with_tokens(user_messages, CONSTRAINT_TOKENS),
+        "user_acceptance_hits": _count_messages_with_tokens(user_messages, ACCEPTANCE_TOKENS),
+        "user_iteration_hits": _count_messages_with_tokens(user_messages, ITERATION_TOKENS),
+        "user_repo_hits": _count_messages_with_tokens(user_messages, REPO_TOKENS),
+        "user_context_hits": _count_messages_with_tokens(user_messages, CONTEXT_TOKENS),
+        "user_handoff_hits": _count_messages_with_tokens(user_messages, HANDOFF_TOKENS),
+        "user_plan_hits": _count_plan_hits(user_messages),
+        "user_path_hits": _count_path_like_messages(user_messages),
+        "assistant_plan_hits": _count_plan_hits(assistant_messages),
+        "assistant_execution_hits": _count_messages_with_tokens(assistant_messages, EXECUTION_TOKENS),
+        "assistant_verification_hits": _count_messages_with_tokens(assistant_messages, VERIFICATION_TOKENS),
+        "assistant_tool_hits": _count_messages_with_tokens(assistant_messages, TOOL_TOKENS),
+        "assistant_adaptation_hits": _count_messages_with_tokens(assistant_messages, ADAPTATION_TOKENS),
+        "assistant_delegation_hits": _count_messages_with_tokens(assistant_messages, DELEGATION_TOKENS),
+        "assistant_context_carry_hits": _count_messages_with_tokens(assistant_messages, CONTEXT_CARRY_TOKENS),
+        "repo_grounding_hits": _count_messages_with_tokens(transcript.messages, REPO_TOKENS) + _count_path_like_messages(transcript.messages),
+        "workflow_hits": _count_messages_with_tokens(transcript.messages, WORKFLOW_TOKENS),
+        "long_horizon_hits": _count_messages_with_tokens(transcript.messages, HANDOFF_TOKENS),
+        "friction_hits": _count_messages_with_tokens(user_messages, FRICTION_TOKENS),
+        "commands_hits": _count_command_like_messages(assistant_messages),
+        "keyword_overlap": _shared_context_overlap(user_messages, assistant_messages),
+        "teaching_hits": _count_messages_with_tokens(transcript.messages, TEACHING_TOKENS),
+    }
+
+
+def _aggregate_signals(analyses: list[Analysis]) -> dict[str, int]:
+    merged: dict[str, int] = {}
+    for analysis in analyses:
+        transcript = analysis.transcript
+        user_messages = [item for item in transcript.messages if item.role == "user"]
+        assistant_messages = [item for item in transcript.messages if item.role == "assistant"]
+        signals = _extract_transcript_signals(transcript, user_messages, assistant_messages)
+        for key, value in signals.items():
+            merged[key] = merged.get(key, 0) + value
+    return merged
+
+
 def _merge_unique(items) -> list[str]:
     seen: list[str] = []
     for item in items:
         if item and item not in seen:
             seen.append(item)
     return seen
+
+
+def _count_messages_with_tokens(messages, tokens: list[str]) -> int:
+    count = 0
+    lowered_tokens = [token.lower() for token in tokens]
+    for item in messages:
+        text = item.text.lower()
+        if any(token in text for token in lowered_tokens):
+            count += 1
+    return count
+
+
+def _count_structured_messages(messages) -> int:
+    return sum(1 for item in messages if STRUCTURED_PATTERN.search(item.text))
+
+
+def _count_path_like_messages(messages) -> int:
+    return sum(1 for item in messages if PATH_LIKE_PATTERN.search(item.text))
+
+
+def _count_command_like_messages(messages) -> int:
+    return sum(1 for item in messages if COMMAND_PATTERN.search(item.text))
+
+
+def _count_plan_hits(messages) -> int:
+    hits = 0
+    for item in messages:
+        text = item.text.lower()
+        if any(token in text for token in PLAN_TOKENS):
+            hits += 1
+            continue
+        if re.search(r"先.{0,30}再", item.text):
+            hits += 1
+            continue
+        if STRUCTURED_PATTERN.search(item.text) and any(token in text for token in ["目标", "约束", "输出", "验收"]):
+            hits += 1
+    return hits
+
+
+def _shared_context_overlap(user_messages, assistant_messages) -> int:
+    user_keywords = _collect_keywords(user_messages)
+    assistant_keywords = _collect_keywords(assistant_messages)
+    return len(user_keywords & assistant_keywords)
 
 
 def _build_aggregate_certificate(
@@ -463,106 +581,120 @@ def _compare_next_focus(improved: list[dict[str, int]], regressed: list[dict[str
     return deduped[:3]
 
 
-def _score_clarity(messages) -> int:
+def _score_clarity(messages, signals: dict[str, int] | None = None) -> int:
     if not messages:
         return 0
+    signals = signals or {}
     lengths = [len(item.text) for item in messages]
     avg_len = mean(lengths)
-    keyword_bonus = sum(any(token in item.text for token in ["目标", "希望", "需要", "请", "实现", "修复", "新增"]) for item in messages)
-    score = 28
-    score += min(int(avg_len / 8), 28)
-    score += min(keyword_bonus * 4, 20)
-    if any("\n" in item.text or "1." in item.text or "-" in item.text for item in messages):
-        score += 12
-    return min(score, 100)
-
-
-def _score_context(messages) -> int:
-    if not messages:
-        return 0
     score = 20
-    for item in messages:
-        text = item.text
-        if any(token in text for token in ["/", ".ts", ".py", ".md", "README", "src/", "tests/", "package.json"]):
-            score += 8
-        if any(token in text for token in ["环境", "仓库", "目录", "模型", "系统", "运行", "日志"]):
-            score += 5
-        if any(token in text for token in ["限制", "风格", "不要", "需要保留", "public", "private"]):
-            score += 5
+    score += min(int(avg_len / 7), 18)
+    score += min(signals.get("user_goal_hits", 0) * 8, 22)
+    score += min(signals.get("user_constraint_hits", 0) * 6, 16)
+    score += min(signals.get("user_acceptance_hits", 0) * 7, 16)
+    score += min(signals.get("user_plan_hits", 0) * 6, 12)
+    score += min(signals.get("user_structured", 0) * 5, 12)
     return min(score, 100)
 
 
-def _score_iteration(messages) -> int:
+def _score_context(messages, signals: dict[str, int] | None = None) -> int:
     if not messages:
         return 0
-    score = 18 + min(len(messages) * 9, 45)
-    refine_hits = sum(any(token in item.text for token in ["继续", "再", "改", "补", "调整", "优化", "下一步", "进一步"]) for item in messages)
-    score += min(refine_hits * 8, 30)
+    signals = signals or {}
+    score = 18
+    score += min(signals.get("user_repo_hits", 0) * 10, 24)
+    score += min(signals.get("user_path_hits", 0) * 8, 20)
+    score += min(signals.get("user_context_hits", 0) * 7, 18)
+    score += min(signals.get("user_constraint_hits", 0) * 5, 12)
+    score += min(signals.get("user_handoff_hits", 0) * 5, 10)
     return min(score, 100)
 
 
-def _score_verification(transcript: Transcript, assistant_messages) -> int:
-    score = 12
-    score += min(transcript.tool_calls * 7, 42)
-    verification_hits = 0
-    for item in assistant_messages:
-        if any(token in item.text.lower() for token in ["test", "build", "验证", "检查", "smoke", "run", "git status"]):
-            verification_hits += 1
-    score += min(verification_hits * 8, 46)
+def _score_iteration(messages, signals: dict[str, int] | None = None) -> int:
+    if not messages:
+        return 0
+    signals = signals or {}
+    score = 16 + min(len(messages) * 7, 28)
+    score += min(signals.get("user_iteration_hits", 0) * 8, 26)
+    score += min(signals.get("user_plan_hits", 0) * 5, 12)
+    score += min(signals.get("user_handoff_hits", 0) * 6, 12)
     return min(score, 100)
 
 
-def _score_collaboration(user_messages, assistant_messages) -> int:
+def _score_verification(transcript: Transcript, assistant_messages, signals: dict[str, int] | None = None) -> int:
+    signals = signals or {}
+    score = 14
+    score += min(transcript.tool_calls * 6, 28)
+    score += min(signals.get("assistant_verification_hits", 0) * 9, 28)
+    score += min(signals.get("user_acceptance_hits", 0) * 8, 20)
+    score += min(signals.get("commands_hits", 0) * 5, 10)
+    return min(score, 100)
+
+
+def _score_collaboration(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> int:
     if not user_messages or not assistant_messages:
         return 25
+    signals = signals or {}
     ratio = min(len(user_messages), len(assistant_messages)) / max(len(user_messages), len(assistant_messages))
-    score = 35 + int(ratio * 35)
-    if len(user_messages) >= 2 and len(assistant_messages) >= 2:
-        score += 15
-    if any(len(item.text) > 180 for item in user_messages):
-        score += 10
+    score = 30 + int(ratio * 24)
+    score += min(min(len(user_messages), len(assistant_messages)) * 4, 16)
+    score += min(signals.get("user_handoff_hits", 0) * 4, 8)
+    score += min(signals.get("assistant_context_carry_hits", 0) * 5, 10)
+    score += min(signals.get("assistant_delegation_hits", 0) * 6, 12)
     return min(score, 100)
 
 
-def _score_execution(messages) -> int:
+def _score_execution(messages, signals: dict[str, int] | None = None) -> int:
     if not messages:
         return 0
-    score = 25 + min(len(messages) * 8, 35)
-    action_hits = sum(any(token in item.text for token in ["我先", "接下来", "已", "完成", "会", "正在", "验证"]) for item in messages)
-    score += min(action_hits * 6, 30)
+    signals = signals or {}
+    score = 20 + min(len(messages) * 5, 24)
+    score += min(signals.get("assistant_execution_hits", 0) * 9, 28)
+    score += min(signals.get("assistant_plan_hits", 0) * 5, 10)
+    score += min(signals.get("commands_hits", 0) * 5, 12)
     return min(score, 100)
 
 
-def _score_tooling(transcript: Transcript) -> int:
-    return min(18 + transcript.tool_calls * 12, 100)
+def _score_tooling(transcript: Transcript, signals: dict[str, int] | None = None) -> int:
+    signals = signals or {}
+    score = 16 + min(transcript.tool_calls * 10, 46)
+    score += min(signals.get("assistant_tool_hits", 0) * 7, 20)
+    score += min(signals.get("commands_hits", 0) * 4, 10)
+    return min(score, 100)
 
 
-def _score_context_retention(user_messages, assistant_messages) -> int:
+def _score_context_retention(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> int:
     if not user_messages or not assistant_messages:
         return 20
-    user_keywords = _collect_keywords(user_messages)
-    assistant_keywords = _collect_keywords(assistant_messages)
-    overlap = len(user_keywords & assistant_keywords)
-    return min(24 + overlap * 8, 100)
+    signals = signals or {}
+    score = 22
+    score += min(signals.get("keyword_overlap", 0) * 6, 24)
+    score += min(signals.get("assistant_context_carry_hits", 0) * 8, 24)
+    score += min(signals.get("repo_grounding_hits", 0) * 3, 12)
+    return min(score, 100)
 
 
-def _score_recovery(user_messages, assistant_messages) -> int:
-    friction = any(any(token in item.text for token in ["报错", "失败", "不对", "太难", "卡住", "问题"]) for item in user_messages)
-    adaptation = any(any(token in item.text for token in ["方案", "改成", "先", "分步", "独立", "兼容", "回退"]) for item in assistant_messages)
-    score = 38
-    if friction:
-        score += 18
-    if adaptation:
-        score += 26
+def _score_recovery(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> int:
+    signals = signals or {}
+    score = 26
+    score += min(signals.get("friction_hits", 0) * 10, 24)
+    score += min(signals.get("assistant_adaptation_hits", 0) * 10, 26)
+    if signals.get("friction_hits", 0) and signals.get("assistant_adaptation_hits", 0):
+        score += 14
     return min(score, 100)
 
 
 def _collect_keywords(messages) -> set[str]:
     keywords: set[str] = set()
     for item in messages:
-        for token in ["README", "skill", "repo", "git", "public", "证书", "日志", "解析", "用户", "AI", "协作", "境界"]:
-            if token.lower() in item.text.lower():
-                keywords.add(token.lower())
+        lowered = item.text.lower()
+        for token in ["readme", "skill", "repo", "git", "public", "证书", "日志", "解析", "用户", "ai", "协作", "等级", "agent", "workflow", "tool", "model", "token"]:
+            if token in lowered:
+                keywords.add(token)
+        for match in ASCII_TERM_PATTERN.findall(item.text):
+            token = match.lower().strip("./")
+            if len(token) >= 4 and ("/" in token or "." in token or token in {"codex", "claude", "cursor", "vscode", "opencode", "openclaw"}):
+                keywords.add(token)
     return keywords
 
 
@@ -665,27 +797,59 @@ def _user_cap_rank(
     tool_calls: int,
     session_count: int,
     method_sediment: bool,
+    signals: dict[str, int] | None = None,
 ) -> int:
+    signals = signals or {}
     user_map = _metric_map(user_metrics)
     assistant_map = _metric_map(assistant_metrics)
     cap = 2
     if total_messages >= 4 and user_map.get("协作节奏", 0) >= 55 and user_map.get("上下文供给", 0) >= 40:
         cap = 3
-    if method_sediment:
+    if method_sediment or (
+        signals.get("user_plan_hits", 0) >= 1 and signals.get("user_constraint_hits", 0) >= 1 and signals.get("user_acceptance_hits", 0) >= 1
+    ):
         cap = max(cap, 4)
-    if assistant_map.get("执行落地", 0) >= 50 and tool_calls >= 1:
+    if assistant_map.get("执行落地", 0) >= 50 and tool_calls >= 1 and user_map.get("验收意识", 0) >= 40:
         cap = max(cap, 5)
-    if assistant_map.get("执行落地", 0) >= 50 and assistant_map.get("工具调度", 0) >= 40 and tool_calls >= 2:
+    if assistant_map.get("执行落地", 0) >= 55 and assistant_map.get("工具调度", 0) >= 45 and tool_calls >= 2 and signals.get("repo_grounding_hits", 0) >= 2:
         cap = max(cap, 6)
-    if assistant_map.get("工具调度", 0) >= 50 and assistant_map.get("上下文承接", 0) >= 45 and tool_calls >= 3:
+    if (
+        assistant_map.get("工具调度", 0) >= 55
+        and assistant_map.get("上下文承接", 0) >= 50
+        and tool_calls >= 3
+        and (signals.get("assistant_delegation_hits", 0) >= 1 or signals.get("assistant_context_carry_hits", 0) >= 2)
+    ):
         cap = max(cap, 7)
-    if assistant_map.get("验证闭环", 0) >= 45 and assistant_map.get("补救适配", 0) >= 45 and tool_calls >= 4:
+    if (
+        assistant_map.get("验证闭环", 0) >= 55
+        and assistant_map.get("补救适配", 0) >= 50
+        and tool_calls >= 4
+        and signals.get("friction_hits", 0) >= 1
+    ):
         cap = max(cap, 8)
-    if session_count >= 3 and method_sediment and assistant_map.get("验证闭环", 0) >= 45:
+    if (
+        session_count >= 3
+        and method_sediment
+        and assistant_map.get("验证闭环", 0) >= 55
+        and signals.get("workflow_hits", 0) >= 2
+        and signals.get("long_horizon_hits", 0) >= 1
+    ):
         cap = max(cap, 9)
-    if session_count >= 5 and assistant_map.get("验证闭环", 0) >= 55 and assistant_map.get("补救适配", 0) >= 55:
+    if (
+        session_count >= 5
+        and assistant_map.get("验证闭环", 0) >= 60
+        and assistant_map.get("补救适配", 0) >= 55
+        and user_map.get("验收意识", 0) >= 55
+        and signals.get("teaching_hits", 0) >= 2
+    ):
         cap = max(cap, 10)
-    if session_count >= 8 and assistant_map.get("执行落地", 0) >= 60 and assistant_map.get("验证闭环", 0) >= 60 and assistant_map.get("工具调度", 0) >= 60:
+    if (
+        session_count >= 8
+        and assistant_map.get("执行落地", 0) >= 65
+        and assistant_map.get("验证闭环", 0) >= 65
+        and assistant_map.get("工具调度", 0) >= 65
+        and method_sediment
+    ):
         cap = max(cap, 11)
     return cap
 
@@ -697,24 +861,47 @@ def _assistant_cap_rank(
     tool_calls: int,
     session_count: int,
     method_sediment: bool,
+    signals: dict[str, int] | None = None,
 ) -> int:
+    signals = signals or {}
     assistant_map = _metric_map(assistant_metrics)
     cap = 2
     if total_messages >= 2 and assistant_map.get("执行落地", 0) >= 45:
         cap = 3
-    if method_sediment:
+    if method_sediment or (signals.get("assistant_plan_hits", 0) >= 1 and signals.get("assistant_execution_hits", 0) >= 1):
         cap = max(cap, 4)
-    if assistant_map.get("执行落地", 0) >= 50 and tool_calls >= 1:
+    if assistant_map.get("执行落地", 0) >= 52 and tool_calls >= 1 and signals.get("repo_grounding_hits", 0) >= 1:
         cap = max(cap, 5)
-    if assistant_map.get("工具调度", 0) >= 40 and assistant_map.get("上下文承接", 0) >= 40 and tool_calls >= 2:
+    if assistant_map.get("工具调度", 0) >= 45 and assistant_map.get("上下文承接", 0) >= 45 and tool_calls >= 2:
         cap = max(cap, 6)
-    if assistant_map.get("工具调度", 0) >= 50 and assistant_map.get("补救适配", 0) >= 45 and tool_calls >= 3:
+    if (
+        assistant_map.get("工具调度", 0) >= 55
+        and assistant_map.get("补救适配", 0) >= 50
+        and tool_calls >= 3
+        and (signals.get("assistant_delegation_hits", 0) >= 1 or signals.get("assistant_tool_hits", 0) >= 2)
+    ):
         cap = max(cap, 7)
-    if assistant_map.get("验证闭环", 0) >= 45 and assistant_map.get("上下文承接", 0) >= 45 and tool_calls >= 4:
+    if (
+        assistant_map.get("验证闭环", 0) >= 55
+        and assistant_map.get("上下文承接", 0) >= 50
+        and tool_calls >= 4
+        and signals.get("commands_hits", 0) >= 1
+    ):
         cap = max(cap, 8)
-    if session_count >= 3 and assistant_map.get("验证闭环", 0) >= 45 and assistant_map.get("执行落地", 0) >= 55:
+    if (
+        session_count >= 3
+        and assistant_map.get("验证闭环", 0) >= 55
+        and assistant_map.get("执行落地", 0) >= 60
+        and signals.get("long_horizon_hits", 0) >= 1
+    ):
         cap = max(cap, 9)
-    if session_count >= 5 and assistant_map.get("验证闭环", 0) >= 55 and assistant_map.get("工具调度", 0) >= 55 and assistant_map.get("执行落地", 0) >= 60:
+    if (
+        session_count >= 5
+        and assistant_map.get("验证闭环", 0) >= 60
+        and assistant_map.get("工具调度", 0) >= 60
+        and assistant_map.get("执行落地", 0) >= 65
+        and (signals.get("workflow_hits", 0) >= 2 or method_sediment)
+    ):
         cap = max(cap, 10)
     return cap
 
@@ -860,60 +1047,84 @@ def _growth_plan(metrics: list[MetricScore], user_track: bool) -> list[str]:
     return plans[:3]
 
 
-def _explain_clarity(messages) -> str:
+def _explain_clarity(messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
     if not messages:
         return "没有用户消息，无法判断。"
-    if any(len(item.text) > 120 for item in messages):
-        return "存在较完整的任务描述，目标表达偏清晰。"
-    return "能表达基本诉求，但还可以更早给出验收目标。"
+    if signals.get("user_goal_hits", 0) and signals.get("user_constraint_hits", 0) and signals.get("user_acceptance_hits", 0):
+        return "起手就把目标、约束和验收交代出来了，主线收得住。"
+    if signals.get("user_structured", 0) or any(len(item.text) > 120 for item in messages):
+        return "任务描述已有层次，目标表达基本清楚。"
+    return "能说清大方向，但目标和验收还可以更早收束。"
 
 
-def _explain_context(messages) -> str:
-    hits = sum(any(token in item.text for token in ["/", ".md", ".py", ".ts", "仓库", "日志"]) for item in messages)
-    if hits >= 2:
-        return "用户提供了路径、文件或环境信息，AI 更容易落地。"
+def _explain_context(messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if signals.get("user_repo_hits", 0) + signals.get("user_path_hits", 0) >= 2 and signals.get("user_context_hits", 0) >= 1:
+        return "路径、文件、环境和样例给得较全，AI 更容易直接进仓库干活。"
+    if signals.get("user_repo_hits", 0) or signals.get("user_path_hits", 0):
+        return "已经开始给仓库与文件线索了，但环境边界还能再补足。"
     return "上下文仍偏口语化，建议补路径、文件名和约束。"
 
 
-def _explain_iteration(messages) -> str:
+def _explain_iteration(messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if signals.get("user_iteration_hits", 0) >= 2 and (signals.get("user_plan_hits", 0) >= 1 or signals.get("user_handoff_hits", 0) >= 1):
+        return "会持续打磨，并且能沿着上一轮结果继续推进。"
     if len(messages) >= 3:
-        return "存在多轮补充或修正，具备持续打磨意识。"
+        return "存在多轮补充或修正，已经有持续调向意识。"
     return "当前更像单轮指令，后续可增加定向修正。"
 
 
-def _explain_verification(transcript: Transcript) -> str:
-    if transcript.tool_calls >= 3:
-        return "会话里有明显的读取、搜索或验证动作。"
+def _explain_verification(transcript: Transcript, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if transcript.tool_calls >= 3 and signals.get("assistant_verification_hits", 0) >= 1:
+        return "会话里有实际验证动作，也有对结果与风险的回报。"
+    if signals.get("user_acceptance_hits", 0) >= 1:
+        return "已经在主动追问验收，但验证证据还可以再实一点。"
     return "验证动作不算多，可以更主动要求测试与确认结果。"
 
 
-def _explain_collaboration(user_messages, assistant_messages) -> str:
+def _explain_collaboration(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if len(user_messages) >= 2 and len(assistant_messages) >= 2 and signals.get("assistant_context_carry_hits", 0) >= 1:
+        return "双方能接住上一轮上下文，推进节奏已经连起来了。"
     if len(user_messages) >= 2 and len(assistant_messages) >= 2:
         return "双方回合同步，已经形成共同推进节奏。"
     return "互动回合偏少，适合拆小步增加反馈频率。"
 
 
-def _explain_execution(messages) -> str:
+def _explain_execution(messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if signals.get("assistant_execution_hits", 0) >= 2 and signals.get("commands_hits", 0) >= 1:
+        return "AI 会先落地动作，再回报过程和结果。"
     if any("完成" in item.text or "开始" in item.text for item in messages):
         return "AI 明显偏执行流，而非只做抽象建议。"
     return "AI 仍有总结倾向，可以要求先做再说。"
 
 
-def _explain_tooling(transcript: Transcript) -> str:
-    if transcript.tool_calls >= 4:
-        return "AI 已经把工具当作主工作流的一部分。"
+def _explain_tooling(transcript: Transcript, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if transcript.tool_calls >= 4 and signals.get("assistant_tool_hits", 0) >= 1:
+        return "AI 已经把读文件、跑命令和验证工具接进主工作流。"
     if transcript.tool_calls >= 1:
         return "AI 有工具意识，但还未完全进入高强度执行节奏。"
     return "当前几乎没有工具痕迹。"
 
 
-def _explain_context_retention(user_messages, assistant_messages) -> str:
+def _explain_context_retention(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if signals.get("keyword_overlap", 0) >= 2 and signals.get("assistant_context_carry_hits", 0) >= 1:
+        return "AI 不只复述主题词，还能沿着前一轮上下文继续推进。"
     if _collect_keywords(user_messages) & _collect_keywords(assistant_messages):
         return "AI 基本承接了用户的关键主题词。"
     return "AI 对用户语境的复用度还不够。"
 
 
-def _explain_recovery(user_messages, assistant_messages) -> str:
+def _explain_recovery(user_messages, assistant_messages, signals: dict[str, int] | None = None) -> str:
+    signals = signals or {}
+    if signals.get("friction_hits", 0) >= 1 and signals.get("assistant_adaptation_hits", 0) >= 1:
+        return "遇到阻力后有换打法、缩范围或兼容处理，补救动作是实的。"
     has_issue = any(any(token in item.text for token in ["问题", "太难", "失败", "报错"]) for item in user_messages)
     if has_issue:
         return "会话里出现阻力后，AI 有调整路线的空间。"
