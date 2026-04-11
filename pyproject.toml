@@ -1,7 +1,7 @@
 [project]
 name = "vibecoding-skill"
 version = "0.1.0"
-description = "Read code-agent traces, distill vibecoding ability, and generate a report, share card, and upgrade guidance."
+description = "Read code-agent traces, distill vibecoding habits, mimic a person's collaboration style, rate level, and generate upgrade guidance."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

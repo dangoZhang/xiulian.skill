@@ -122,7 +122,7 @@ def infer_display_name(transcript: Transcript) -> str | None:
 
 
 def default_display_name(certificate_track: str = "user") -> str:
-    return "道友" if certificate_track == "user" else "用户"
+    return "码奸" if certificate_track == "user" else "用户"
 
 
 def detect_source(path: Path, source: str) -> str:

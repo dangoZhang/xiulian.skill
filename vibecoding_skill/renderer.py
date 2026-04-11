@@ -50,6 +50,7 @@ def render_markdown(
     if memory_summary:
         sections.extend(["", _render_memory_summary(memory_summary)])
     sections.extend(["", _render_cultivation_judgement(insight_payload)])
+    sections.extend(["", _render_habit_section(insight_payload)])
     sections.extend(["", _render_insights_section(insight_payload)])
     sections.extend(["", _render_coaching_section(insight_payload)])
     sections.extend(
@@ -97,6 +98,8 @@ def render_aggregate_markdown(
         sections.extend(["", _render_memory_summary(memory_summary)])
     if insight_payload:
         sections.extend(["", _render_cultivation_judgement(insight_payload)])
+    if insight_payload:
+        sections.extend(["", _render_habit_section(insight_payload)])
     if insight_payload:
         sections.extend(["", _render_insights_section(insight_payload)])
         sections.extend(["", _render_coaching_section(insight_payload)])
@@ -155,10 +158,37 @@ def _render_cultivation_judgement(insights: dict[str, object]) -> str:
     return "\n".join(lines)
 
 
+def _render_habit_section(insights: dict[str, object]) -> str:
+    lines = ["## 习惯画像"]
+    habit_profile_lines = _string_list(insights.get("habit_profile_lines"))
+    mimic_lines = _string_list(insights.get("mimic_lines"))
+    target_summary_lines = _string_list(insights.get("target_summary_lines"))
+    target_gap_lines = _string_list(insights.get("target_gap_lines"))
+    target_drill_lines = _string_list(insights.get("target_drill_lines"))
+    has_content = False
+    if habit_profile_lines:
+        has_content = True
+        lines.extend(["", "### 这套 vibecoding 习惯是什么"])
+        for item in habit_profile_lines:
+            lines.append(f"- {item}")
+    if mimic_lines:
+        has_content = True
+        lines.extend(["", "### 如果要模仿这套习惯"])
+        for item in mimic_lines:
+            lines.append(f"- {item}")
+    if target_summary_lines or target_gap_lines or target_drill_lines:
+        has_content = True
+        lines.extend(["", "### 如果目标是某个等级"])
+        for item in target_summary_lines + target_gap_lines + target_drill_lines:
+            lines.append(f"- {item}")
+    return "\n".join(lines) if has_content else ""
+
+
 def _render_insights_section(insights: dict[str, object]) -> str:
     groups = [
         ("### 你这边", insights.get("user_summary_lines")),
         ("### AI 这边", insights.get("assistant_summary_lines")),
+        ("### 现代协作信号", insights.get("modern_signal_lines")),
         ("### 分享卡取材", insights.get("image_concepts")),
         ("### 判断依据", insights.get("report_basis_lines")),
     ]
@@ -182,6 +212,7 @@ def render_coaching_markdown(
     source: str,
     generated_at: str | None,
     insights: dict[str, object],
+    target_level: str | None = None,
 ) -> str:
     sections = [
         f"# {title}",
@@ -194,6 +225,9 @@ def render_coaching_markdown(
     ]
     if generated_at:
         sections.append(f"- 生成时间：`{generated_at}`")
+    if target_level:
+        sections.append(f"- 目标等级：`{target_level}`")
+    sections.extend(["", _render_habit_section(insights)])
     sections.extend(["", _render_coaching_section(insights)])
     return "\n".join(sections).strip() + "\n"
 

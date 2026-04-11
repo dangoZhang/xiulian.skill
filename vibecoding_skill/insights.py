@@ -105,42 +105,55 @@ ASSISTANT_AI_TERMS = {
 }
 
 ABILITY_LIBRARY = {
-    "L1": "还停留在单轮提问，能把问题问出去，但大多还要靠反复试。",
-    "L2": "开始会调 prompt 了，知道换一种问法，回答就会跟着变。",
-    "L3": "能独立跑完小任务，也会根据结果继续补充要求，把事做成。",
-    "L4": "已经会把常见来回沉淀成工作流，熟悉的任务通常能沿着上下文稳定推进到多步完成。",
-    "L5": "会把重复打法炼成可复用套路，同类问题不必每次都从零开始。",
-    "L6": "会让 AI 先代做一段，再回来核对方向和结果，协作已经开始成形。",
-    "L7": "能同时调动多 Agent 和工具，把一件完整差事拆开并行推进。",
-    "L8": "开始设计能力和流程，不只是在完成任务，而是在搭一套可持续的方法。",
-    "L9": "能把这套协作带进真实项目，边做边根据反馈修正方法。",
-    "L10": "能把自己的方法传给团队，让别人也能复现同样的推进质量。",
+    "L1": "你和 AI 还停在问一句答一句的阶段，能把问题抛出去，但推进更多靠反复试。",
+    "L2": "你已经开始懂得调 prompt，同一个问题会换问法，开始能有意识地把回答往对的方向拽。",
+    "L3": "你能独立做成小任务，也会顺着结果继续补要求，协作开始有连续性了。",
+    "L4": "你已经能把常见任务沿着上下文稳定推到多步完成，熟悉的问题不太会半路掉线。",
+    "L5": "你开始把顺手打法沉成可复用套路，同类问题不用每次都重新摸索一遍。",
+    "L6": "你已经会把一段工作先委给 AI 做，再回来看方向、结果和风险，协作开始真正成形。",
+    "L7": "你已经能把任务拆开，调动多 Agent 和工具并行推进，推进方式开始带一点调度味道。",
+    "L8": "你开始搭方法和流程，不再只是一件件把任务做完，而是在经营一套可持续的协作系统。",
+    "L9": "你能把这套协作带进真实项目，在约束、反馈和返工里继续修正做法。",
+    "L10": "你已经能把自己的协作方法讲清、沉淀下，再稳定复制给别人和团队。",
 }
 
 CARD_ABILITY_LIBRARY = {
-    "L1": "还停留在单轮提问，更多时候还要靠反复试。",
-    "L2": "已经会调 prompt，知道换一种问法，回答就会变。",
-    "L3": "能跑完小任务，也会根据结果继续补充要求。",
-    "L4": "已经会把常见来回沉淀成工作流，熟悉任务通常能稳定推进到多步完成。",
-    "L5": "会把重复打法炼成可复用套路，同类问题不必每次从零开始。",
-    "L6": "会让 AI 先代做一段，再回来核对方向和结果。",
-    "L7": "能同时调动多 Agent 和工具，把一件完整差事拆开并行推进。",
-    "L8": "开始设计能力和流程，正在搭一套可持续的方法。",
-    "L9": "能把这套协作带进真实项目，并根据反馈持续修正。",
-    "L10": "能把自己的方法传给团队，让别人也能稳定复现。",
+    "L1": "现在还偏单轮试探，能把问题问出去，但大多要靠多试几次才慢慢靠近结果。",
+    "L2": "现在已经知道问法会改结果，会主动换 prompt，把回答往更可用的方向拉。",
+    "L3": "现在已经能独立做成小任务，也会顺着结果继续补要求，不再总是问完就断。",
+    "L4": "现在已经能把熟悉任务沿着上下文稳稳推成多步协作，来回之间不容易掉主线。",
+    "L5": "现在开始把顺手打法沉成套路，同类任务会越做越快，越做越像自己的固定章法。",
+    "L6": "现在已经会把一段具体工作先委给 AI 推进，再回来收方向、结果和风险。",
+    "L7": "现在已经能把一件完整差事拆开，交给多 Agent 和工具并行推进，整体调度感出来了。",
+    "L8": "现在开始经营自己的方法和流程，重点已经不只是一轮任务做没做完。",
+    "L9": "现在已经能把这套协作放进真实项目，在反馈、返工和约束里继续修正打法。",
+    "L10": "现在已经能把自己的协作章法沉淀成别人也能照着复现的方法。",
 }
 
 CARD_VERDICT_LIBRARY = {
-    "L1": "这一层还在摸门，能问出问题，但稳定性还没真正出来。",
-    "L2": "这一层开始知道问法会改结果，已经脱离纯撞运气。",
-    "L3": "这一层已经能独立做成小事，也知道边做边补要求。",
-    "L4": "这一层已经会把常见来回沉淀成工作流，熟悉任务通常能稳定推进到多步完成。",
-    "L5": "这一层开始有自己的套路，同类任务不必每次都从零起手。",
-    "L6": "这一层已经懂得让 AI 先做一段，再回来收方向和结果。",
-    "L7": "这一层已经能同时调动多 Agent 和工具，把整件事拆开并行推进。",
-    "L8": "这一层开始搭方法、搭流程，重心已经不只是一件件做任务。",
-    "L9": "这一层能把协作带进真实项目，并根据反馈持续修正做法。",
-    "L10": "这一层已经能把方法沉淀下来，再稳定复制给团队使用。",
+    "L1": "这一层的人，还停留在单轮提问，AI 更像临时工具。",
+    "L2": "这一层的人，已知道问法会改变结果，但稳定性还不够。",
+    "L3": "这一层的人，能做成小任务，也会边做边补要求。",
+    "L4": "这一层的人，常见任务能稳定推进到多步完成。",
+    "L5": "这一层的人，开始把重复打法沉淀成可复用套路。",
+    "L6": "这一层的人，会让 AI 先走一段，再回来收方向和结果。",
+    "L7": "这一层的人，能同时调动多 Agent 和工具并行推进。",
+    "L8": "这一层的人，开始搭能力、搭流程，不只是在做单次任务。",
+    "L9": "这一层的人，能把这套协作带进真实项目并持续修正。",
+    "L10": "这一层的人，能把方法沉淀下来，稳定复制给团队。",
+}
+
+NEXT_LEVEL_FOCUS_LIBRARY = {
+    "L1": "先把问题说清楚，别让 AI 靠猜补全主线。",
+    "L2": "下一层看的是能不能把小任务真正做成，而不只是把答案问出来。",
+    "L3": "下一层看的是能不能把熟悉任务稳定推进成多步协作。",
+    "L4": "下一层看的是能不能把顺手打法沉成可复用套路。",
+    "L5": "下一层看的是能不能把一段具体工作放心委给 AI 先推进。",
+    "L6": "下一层看的是能不能把多 Agent、多工具真正组织起来并行推进。",
+    "L7": "下一层看的是能不能从做任务走向搭方法、搭流程。",
+    "L8": "下一层看的是能不能把打法放进真实项目，在反馈里继续修正。",
+    "L9": "下一层看的是能不能把这套方法讲清、沉淀下，再复制给别人。",
+    "L10": "这一层更重要的是守住稳定度，把方法继续沉淀成长期资产。",
 }
 
 STAGE_LABELS = {
@@ -170,6 +183,37 @@ IMAGE_CONCEPT_NOTES = {
     "修仙叙事": "世界观要贴近常见修仙小说语汇，重点是境界、功法、破境，不可乱造设定。",
     "分享传播": "这张卡既是评测结果，也是可晒图的社交物料，需优先照顾转发时的辨识度。",
     "生图约束": "如果交给模型生图，必须明确最后一行文字下方仍要保留完整安全边距。",
+}
+
+MODERN_AGENT_SIGNALS = {
+    "cross_agent_memory": {
+        "keywords": ["memory", "记忆", "上次评测", "previous snapshot", "snapshot", "长期", "跨周期", "history"],
+        "line": "出现了跨轮次记忆信号，说明这套协作已经不再只看单次对话，而开始积累长期上下文。",
+    },
+    "context_compaction": {
+        "keywords": ["压缩上下文", "总结当前进展", "继续上次", "context compaction", "handoff", "交接", "阶段总结"],
+        "line": "出现了上下文压缩 / 交接信号，说明你已经在处理更长链路任务，而不只是短回合问答。",
+    },
+    "interactive_steering": {
+        "keywords": ["边做边改", "继续做", "我先看一下", "先做到这里", "while it’s working", "steer", "interact in real time"],
+        "line": "出现了过程内调向信号，说明你会在 AI 执行过程中持续修正方向，而不是只等最后答案。",
+    },
+    "agentic_workflow": {
+        "keywords": [".github/workflows", "workflow", "工作流", "自动化", "triage", "CI", "markdown", "schedule"],
+        "line": "出现了工作流化信号，说明协作开始从单任务推进走向可复用的自动化流程。",
+    },
+    "repo_legibility": {
+        "keywords": ["AGENTS.md", "README", "docs", "设计文档", "文档索引", "schema", "可见", "repo 内"],
+        "line": "出现了仓库可读性信号，说明你开始把知识写回仓库，让 Agent 能在运行时直接看见规则和上下文。",
+    },
+    "async_teammate": {
+        "keywords": ["后台", "异步", "delegate", "assign", "交给 agent", "先让 ai 做", "teammate"],
+        "line": "出现了异步委托信号，说明你已经开始把 AI 当成能独立推进一段工作的协作对象。",
+    },
+    "mcp_tooling": {
+        "keywords": ["mcp", "tool", "工具调用", "connector", "server", "读文件", "跑命令", "web search"],
+        "line": "出现了工具编排信号，说明这轮协作已经明显依赖外部工具和连接器，而不只是纯文本问答。",
+    },
 }
 
 COACHING_PLAYBOOK = {
@@ -226,7 +270,7 @@ COACHING_PLAYBOOK = {
 }
 
 
-def build_analysis_insights(analysis: Analysis) -> dict[str, object]:
+def build_analysis_insights(analysis: Analysis, target_level: str | None = None) -> dict[str, object]:
     return _build_insights(
         messages=analysis.transcript.messages,
         user_metrics=analysis.user_metrics,
@@ -236,10 +280,11 @@ def build_analysis_insights(analysis: Analysis) -> dict[str, object]:
         total_messages=len(analysis.transcript.messages),
         tool_calls=analysis.transcript.tool_calls,
         total_tokens=analysis.transcript.token_usage.total_tokens,
+        target_level=target_level,
     )
 
 
-def build_aggregate_insights(analyses: list[Analysis], aggregate: dict[str, object]) -> dict[str, object]:
+def build_aggregate_insights(analyses: list[Analysis], aggregate: dict[str, object], target_level: str | None = None) -> dict[str, object]:
     messages = [message for analysis in analyses for message in analysis.transcript.messages]
     return _build_insights(
         messages=messages,
@@ -250,6 +295,7 @@ def build_aggregate_insights(analyses: list[Analysis], aggregate: dict[str, obje
         total_messages=int(aggregate.get("total_messages", 0) or 0),
         tool_calls=int(aggregate.get("total_tool_calls", 0) or 0),
         total_tokens=int(_as_dict(aggregate.get("token_usage")).get("total_tokens", 0) or 0),
+        target_level=target_level,
     )
 
 
@@ -263,6 +309,7 @@ def _build_insights(
     total_messages: int,
     tool_calls: int,
     total_tokens: int,
+    target_level: str | None,
 ) -> dict[str, object]:
     user_items = _metric_items(user_metrics)
     assistant_items = _metric_items(assistant_metrics)
@@ -306,27 +353,52 @@ def _build_insights(
         f"这轮样本看下来，你现在处在{stage}，对应 {rank}。",
         _card_verdict(rank),
     ]
-    standard_card_verdict_lines = [
-        f"当前处在{stage} / {rank}。",
-        _card_verdict(rank),
-    ]
-    card_verdict_lines = [
-        f"当前落在{realm} / {rank}。",
-        _card_verdict(rank),
-    ]
+    standard_card_verdict_lines = [_card_verdict(rank)]
+    card_verdict_lines = [_card_verdict(rank)]
     breakthrough_lines = _merge_growth_lines(user_certificate, assistant_certificate)
     card_breakthrough_lines = [
-        "下一轮先把目标、边界和验收写在前面，再让 AI 动手；"
-        "每轮结束都补一句：改了什么、怎么验证、还有什么没验。"
+        _card_breakthrough_text(
+            rank=rank,
+            user_low_name=user_low_name,
+            assistant_low_name=assistant_low_name,
+        )
     ]
     coaching_focus_lines, coaching_drill_lines, coaching_prompt_lines, coaching_cycle_lines = _build_coaching_plan(
         user_low["name"],
         assistant_low["name"],
     )
+    habit_profile_lines = _build_habit_profile_lines(
+        user_top_name=user_top_name,
+        assistant_top_name=assistant_top_name,
+        user_low_name=user_low_name,
+        assistant_low_name=assistant_low_name,
+        user_top_text=_metric_behavior(user_top["name"], "strong", track="user"),
+        assistant_top_text=_metric_behavior(assistant_top["name"], "strong", track="assistant"),
+        user_low_text=_metric_behavior(user_low["name"], "weak", track="user"),
+        assistant_low_text=_metric_behavior(assistant_low["name"], "weak", track="assistant"),
+    )
+    mimic_lines = _build_mimic_lines(
+        user_top_name=user_top_name,
+        assistant_top_name=assistant_top_name,
+        user_low_name=user_low_name,
+    )
+    target_summary_lines, target_gap_lines, target_drill_lines = _build_target_level_plan(
+        current_rank=rank,
+        target_level=target_level,
+        user_low_name=user_low_name,
+        assistant_low_name=assistant_low_name,
+    )
+    modern_signal_lines = _modern_agent_signal_lines(
+        messages=messages,
+        total_messages=total_messages,
+        tool_calls=tool_calls,
+    )
 
     return {
         "realm": realm,
         "rank": rank,
+        "stage": stage,
+        "target_level": target_level,
         "ability_text": ability_text,
         "card_ability_text": card_ability_text,
         "usage_line": f"{_fmt_int(total_tokens)} tokens · {total_messages} 条消息 · {tool_calls} 次工具调用" if total_tokens else f"{total_messages} 条消息 · {tool_calls} 次工具调用",
@@ -339,6 +411,12 @@ def _build_insights(
         "coaching_drill_lines": coaching_drill_lines,
         "coaching_prompt_lines": coaching_prompt_lines,
         "coaching_cycle_lines": coaching_cycle_lines,
+        "habit_profile_lines": habit_profile_lines,
+        "mimic_lines": mimic_lines,
+        "target_summary_lines": target_summary_lines,
+        "target_gap_lines": target_gap_lines,
+        "target_drill_lines": target_drill_lines,
+        "modern_signal_lines": modern_signal_lines,
         "user_summary_lines": [
             f"你这轮最稳的是“{user_top_name}”，{user_top['rationale']}",
             f"最拖后腿的是“{user_low_name}”，{user_low['rationale']}",
@@ -354,6 +432,121 @@ def _build_insights(
             "传播层重点是：大字阶段、大字等级、一眼能看懂的判断，以及下一轮最该补的动作。",
         ],
     }
+
+
+def _build_habit_profile_lines(
+    *,
+    user_top_name: str,
+    assistant_top_name: str,
+    user_low_name: str,
+    assistant_low_name: str,
+    user_top_text: str,
+    assistant_top_text: str,
+    user_low_text: str,
+    assistant_low_text: str,
+) -> list[str]:
+    return [
+        f"起手习惯：你通常会先抓住“{user_top_name}”，{user_top_text}。",
+        f"推进习惯：AI 侧最像你的地方是“{assistant_top_name}”，{assistant_top_text}。",
+        f"容易掉点的地方：你这边的“{user_low_name}”和 AI 侧的“{assistant_low_name}”还不够稳，分别表现为{user_low_text}、{assistant_low_text}。",
+    ]
+
+
+def _build_mimic_lines(
+    *,
+    user_top_name: str,
+    assistant_top_name: str,
+    user_low_name: str,
+) -> list[str]:
+    return [
+        f"如果要复刻这套习惯，开局先按“目标先说清 + 上下文先给够”的方式推进，再把“{assistant_top_name}”保持住。",
+        f"协作时优先模仿你的强项：先把主线收束，再让 Agent 直接动手，不要把解释放在执行前面。",
+        f"如果要模仿得更像，最要避免的是“{user_low_name}”掉线；每轮结束都补一次验证和回看。",
+    ]
+
+
+def _build_target_level_plan(
+    *,
+    current_rank: str,
+    target_level: str | None,
+    user_low_name: str,
+    assistant_low_name: str,
+) -> tuple[list[str], list[str], list[str]]:
+    if not target_level:
+        return [], [], []
+    current_value = _rank_number(current_rank)
+    target_value = _rank_number(target_level)
+    if target_value <= 0:
+        return [], [], []
+    if target_value <= current_value:
+        return [
+            f"当前已经在 {current_rank}，目标 {target_level} 已经覆盖到了。"
+        ], [
+            "现在更值得做的是把这层能力稳定下来，再扩大样本看看是否真稳。"
+        ], [
+            "连续几轮都保留同样的起手、执行、验证节奏，避免只在单次样本里偶然发挥。"
+        ]
+
+    missing_habits = _target_habit_focus(target_level)
+    target_habit_drills = _target_habit_drills(*missing_habits)
+    return [
+        f"当前是 {current_rank}，目标是 {target_level}，中间还差 {target_value - current_value} 个等级。"
+    ], [
+        f"冲到 {target_level}，关键不只是在单轮里更顺，还要把“{missing_habits[0]}”“{missing_habits[1]}”练成稳定习惯。",
+        f"眼下最先补的是“{user_low_name}”和“{assistant_low_name}”，这两项会直接限制你往更高等级走。",
+    ], [
+        target_habit_drills[0],
+        target_habit_drills[1],
+        f"每做完一轮，都对照 {target_level} 回看一次：这轮有没有真正出现更高等级应有的习惯。",
+    ]
+
+
+def _target_habit_focus(target_level: str) -> tuple[str, str]:
+    mapping = {
+        "L1": ("目标表达", "协作节奏"),
+        "L2": ("目标表达", "迭代修正"),
+        "L3": ("上下文信息", "结果验证"),
+        "L4": ("协作节奏", "回看确认"),
+        "L5": ("复用套路", "结果验证"),
+        "L6": ("委托执行", "回看确认"),
+        "L7": ("并行推进", "工具调用"),
+        "L8": ("系统打法", "上下文布置"),
+        "L9": ("真实项目回流", "补救适配"),
+        "L10": ("方法沉淀", "团队复制"),
+    }
+    return mapping.get(target_level, ("协作节奏", "结果验证"))
+
+
+def _target_habit_drills(first_habit: str, second_habit: str) -> tuple[str, str]:
+    drill_map = {
+        "目标表达": "下一轮开局先把目标、边界、输出物和验收写成四行，再让 Agent 开始做。",
+        "协作节奏": "把任务拆成更短的连续回合，每回合只推进一个最关键问题。",
+        "迭代修正": "看到结果偏了就立刻补一条关键修正，不要等整轮做完再统一返工。",
+        "上下文信息": "每轮开始先把路径、日志、环境和已有尝试一次性给够，减少 Agent 来回追问。",
+        "结果验证": "收尾固定追问三件事：改了什么、怎么验证、还有什么没验。",
+        "回看确认": "每轮结束都让 Agent 回报一次结果证据和剩余风险，别停在“已经改完”。",
+        "复用套路": "把这轮顺手的起手话术、执行节奏和验收方式记下来，下轮继续复用。",
+        "委托执行": "先把任务拆给 Agent 做一段，再回来只盯方向、验收和风险，不要全程手动接管。",
+        "并行推进": "遇到中等以上复杂任务时，主动拆成两到三个并行子问题，不要只让一个 Agent 顺排往下做。",
+        "工具调用": "凡是能读文件、跑命令、查日志验证的环节，都要求 Agent 先动工具再下判断。",
+        "系统打法": "别只盯一轮任务，把起手、执行、验证和复盘连成一套固定打法。",
+        "上下文布置": "在开局前先把文件范围、约束和验收方式布置好，让后续每轮都沿同一主线推进。",
+        "真实项目回流": "每完成一轮真实任务，都回收一次结果和踩坑，把它们写回下一轮协作规则。",
+        "补救适配": "一旦卡住就先给三个缩范围方案，再选最短路径继续推进，不要原地硬拧。",
+        "方法沉淀": "把高频有效的做法沉淀成固定模板、skill 或常驻协作规则。",
+        "团队复制": "把你这套做法写成别人也能复用的步骤，让同事照着就能跑出接近结果。",
+    }
+    return (
+        drill_map.get(first_habit, f"下一轮刻意强化“{first_habit}”，别只靠临场发挥。"),
+        drill_map.get(second_habit, f"下一轮刻意强化“{second_habit}”，别只靠临场发挥。"),
+    )
+
+
+def _rank_number(level: str) -> int:
+    try:
+        return int(str(level).replace("L", ""))
+    except ValueError:
+        return 0
 
 
 def _merge_growth_lines(user_certificate, assistant_certificate) -> list[str]:
@@ -472,8 +665,8 @@ def _compose_card_ability_summary(
 ) -> str:
     return (
         f"{level_text}"
-        f" 这轮亮点在{user_top_name}和{assistant_top_name}：你这边{user_top_text}，AI 这边{assistant_top_text}。"
-        f" 最该补的是{user_low_name}和{assistant_low_name}：你这边{user_low_text}，AI 这边{assistant_low_text}。"
+        f" 这轮最见功力的是{user_top_name}和{assistant_top_name}：你{user_top_text}，AI 侧{assistant_top_text}。"
+        f" 真正拦着往上走的，是{user_low_name}和{assistant_low_name}：你{user_low_text}，AI 侧{assistant_low_text}。"
     )
 
 
@@ -507,6 +700,15 @@ def _card_verdict(rank: str) -> str:
     return CARD_VERDICT_LIBRARY.get(rank, "这一层已经有稳定可复用的协作做法。")
 
 
+def _card_breakthrough_text(rank: str, user_low_name: str, assistant_low_name: str) -> str:
+    focus = NEXT_LEVEL_FOCUS_LIBRARY.get(rank, "下一层看的是把这套协作继续练稳。")
+    return (
+        f"{focus}"
+        f" 下一轮先盯住{user_low_name}和{assistant_low_name}，"
+        f"把目标、执行、验证接成一条完整回路。"
+    )
+
+
 
 
 def _image_concepts(messages: list[Message]) -> list[str]:
@@ -524,6 +726,23 @@ def _image_concepts(messages: list[Message]) -> list[str]:
         joined = "、".join(dict.fromkeys(keywords))
         lines.append(f"{name}：{IMAGE_CONCEPT_NOTES.get(name, '这一类要求在轨迹里被反复提及。')} 命中词包括 {joined}。")
     return lines
+
+
+def _modern_agent_signal_lines(*, messages: list[Message], total_messages: int, tool_calls: int) -> list[str]:
+    text = "\n".join(message.text.lower() for message in messages)
+    lines: list[str] = []
+    for signal in MODERN_AGENT_SIGNALS.values():
+        if any(keyword.lower() in text for keyword in signal["keywords"]):
+            lines.append(signal["line"])
+    if tool_calls >= 4:
+        lines.append("这轮工具调用已经比较密，协作形态更接近 agentic coding，而不是纯聊天式问答。")
+    if total_messages >= 18:
+        lines.append("这轮消息长度已经跨过短回合范围，蒸馏重点应放在长链路推进、交接和收尾，而不是单句 prompt 技巧。")
+    deduped: list[str] = []
+    for line in lines:
+        if line not in deduped:
+            deduped.append(line)
+    return deduped[:4]
 
 
 def _fmt_int(value: int) -> str:

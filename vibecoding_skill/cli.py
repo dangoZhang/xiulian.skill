@@ -49,6 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--min-messages", type=int, default=8, help="Exclude tiny sessions below this message count in aggregate mode.")
     analyze.add_argument("--memory-key", help="Custom memory group key. Reuse it across cycles to compare with the previous evaluation.")
     analyze.add_argument("--no-memory", action="store_true", help="Do not read or write local evaluation memory.")
+    analyze.add_argument("--target-level", choices=[f"L{i}" for i in range(1, 11)], help="Optional target vibecoding level for upgrade coaching.")
     analyze.add_argument("--output", help="Write markdown report to a file.")
     analyze.add_argument("--json-output", help="Write structured JSON summary to a file.")
     analyze.add_argument("--card-dir", help="Write shareable SVG cards to this directory.")
@@ -72,6 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
     coach.add_argument("--until", help="Only include sessions on/before this date or datetime. Example: 2026-04-09")
     coach.add_argument("--limit", type=int, help="Cap the number of sessions after filtering.")
     coach.add_argument("--min-messages", type=int, default=8, help="Exclude tiny sessions below this message count in aggregate mode.")
+    coach.add_argument("--target-level", choices=[f"L{i}" for i in range(1, 11)], help="Target vibecoding level to coach toward.")
     coach.add_argument("--output", help="Write markdown coaching plan to a file.")
     coach.add_argument("--json-output", help="Write structured coaching JSON to a file.")
 
@@ -101,7 +103,7 @@ def main() -> None:
         _apply_display_name(transcript, args.username, track=args.certificate)
         analysis = analyze_transcript(transcript)
         payload = _to_json(analysis)
-        payload["insights"] = build_analysis_insights(analysis)
+        payload["insights"] = build_analysis_insights(analysis, target_level=args.target_level)
         scope_kind = "path"
         scope_label = f"{source}:单次记录"
     elif args.all or args.since or args.until or args.limit:
@@ -116,13 +118,14 @@ def main() -> None:
         for analysis in analyses:
             _apply_display_name(analysis.transcript, args.username, track=args.certificate)
         aggregate = aggregate_analyses(analyses, min_messages=args.min_messages)
-        aggregate["insights"] = build_aggregate_insights(analyses, aggregate)
-        aggregate["display_name"] = _resolve_display_name_from_analyses(analyses, override=args.username, track=args.certificate)
+        pooled_analyses, pooled_refs = _aggregate_scope(analyses, refs, min_messages=args.min_messages)
+        aggregate["insights"] = build_aggregate_insights(pooled_analyses, aggregate, target_level=args.target_level)
+        aggregate["display_name"] = _resolve_display_name_from_analyses(pooled_analyses, override=args.username, track=args.certificate)
         aggregate["time_window"] = {
             "since": args.since,
             "until": args.until,
-            "latest_session": _display_ref(refs[0]),
-            "oldest_session": _display_ref(refs[-1]),
+            "latest_session": _display_ref(pooled_refs[0]),
+            "oldest_session": _display_ref(pooled_refs[-1]),
         }
         payload = aggregate
         scope_kind = "window" if args.since or args.until else "aggregate"
@@ -134,7 +137,7 @@ def main() -> None:
         _apply_display_name(transcript, args.username, track=args.certificate)
         analysis = analyze_transcript(transcript)
         payload = _to_json(analysis)
-        payload["insights"] = build_analysis_insights(analysis)
+        payload["insights"] = build_analysis_insights(analysis, target_level=args.target_level)
         scope_kind = "latest"
         scope_label = f"{source}:最近一次"
 
@@ -231,12 +234,13 @@ def _handle_coach(args) -> None:
         transcript = load_transcript(args.path, source=source)
         _apply_display_name(transcript, args.username, track="user")
         analysis = analyze_transcript(transcript)
-        insights = build_analysis_insights(analysis)
+        insights = build_analysis_insights(analysis, target_level=args.target_level)
         payload = {
             "display_name": analysis.transcript.display_name,
             "source": analysis.transcript.source,
             "insights": insights,
             "generated_at": generated_at,
+            "target_level": args.target_level,
         }
     elif args.all or args.since or args.until or args.limit:
         if source == "auto":
@@ -250,11 +254,13 @@ def _handle_coach(args) -> None:
         for analysis in analyses:
             _apply_display_name(analysis.transcript, args.username, track="user")
         aggregate = aggregate_analyses(analyses, min_messages=args.min_messages)
+        pooled_analyses, _ = _aggregate_scope(analyses, refs, min_messages=args.min_messages)
         payload = {
-            "display_name": _resolve_display_name_from_analyses(analyses, override=args.username, track="user"),
+            "display_name": _resolve_display_name_from_analyses(pooled_analyses, override=args.username, track="user"),
             "source": source,
-            "insights": build_aggregate_insights(analyses, aggregate),
+            "insights": build_aggregate_insights(pooled_analyses, aggregate, target_level=args.target_level),
             "generated_at": generated_at,
+            "target_level": args.target_level,
         }
     else:
         if source == "auto":
@@ -265,16 +271,18 @@ def _handle_coach(args) -> None:
         payload = {
             "display_name": analysis.transcript.display_name,
             "source": analysis.transcript.source,
-            "insights": build_analysis_insights(analysis),
+            "insights": build_analysis_insights(analysis, target_level=args.target_level),
             "generated_at": generated_at,
+            "target_level": args.target_level,
         }
 
     markdown = render_coaching_markdown(
         "vibecoding.skill 突破教练",
-        display_name=str(payload.get("display_name") or "道友"),
+        display_name=str(payload.get("display_name") or "码奸"),
         source=str(payload.get("source") or source),
         generated_at=generated_at,
         insights=payload["insights"],
+        target_level=args.target_level,
     )
     if args.output:
         output_path = Path(args.output).expanduser().resolve()
@@ -385,6 +393,15 @@ def _scope_label(source: str, scope_kind: str, args) -> str:
     if scope_kind == "latest":
         return f"{source}:最近一次"
     return f"{source}:单次记录"
+
+
+def _aggregate_scope(analyses, refs, min_messages: int):
+    paired = [(analysis, ref) for analysis, ref in zip(analyses, refs) if len(analysis.transcript.messages) >= min_messages]
+    if not paired:
+        return analyses, refs
+    pooled_analyses = [analysis for analysis, _ in paired]
+    pooled_refs = [ref for _, ref in paired]
+    return pooled_analyses, pooled_refs
 
 
 def _payload_source(payload: dict[str, object], fallback: str) -> str:
