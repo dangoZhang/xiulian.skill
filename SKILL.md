@@ -16,6 +16,7 @@ description: Distill habits from real code-agent traces, mimic a person's vibeco
 - 蒸馏某个人的 `vibecoding` 习惯
 - 按等级表判断当前阶段和等级
 - 帮用户朝下一等级或目标等级继续练
+- 导出一份可分享、可安装的 `vibecoding` skill 包
 
 基础输出只有四层：
 
@@ -56,7 +57,8 @@ description: Distill habits from real code-agent traces, mimic a person's vibeco
 3. 再输出人话版判断：现在在哪一层，最强项是什么，最短板是什么，下一步先补什么。
 4. 用户问“为什么”，再补依据和拆解。
 5. 用户问“给我一张卡”时先给默认分享卡。
-6. 用户问“怎么提升”或“怎么到 L7 / L8”，再补升级建议；明确想要修仙风格时再给彩蛋版。
+6. 用户问“导出来分享给别人”时，默认导出整份 skill 包，不只丢一个 markdown。
+7. 用户问“怎么提升”或“怎么到 L7 / L8”，再补升级建议；明确想要修仙风格时再给彩蛋版。
 
 ## Latest Mode
 
@@ -86,6 +88,12 @@ description: Distill habits from real code-agent traces, mimic a person's vibeco
    - 第一段：先生成默认人话版报告。
    - 第二段：对照 [修仙彩蛋表](./docs/lexicon.md)，把对应词替换成修仙词；替换后再整体改写，使文本符合修仙小说风格并且流畅连贯。
 8. 修仙改写时必须保留原始报告里的事实、等级、短板、突破方向、token、模型、时间窗、样本规模，不允许为了风格丢信息。
+9. 当用户要求“分享给别人继续用”时，默认导出这些文件：
+   - `SKILL.md`：给 Agent 安装
+   - `PROFILE.md`：给人快速阅读
+   - `REPORT.md`：完整依据
+   - `assets/vibecoding-card.png`：社交分享
+10. 如果用户只说“发我一份给同事”，优先建议分享整个导出目录或 zip；只有明确说“我只想让他读一下”时，才退回单独分享 `md`。
 
 ## Language Rules
 
@@ -109,6 +117,8 @@ description: Distill habits from real code-agent traces, mimic a person's vibeco
 - “如果我想从 L4 冲到 L5，下一轮最值得补的一个动作是什么？”
 - “按最新 Agent 生态的口径看，我最近这段协作更像哪一类玩法？”
 - “如果最近流行的是 memory、handoff、delegation 这套，你看看我的记录里有没有这些信号。”
+- “把这套 vibecoding 习惯导出成一个 skill 包，我要直接发给同事安装。”
+- “给我一份可分享导出，阅读版和安装版都带上。”
 
 ## Output Contract
 

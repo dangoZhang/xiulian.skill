@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .analyzer import aggregate_analyses, analyze_transcript, compare_analyses
 from .cards import write_cards
+from .exporter import export_bundle
 from .insights import build_aggregate_insights, build_analysis_insights
 from .memory import build_memory_summary, build_snapshot, load_previous_snapshot
 from .themes import get_ai_level_theme
@@ -55,6 +56,24 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--card-dir", help="Write shareable SVG cards to this directory.")
     analyze.add_argument("--card-style", choices=["default", "xianxia"], default="default", help="Card style. Use xianxia only as an easter egg.")
 
+    export = subparsers.add_parser("export", help="Export a shareable vibecoding bundle, including a reusable skill package.")
+    export.add_argument("--path", help="Transcript path. If omitted, use the latest file for --source.")
+    export.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
+    export.add_argument("--certificate", choices=["user", "assistant", "both"], default="both")
+    export.add_argument("--username", help="Display name for the export bundle.")
+    export.add_argument("--all", action="store_true", help="Aggregate all detected sessions for the source.")
+    export.add_argument("--since", help="Only include sessions on/after this date or datetime. Example: 2026-04-01")
+    export.add_argument("--until", help="Only include sessions on/before this date or datetime. Example: 2026-04-09")
+    export.add_argument("--limit", type=int, help="Cap the number of sessions after filtering.")
+    export.add_argument("--min-messages", type=int, default=8, help="Exclude tiny sessions below this message count in aggregate mode.")
+    export.add_argument("--memory-key", help="Custom memory group key. Reuse it across cycles to compare with the previous evaluation.")
+    export.add_argument("--no-memory", action="store_true", help="Do not read or write local evaluation memory.")
+    export.add_argument("--target-level", choices=[f"L{i}" for i in range(1, 11)], help="Optional target vibecoding level for upgrade coaching.")
+    export.add_argument("--card-style", choices=["default", "xianxia"], default="default", help="Card style. Use xianxia only as an easter egg.")
+    export.add_argument("--export-dir", required=True, help="Directory to write the shareable skill bundle into.")
+    export.add_argument("--slug", help="Optional exported skill slug.")
+    export.add_argument("--zip", action="store_true", help="Also create a zip archive next to the export directory.")
+
     compare = subparsers.add_parser("compare", help="Compare two transcript windows and summarize the upgrade path.")
     compare.add_argument("--before", required=True, help="Previous-cycle transcript path.")
     compare.add_argument("--after", help="Current-cycle transcript path. If omitted, use latest file for --source.")
@@ -96,8 +115,41 @@ def main() -> None:
         _handle_coach(args)
         return
 
+    payload, markdown = _build_analysis_result(args)
+
+    if args.command == "export":
+        exported = export_bundle(
+            payload=payload,
+            markdown=markdown,
+            output_dir=args.export_dir,
+            card_style=args.card_style,
+            archive=args.zip,
+            slug=args.slug,
+        )
+        print(json.dumps(exported, ensure_ascii=False, indent=2))
+        return
+
+    if args.output:
+        output_path = Path(args.output).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(markdown, encoding="utf-8")
+    else:
+        print(markdown)
+
+    if args.card_dir:
+        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate, style=args.card_style)
+
+    if args.json_output:
+        output_path = Path(args.json_output).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _build_analysis_result(args):
     generated_at = _generated_at()
     source = normalize_source(args.source)
+    analysis = None
+    aggregate = None
     if args.path:
         transcript = load_transcript(args.path, source=source)
         _apply_display_name(transcript, args.username, track=args.certificate)
@@ -115,8 +167,8 @@ def main() -> None:
         if not refs:
             raise SystemExit("No sessions matched the requested source/time window.")
         analyses = [analyze_transcript(load_transcript(ref, source=source)) for ref in refs]
-        for analysis in analyses:
-            _apply_display_name(analysis.transcript, args.username, track=args.certificate)
+        for item in analyses:
+            _apply_display_name(item.transcript, args.username, track=args.certificate)
         aggregate = aggregate_analyses(analyses, min_messages=args.min_messages)
         pooled_analyses, pooled_refs = _aggregate_scope(analyses, refs, min_messages=args.min_messages)
         aggregate["insights"] = build_aggregate_insights(pooled_analyses, aggregate, target_level=args.target_level)
@@ -160,7 +212,7 @@ def main() -> None:
         memory_summary = build_memory_summary(previous, snapshot)
         payload["memory"] = memory_summary
 
-    if args.path or (not args.all and not args.since and not args.until and not args.limit):
+    if analysis is not None:
         markdown = render_markdown(
             analysis,
             certificate_choice=args.certificate,
@@ -176,21 +228,7 @@ def main() -> None:
             generated_at=generated_at,
             insights=aggregate.get("insights"),
         )
-
-    if args.output:
-        output_path = Path(args.output).expanduser().resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(markdown, encoding="utf-8")
-    else:
-        print(markdown)
-
-    if args.card_dir:
-        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate, style=args.card_style)
-
-    if args.json_output:
-        output_path = Path(args.json_output).expanduser().resolve()
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return payload, markdown
 
 
 def _handle_compare(args) -> None:
