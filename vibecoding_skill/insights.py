@@ -143,6 +143,19 @@ CARD_VERDICT_LIBRARY = {
     "L10": "这一层已经能把方法沉淀下来，再稳定复制给团队使用。",
 }
 
+STAGE_LABELS = {
+    "L1": "试手期",
+    "L2": "入门期",
+    "L3": "成形期",
+    "L4": "稳定期",
+    "L5": "复用期",
+    "L6": "委托期",
+    "L7": "并行期",
+    "L8": "系统期",
+    "L9": "落地期",
+    "L10": "传承期",
+}
+
 IMAGE_CONCEPT_GROUPS = {
     "版式层级": ["标题", "副题", "小标题", "布局", "排版", "层级", "留白", "对齐", "间距", "框", "边框", "面板", "位置"],
     "文字可读": ["重叠", "可读", "看不清", "清晰", "字号", "字色", "颜色", "配色", "字距", "换行"],
@@ -259,6 +272,7 @@ def _build_insights(
 
     realm = _certificate_value(user_certificate, "level", "凡人")
     rank = _certificate_value(assistant_certificate, "level", "L1")
+    stage = STAGE_LABELS.get(rank, "试手期")
     level_ability_text = _ability_text(rank)
     card_level_ability_text = _card_ability_text(rank)
     user_top_name = USER_XIANXIA_STRONG.get(user_top["name"], user_top["name"])
@@ -289,7 +303,11 @@ def _build_insights(
         assistant_low_text=_metric_card_behavior(assistant_low["name"], "weak", track="assistant"),
     )
     verdict_lines = [
-        f"这轮样本看下来，你现在落在{realm}，对应 {rank}。",
+        f"这轮样本看下来，你现在处在{stage}，对应 {rank}。",
+        _card_verdict(rank),
+    ]
+    standard_card_verdict_lines = [
+        f"当前处在{stage} / {rank}。",
         _card_verdict(rank),
     ]
     card_verdict_lines = [
@@ -313,6 +331,7 @@ def _build_insights(
         "card_ability_text": card_ability_text,
         "usage_line": f"{_fmt_int(total_tokens)} tokens · {total_messages} 条消息 · {tool_calls} 次工具调用" if total_tokens else f"{total_messages} 条消息 · {tool_calls} 次工具调用",
         "verdict_lines": verdict_lines,
+        "standard_card_verdict_lines": standard_card_verdict_lines,
         "card_verdict_lines": card_verdict_lines,
         "breakthrough_lines": breakthrough_lines,
         "card_breakthrough_lines": card_breakthrough_lines,
@@ -331,8 +350,8 @@ def _build_insights(
         ],
         "image_concepts": image_concepts,
         "report_basis_lines": [
-            "单卡取材自：境界、等级、能力描述、短长板、真实会话规模与破境建议。",
-            "传播层重点是：大境界字、等级色、可晒图能力判词，以及下一轮修炼方向。",
+            "单卡取材自：阶段、等级、能力摘要、短长板和真实会话规模。",
+            "传播层重点是：大字阶段、大字等级、一眼能看懂的判断，以及下一轮最该补的动作。",
         ],
     }
 
@@ -343,7 +362,7 @@ def _merge_growth_lines(user_certificate, assistant_certificate) -> list[str]:
         cleaned = _xianxiaize_growth(item)
         if cleaned and cleaned not in merged:
             merged.append(cleaned)
-    return merged[:2] or ["先守住一条主线，把最短的那块板补上，再看下一轮能不能破境。"]
+    return merged[:2] or ["先守住一条主线，把最短的那块板补上，再看下一轮能不能升级。"]
 
 
 def _xianxiaize_growth(text: str) -> str:
@@ -354,7 +373,7 @@ def _xianxiaize_growth(text: str) -> str:
         "让 AI 在下一轮任务里强制执行“实现 -> 验证 -> 回报”节奏": "下一轮强制走“实现 -> 验证 -> 回报”三步，不要停在半路。",
         "每一轮收功时，都要附上看得见的凭据": "每轮结束都留下看得见的验证结果。",
         "下次闭关前，先把诉求写成“目标 + 约束 + 输出物 + 验收”四段式": "下次起手前，先把目标、边界、输出物和验收写清楚。",
-        "待下一轮问答结束，再来看境界变化": "等下一轮做完，再回来看自己有没有破境。",
+        "待下一轮问答结束，再来看境界变化": "等下一轮做完，再回来看自己有没有升级。",
     }
     for src, dst in replacements.items():
         cleaned = cleaned.replace(src, dst)
@@ -499,7 +518,7 @@ def _image_concepts(messages: list[Message]) -> list[str]:
             hits.append((name, len(matched), matched[:4]))
     hits.sort(key=lambda item: item[1], reverse=True)
     if not hits:
-        return ["当前样本里没有额外宣发要求，这张卡主要依据真实修为、等级与破境方向生成。"]
+        return ["当前样本里没有额外宣发要求，这张卡主要依据真实阶段、等级与突破方向生成。"]
     lines = []
     for name, _, keywords in hits[:4]:
         joined = "、".join(dict.fromkeys(keywords))

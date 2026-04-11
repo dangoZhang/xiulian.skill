@@ -1,27 +1,31 @@
 <div align="center">
 
-# 修仙.skil
+# vibecoding.skill
 
-> *"先看清你的 vibecoding 到了哪一层，再决定要不要修仙。"*
+> *"看清你与 Code Agent 的协作方式，也看见下一步怎么更强。"*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://python.org)
 [![Codex](https://img.shields.io/badge/Codex-Skill-111111)](https://developers.openai.com/codex/skills)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blueviolet)](https://claude.ai/code)
-[![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-green)](https://agentskills.io)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/xiuxian.skill/archive/refs/heads/main.zip)
+[![OpenCode](https://img.shields.io/badge/OpenCode-Ready-1991FF)](https://opencode.ai)
+[![OpenClaw](https://img.shields.io/badge/OpenClaw-Ready-0F766E)](https://github.com/openclaw/openclaw)
+[![Download ZIP](https://img.shields.io/badge/Download-ZIP-2EA44F)](https://github.com/dangoZhang/vibecoding.skill/archive/refs/heads/main.zip)
 
 <br>
 
-它评的不是你会不会聊天。<br>
-它评的是你能不能把 AI 真正带进工作流，做出结果，留下验证，再继续突破。<br>
+<img src="./assets/readme/vibecoding-card.png" alt="vibecoding.skill 效果示例" width="54%" />
 
 <br>
 
-默认先用人话告诉你：你现在处在哪一层、强在哪、短在哪、下一步该怎么练。<br>
-如果你想晒图，它再把这些能力炼成一张修仙风格的分享卡。<br>
+把你和 Code Agent 的真实协作记录，蒸馏成一份报告、一张分享卡、和下一轮可直接照做的突破建议。<br>
+默认先说人话；你明确想看“境界感”时，再切到修仙彩蛋。<br>
 
-[安装](#安装) · [使用](#使用) · [效果示例](#效果示例) · [境界与等级](#境界与等级) · [English](README_EN.md)
+[![Codex 来源](https://img.shields.io/badge/蒸馏来源-Codex-111111)](#)
+[![Claude Code 来源](https://img.shields.io/badge/蒸馏来源-Claude%20Code-blueviolet)](#)
+[![OpenCode 来源](https://img.shields.io/badge/蒸馏来源-OpenCode-1991FF)](#)
+[![OpenClaw 来源](https://img.shields.io/badge/蒸馏来源-OpenClaw-0F766E)](#)
+[![Cursor 来源](https://img.shields.io/badge/蒸馏来源-Cursor-222222)](#)
+[![VS Code 来源](https://img.shields.io/badge/蒸馏来源-VS%20Code-007ACC)](#)
 
 </div>
 
@@ -29,44 +33,25 @@
 
 ## 项目介绍
 
-`修仙.skil` 的核心不是“修仙”，而是 `vibecoding`。
+`vibecoding.skill` 关心的是，你有没有把 AI 真正带进工作流。
 
-`vibecoding` 很容易做得很轻，很快，也很飘。真正拉开差距的，是你会不会把目标讲清楚、把上下文喂够、让 Agent 真读文件真跑命令、最后逼它拿出验证结果。  
-这个 skill 做的，就是从真实轨迹里把这些习惯蒸馏出来。
+它会从真实协作轨迹里判断你当前的 `阶段`、`等级`、`最强项`、`最短板` 和 `下一步突破方向`。  
+默认输出是正常的 AI / Agent 语言，适合复盘、晒图和继续训练自己的协作方式。
 
-它默认输出三层东西：
+修仙只保留为彩蛋：
 
-- `境界`：你现在大概处在哪个阶段
-- `等级`：你的协作稳定度大概到什么强度
-- `突破建议`：下一轮最该补的一个动作
-
-修仙叙事只在两种时候出现：
-
-- 你主动问“我的境界如何”
-- 你想要一张能分享的修仙卡
+- 你主动说想看“境界”
+- 你主动说想生成修仙版分享卡
 
 ---
 
 ## 安装
 
 ```bash
-npx skills add https://github.com/dangoZhang/xiuxian.skill -a codex -a claude-code -a cursor -a opencode -a openclaw
+npx skills add https://github.com/dangoZhang/vibecoding.skill -a codex -a claude-code -a cursor -a opencode -a openclaw
 ```
 
-```bash
-mkdir -p ~/.codex/skills
-git clone https://github.com/dangoZhang/xiuxian.skill.git ~/.codex/skills/xiuxian-skill
-```
-
-```bash
-mkdir -p ~/.claude/skills
-git clone https://github.com/dangoZhang/xiuxian.skill.git ~/.claude/skills/xiuxian-skill
-```
-
-```bash
-mkdir -p ~/.openclaw/skills
-git clone https://github.com/dangoZhang/xiuxian.skill.git ~/.openclaw/skills/xiuxian-skill
-```
+装好之后，直接对 Agent 说下面这些话就可以。
 
 ---
 
@@ -75,28 +60,26 @@ git clone https://github.com/dangoZhang/xiuxian.skill.git ~/.openclaw/skills/xiu
 ### 问境界
 
 ```text
-看看我最近两周和 AI 协作到了什么境界。先用人话说清楚我现在最像哪一层，再给我一个修仙称号。
+给我一份最近 14 天的 vibecoding 报告。直接告诉我现在在什么阶段、L几、最明显的长板和短板。
 ```
 
 ### 生成分享卡
 
 ```text
-把我最近 10 天的 Codex 轨迹炼成一张分享卡。大字只保留境界和等级，其他内容帮我收成一眼能看懂的判词。
+把我最近一周和 Code Agent 的协作蒸馏成一张分享卡。大字只保留阶段和等级，正文压成一眼能看懂的摘要。
 ```
 
 ### 指导突破
 
 ```text
-别只告诉我等级。结合我最近这轮轨迹，指出我最拖后腿的一个习惯，再给我 3 条下一轮立刻能照做的突破建议。
+结合我最近这轮真实轨迹，告诉我最该补的一个习惯，再给我下一轮可以直接照做的突破建议。
 ```
 
----
+### 彩蛋模式
 
-## 效果示例
-
-<div align="center">
-  <img src="./assets/readme/xiuxian-card.png" alt="修仙.skil 效果示例" width="54%" />
-</div>
+```text
+如果有彩蛋版，也顺手把这份结果翻成修仙风格分享卡。
+```
 
 ---
 
@@ -119,7 +102,7 @@ git clone https://github.com/dangoZhang/xiuxian.skill.git ~/.openclaw/skills/xiu
 
 ## 词汇表
 
-- [AI / vibecoding / 修仙词汇表](./docs/lexicon.md)
+- [vibecoding / AI / 修仙彩蛋词汇表](./docs/lexicon.md)
 
 ---
 

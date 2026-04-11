@@ -1,8 +1,9 @@
-# 修仙.skil
+# vibecoding.skill
 
-Read real agent transcripts, distill your AI collaboration trace, and return one cultivation card with just two headline outputs:
+Distill your real interaction history with code agents into a vibecoding report, a share card, and upgrade guidance.
 
-- realm
+- stage
 - level
+- next step
 
 Main documentation lives in [README.md](./README.md).

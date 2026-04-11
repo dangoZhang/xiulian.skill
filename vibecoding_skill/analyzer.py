@@ -77,6 +77,21 @@ AI_LEVEL_DESCRIPTIONS = {
     "L10": "方法已可复制到团队与客户场景",
 }
 
+REALM_TO_STAGE = {
+    "凡人": "试手期",
+    "感气": "入门期",
+    "炼气": "成形期",
+    "筑基": "稳定期",
+    "金丹": "复用期",
+    "元婴": "委托期",
+    "化神": "并行期",
+    "炼虚": "系统期",
+    "合体": "落地期",
+    "大乘": "传承期",
+    "渡劫": "传承期",
+    "飞升": "传承期",
+}
+
 LEVEL_TABLES = {
     "user": REALM_LEVELS,
     "assistant": AI_LEVELS,
@@ -158,6 +173,12 @@ def level_rank(track: str, level: str) -> int:
         if name == level:
             return index
     return -1
+
+
+def display_level(track: str, level: str) -> str:
+    if track == "user":
+        return REALM_TO_STAGE.get(level, level)
+    return level
 
 
 def compare_analyses(before: Analysis, after: Analysis) -> dict[str, object]:
@@ -310,20 +331,32 @@ def _compare_track(before: Analysis, after: Analysis, track: str) -> dict[str, o
     after_rank = level_rank(track, after_certificate.level)
     score_delta = after_certificate.score - before_certificate.score
 
-    if after_rank > before_rank:
-        outcome = "破境成功"
-    elif after_rank == before_rank and score_delta > 0:
-        outcome = "境界未变，但功力上涨"
-    elif score_delta == 0:
-        outcome = "境界持平"
+    if track == "user":
+        if after_rank > before_rank:
+            outcome = "阶段升级"
+        elif after_rank == before_rank and score_delta > 0:
+            outcome = "阶段不变，但稳定度上升"
+        elif score_delta == 0:
+            outcome = "阶段持平"
+        else:
+            outcome = "本轮还未升级"
     else:
-        outcome = "本轮未能突破"
+        if after_rank > before_rank:
+            outcome = "等级提升"
+        elif after_rank == before_rank and score_delta > 0:
+            outcome = "等级未变，但稳定度上升"
+        elif score_delta == 0:
+            outcome = "等级持平"
+        else:
+            outcome = "本轮还未升级"
 
     return {
         "title": before_certificate.title,
         "outcome": outcome,
         "before_level": before_certificate.level,
         "after_level": after_certificate.level,
+        "display_before_level": display_level(track, before_certificate.level),
+        "display_after_level": display_level(track, after_certificate.level),
         "before_score": before_certificate.score,
         "after_score": after_certificate.score,
         "score_delta": score_delta,
@@ -372,10 +405,10 @@ def _build_aggregate_certificate(
     top = sorted(metrics, key=lambda item: item.score, reverse=True)
     low = sorted(metrics, key=lambda item: item.score)
     if track == "user":
-        persona_title = f"{level}协作修士"
-        title = "修为判定"
+        persona_title = f"{level} 协作阶段"
+        title = "阶段判定"
         subtitle = REALM_DESCRIPTIONS[level]
-        summary = f"这是你在多场真实协作里的稳定层次。当前已到 {level}，补齐短板后再看下一次突破。"
+        summary = f"这是你在多场真实协作里的稳定阶段。当前已到 {level}，补齐短板后再看下一次升级。"
     else:
         persona_title = f"{level} 协作等级"
         title = "等级判定"
@@ -555,7 +588,7 @@ def _build_user_certificate(score: int, metrics: list[MetricScore], transcript: 
     growth_plan = _growth_plan(low[:2], user_track=True)
     return Certificate(
         track="user",
-        title="修为判定",
+        title="阶段判定",
         level=level,
         score=score,
         persona=persona,

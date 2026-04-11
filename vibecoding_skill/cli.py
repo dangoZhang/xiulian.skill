@@ -29,15 +29,15 @@ from .renderer import render_aggregate_markdown, render_coaching_markdown, rende
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="xiuxian-skill",
-        description="Read agent transcripts, distill vibe coding ability, and issue a cultivation report.",
+        prog="vibecoding-skill",
+        description="Read code-agent transcripts, distill vibecoding ability, and issue a concise ability report.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     scan = subparsers.add_parser("scan", help="Show default transcript locations and latest detected files.")
     scan.add_argument("--source", choices=["codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code", "all"], default="all")
 
-    analyze = subparsers.add_parser("analyze", help="Analyze a transcript and print a cultivation report.")
+    analyze = subparsers.add_parser("analyze", help="Analyze transcripts and print a vibecoding report.")
     analyze.add_argument("--path", help="Transcript path. If omitted, use the latest file for --source.")
     analyze.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
     analyze.add_argument("--certificate", choices=["user", "assistant", "both"], default="both")
@@ -52,8 +52,9 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--output", help="Write markdown report to a file.")
     analyze.add_argument("--json-output", help="Write structured JSON summary to a file.")
     analyze.add_argument("--card-dir", help="Write shareable SVG cards to this directory.")
+    analyze.add_argument("--card-style", choices=["default", "xianxia"], default="default", help="Card style. Use xianxia only as an easter egg.")
 
-    compare = subparsers.add_parser("compare", help="Compare two transcripts and judge whether this cycle broke through.")
+    compare = subparsers.add_parser("compare", help="Compare two transcript windows and summarize the upgrade path.")
     compare.add_argument("--before", required=True, help="Previous-cycle transcript path.")
     compare.add_argument("--after", help="Current-cycle transcript path. If omitted, use latest file for --source.")
     compare.add_argument("--source", choices=["auto", "codex", "claude", "cc", "opencode", "openclaw", "oc", "cursor", "vscode", "code"], default="auto")
@@ -181,7 +182,7 @@ def main() -> None:
         print(markdown)
 
     if args.card_dir:
-        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate)
+        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate, style=args.card_style)
 
     if args.json_output:
         output_path = Path(args.json_output).expanduser().resolve()
@@ -269,7 +270,7 @@ def _handle_coach(args) -> None:
         }
 
     markdown = render_coaching_markdown(
-        "修仙.skil 突破教练",
+        "vibecoding.skill 突破教练",
         display_name=str(payload.get("display_name") or "道友"),
         source=str(payload.get("source") or source),
         generated_at=generated_at,

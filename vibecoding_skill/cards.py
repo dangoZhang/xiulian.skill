@@ -13,28 +13,48 @@ BASE_FONT_SIZE = 30
 BIG_FONT_SIZE = BASE_FONT_SIZE * 3
 BASE_LINE_HEIGHT = 42
 BODY_WRAP_UNITS = 28.0
+STAGE_LABELS = {
+    "L1": "试手期",
+    "L2": "入门期",
+    "L3": "成形期",
+    "L4": "稳定期",
+    "L5": "复用期",
+    "L6": "委托期",
+    "L7": "并行期",
+    "L8": "系统期",
+    "L9": "落地期",
+    "L10": "传承期",
+}
 
 
-def write_cards(payload: dict[str, object], output_dir: str | Path, certificate_choice: str = "both") -> dict[str, str]:
+def write_cards(
+    payload: dict[str, object],
+    output_dir: str | Path,
+    certificate_choice: str = "both",
+    style: str = "default",
+) -> dict[str, str]:
     del certificate_choice
     target_dir = Path(output_dir).expanduser().resolve()
     target_dir.mkdir(parents=True, exist_ok=True)
-    svg_path = target_dir / "xiuxian-card.svg"
-    png_path = target_dir / "xiuxian-card.png"
-    svg_path.write_text(render_xiuxian_card(payload), encoding="utf-8")
+    basename = "vibecoding-card" if style != "xianxia" else "vibecoding-card-xianxia"
+    svg_path = target_dir / f"{basename}.svg"
+    png_path = target_dir / f"{basename}.png"
+    svg_path.write_text(render_vibecoding_card(payload, style=style), encoding="utf-8")
     _render_png(svg_path, png_path)
     return {"card_svg": str(svg_path), "card_png": str(png_path)}
 
 
-def render_xiuxian_card(payload: dict[str, object]) -> str:
+def render_vibecoding_card(payload: dict[str, object], style: str = "default") -> str:
     insights = _as_dict(payload.get("insights"))
     display_name = _get_display_name(payload)
     generated_at = _format_generated_at(payload.get("generated_at"))
     realm = str(insights.get("realm") or "凡人")
     rank = str(insights.get("rank") or "L1")
+    stage = STAGE_LABELS.get(rank, "试手期")
     ability_text = str(insights.get("card_ability_text") or insights.get("ability_text") or "仍在引气试手。")
     ability_lines = _wrap_block([ability_text], BODY_WRAP_UNITS, limit=6)
-    verdict_source = _string_list(insights.get("card_verdict_lines")) or _string_list(insights.get("verdict_lines"))
+    verdict_source = _string_list(insights.get("card_verdict_lines")) if style == "xianxia" else _string_list(insights.get("standard_card_verdict_lines"))
+    verdict_source = verdict_source or _string_list(insights.get("verdict_lines"))
     verdict_lines = _wrap_block(verdict_source, BODY_WRAP_UNITS, limit=4)
     breakthrough_source = _string_list(insights.get("card_breakthrough_lines")) or _string_list(insights.get("breakthrough_lines"))
     breakthrough_lines = _wrap_block([_join_prose(breakthrough_source)], BODY_WRAP_UNITS, limit=4)
@@ -77,6 +97,15 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
 
     meta_1_y = divider_3_y + 72
     meta_2_y = meta_1_y + 58
+    is_xianxia = style == "xianxia"
+    title = "vibecoding.skill"
+    slogan = "蒸馏你与 Code Agent 的协作记录"
+    left_label = "境界" if is_xianxia else "阶段"
+    left_value = realm if is_xianxia else stage
+    verdict_label = "判词" if is_xianxia else "关键判断"
+    breakthrough_label = "突破方向" if is_xianxia else "下一步"
+    model_label = "法器" if is_xianxia else "模型"
+    user_label = "称呼" if is_xianxia else "用户"
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -104,11 +133,11 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   <rect x="{hero_x}" y="{hero_y}" width="{hero_w}" height="{hero_h}" rx="28" fill="#1B2732" stroke="#314554" stroke-width="2"/>
   <line x1="{hero_mid_x}" y1="{hero_y + 42}" x2="{hero_mid_x}" y2="{hero_y + hero_h - 42}" stroke="#324A5D" stroke-width="2"/>
 
-  <text x="600" y="{header_y}" fill="#13202A" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif" font-weight="700">修仙.skil</text>
-  <text x="600" y="{slogan_y}" fill="#22313C" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="600">把你的 vibecoding 炼成境界</text>
+  <text x="600" y="{header_y}" fill="#13202A" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif" font-weight="700">{_escape(title)}</text>
+  <text x="600" y="{slogan_y}" fill="#22313C" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif" font-weight="600">{_escape(slogan)}</text>
 
-  {_label_pill(int(left_col_mid - 60), label_y - 32, 120, "境界", theme)}
-  <text x="{left_col_mid}" y="{big_y}" fill="#FFFFFF" font-size="{BIG_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif">{_escape(realm)}</text>
+  {_label_pill(int(left_col_mid - 60), label_y - 32, 120, left_label, theme)}
+  <text x="{left_col_mid}" y="{big_y}" fill="#FFFFFF" font-size="{BIG_FONT_SIZE}" text-anchor="middle" font-family="STKaiti, KaiTi, serif">{_escape(left_value)}</text>
 
   {_label_pill(int(right_col_mid - 60), label_y - 32, 120, "等级", theme)}
   <text x="{right_col_mid}" y="{big_y}" fill="{_escape(str(theme.get("accent", "#8EC5FF")))}" font-size="{BIG_FONT_SIZE}" text-anchor="middle" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" font-weight="700">{_escape(rank)}</text>
@@ -116,16 +145,16 @@ def render_xiuxian_card(payload: dict[str, object]) -> str:
   {_label_pill(content_x, ability_label_y - 32, 292, "vibecoding能力", theme)}
   {_text_lines(ability_lines, x=content_x, y=ability_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#1F2328", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
   <line x1="{content_x}" y1="{divider_1_y}" x2="{content_x + content_w}" y2="{divider_1_y}" stroke="#D7C8B3" stroke-width="2"/>
-  {_label_pill(content_x, verdict_label_y - 32, 120, "判词", theme)}
+  {_label_pill(content_x, verdict_label_y - 32, 176, verdict_label, theme)}
   {_text_lines(verdict_lines, x=content_x, y=verdict_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#1F2328", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
 
   <line x1="{content_x}" y1="{divider_2_y}" x2="{content_x + content_w}" y2="{divider_2_y}" stroke="#D7C8B3" stroke-width="2"/>
-  {_label_pill(content_x, breakthrough_label_y - 32, 176, "突破方向", theme)}
+  {_label_pill(content_x, breakthrough_label_y - 32, 176, breakthrough_label, theme)}
   {_text_lines(breakthrough_lines, x=content_x, y=breakthrough_text_y, font_size=BASE_FONT_SIZE, line_height=BASE_LINE_HEIGHT, fill="#1F2328", anchor="start", family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif", weight="500")}
 
   <line x1="{content_x}" y1="{divider_3_y}" x2="{content_x + content_w}" y2="{divider_3_y}" stroke="#D7C8B3" stroke-width="2"/>
-  <text x="600" y="{meta_1_y}" fill="#4A5560" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">法器 { _escape(model_name) }  |  tokens { _escape(_token_name(payload)) }</text>
-  <text x="600" y="{meta_2_y}" fill="#4A5560" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">称呼 { _escape(display_name) }  |  生成于 { _escape(generated_at) }</text>
+  <text x="600" y="{meta_1_y}" fill="#4A5560" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(model_label)} { _escape(model_name) }  |  tokens { _escape(_token_name(payload)) }</text>
+  <text x="600" y="{meta_2_y}" fill="#4A5560" font-size="{BASE_FONT_SIZE}" text-anchor="middle" font-family="PingFang SC, Hiragino Sans GB, Microsoft YaHei, sans-serif">{_escape(user_label)} { _escape(display_name) }  |  生成于 { _escape(generated_at) }</text>
 
 </svg>
 """

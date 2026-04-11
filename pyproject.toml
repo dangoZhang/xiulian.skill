@@ -1,17 +1,17 @@
 [project]
-name = "xiuxian-skill"
+name = "vibecoding-skill"
 version = "0.1.0"
-description = "Read agent transcripts, distill vibe coding ability, and issue a shareable cultivation card."
+description = "Read code-agent traces, distill vibecoding ability, and generate a report, share card, and upgrade guidance."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
-xiuxian-skill = "xiuxian_skill.cli:main"
+vibecoding-skill = "vibecoding_skill.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["xiuxian_skill"]
+packages = ["vibecoding_skill"]

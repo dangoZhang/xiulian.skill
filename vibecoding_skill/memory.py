@@ -6,7 +6,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-from .analyzer import level_rank
+from .analyzer import display_level, level_rank
 
 
 def load_previous_snapshot(snapshot: dict[str, object], max_entries: int = 200) -> dict[str, object] | None:
@@ -26,7 +26,7 @@ def build_memory_summary(previous: dict[str, object] | None, current: dict[str, 
         return {
             "has_previous": False,
             "memory_key": current["memory_key"],
-            "message": "已记住本次评测。下次再测时，会自动显示变化与突破。",
+            "message": "已记住本次评测。下次再测时，会自动显示变化与升级。",
         }
     return {
         "has_previous": True,
@@ -67,16 +67,16 @@ def build_snapshot(
 
 
 def memory_store_path() -> Path:
-    override = os.getenv("XIUXIAN_SKILL_HOME")
+    override = os.getenv("VIBECODING_SKILL_HOME")
     if override:
         return Path(override).expanduser().resolve() / "history.json"
     if sys.platform == "darwin":
-        base = Path.home() / "Library" / "Application Support" / "xiuxian-skill"
+        base = Path.home() / "Library" / "Application Support" / "vibecoding-skill"
     elif os.name == "nt":
-        base = Path(os.getenv("APPDATA", Path.home() / "AppData" / "Roaming")) / "xiuxian-skill"
+        base = Path(os.getenv("APPDATA", Path.home() / "AppData" / "Roaming")) / "vibecoding-skill"
     else:
         xdg = os.getenv("XDG_DATA_HOME")
-        base = Path(xdg).expanduser() / "xiuxian-skill" if xdg else Path.home() / ".local" / "share" / "xiuxian-skill"
+        base = Path(xdg).expanduser() / "vibecoding-skill" if xdg else Path.home() / ".local" / "share" / "vibecoding-skill"
     return base / "history.json"
 
 
@@ -89,16 +89,18 @@ def _build_track_summary(track: str, previous: dict[str, object], current: dict[
     after_rank = level_rank(track, after_level)
     score_delta = after_score - before_score
     if after_rank > before_rank:
-        outcome = "破境成功" if track == "user" else "等级提升"
+        outcome = "阶段升级" if track == "user" else "等级提升"
     elif after_rank == before_rank and score_delta > 0:
-        outcome = "境界未变，功力上涨" if track == "user" else "等级未变，能力上涨"
+        outcome = "阶段不变，稳定度上升" if track == "user" else "等级未变，能力上涨"
     elif score_delta == 0:
         outcome = "与上次持平"
     else:
-        outcome = "本轮未突破" if track == "user" else "本轮未升级"
+        outcome = "本轮还未升级" if track == "user" else "本轮未升级"
     return {
         "before_level": before_level,
         "after_level": after_level,
+        "display_before_level": display_level(track, before_level),
+        "display_after_level": display_level(track, after_level),
         "before_score": before_score,
         "after_score": after_score,
         "score_delta": score_delta,

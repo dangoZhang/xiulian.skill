@@ -3,7 +3,19 @@ from __future__ import annotations
 from .analyzer import infer_talent, infer_talent_from_models
 from .insights import build_analysis_insights
 from .models import Analysis, MetricScore
-from .xianxia import derive_xianxia_profile
+
+STAGE_LABELS = {
+    "L1": "试手期",
+    "L2": "入门期",
+    "L3": "成形期",
+    "L4": "稳定期",
+    "L5": "复用期",
+    "L6": "委托期",
+    "L7": "并行期",
+    "L8": "系统期",
+    "L9": "落地期",
+    "L10": "传承期",
+}
 
 
 def render_markdown(
@@ -17,11 +29,11 @@ def render_markdown(
     insight_payload = insights or build_analysis_insights(analysis)
     talent = infer_talent(analysis.transcript)
     sections = [
-        "# 修仙.skil 能力报告",
+        "# vibecoding.skill 能力报告",
         "",
         "## 本轮概览",
         analysis.overview,
-        f"- 命主：`{analysis.transcript.display_name or '道友'}`",
+        f"- 用户：`{analysis.transcript.display_name or '用户'}`",
         f"- 来源：`{analysis.transcript.source}`",
     ]
     if generated_at:
@@ -30,15 +42,14 @@ def render_markdown(
     if talent:
         sections.extend(
             [
-                f"- 灵根：`{talent['root']}`",
-                f"- 资质：`{talent['aptitude']}`",
-                f"- 炉主：`{talent['primary_model']}`",
+                f"- 资质判断：`{talent['root']}`",
+                f"- 稳定性：`{talent['aptitude']}`",
+                f"- 主用模型：`{talent['primary_model']}`",
             ]
         )
     if memory_summary:
         sections.extend(["", _render_memory_summary(memory_summary)])
     sections.extend(["", _render_cultivation_judgement(insight_payload)])
-    sections.extend(["", _render_xianxia_profile(_analysis_xianxia_payload(analysis))])
     sections.extend(["", _render_insights_section(insight_payload)])
     sections.extend(["", _render_coaching_section(insight_payload)])
     sections.extend(
@@ -64,11 +75,11 @@ def render_aggregate_markdown(
     insight_payload = insights or {}
     talent = infer_talent_from_models(aggregate.get("models", []))
     sections = [
-        "# 修仙.skil 聚合报告",
+        "# vibecoding.skill 聚合报告",
         "",
         "## 本轮概览",
         str(aggregate["overview"]),
-        f"- 命主：`{aggregate.get('display_name', '道友')}`",
+        f"- 用户：`{aggregate.get('display_name', '用户')}`",
         f"- 纳入样本：`{aggregate['sessions_used']}` / `总样本 {aggregate['sessions_total']}`",
     ]
     if generated_at:
@@ -77,16 +88,15 @@ def render_aggregate_markdown(
     if talent:
         sections.extend(
             [
-                f"- 灵根：`{talent['root']}`",
-                f"- 资质：`{talent['aptitude']}`",
-                f"- 炉主：`{talent['primary_model']}`",
+                f"- 资质判断：`{talent['root']}`",
+                f"- 稳定性：`{talent['aptitude']}`",
+                f"- 主用模型：`{talent['primary_model']}`",
             ]
         )
     if memory_summary:
         sections.extend(["", _render_memory_summary(memory_summary)])
     if insight_payload:
         sections.extend(["", _render_cultivation_judgement(insight_payload)])
-    sections.extend(["", _render_xianxia_profile(aggregate)])
     if insight_payload:
         sections.extend(["", _render_insights_section(insight_payload)])
         sections.extend(["", _render_coaching_section(insight_payload)])
@@ -109,16 +119,16 @@ def render_comparison_markdown(
 ) -> str:
     del certificate_choice
     sections = [
-        "# 修仙.skil 破境报告",
+        "# vibecoding.skill 对比报告",
         "",
         "## 对比概览",
         str(comparison["overview"]),
     ]
     if comparison.get("display_name"):
-        sections.append(f"- 命主：`{comparison['display_name']}`")
+        sections.append(f"- 用户：`{comparison['display_name']}`")
     if generated_at:
         sections.append(f"- 生成时间：`{generated_at}`")
-    sections.extend(["", _render_comparison_track("境界变化", comparison["user"])])
+    sections.extend(["", _render_comparison_track("阶段变化", comparison["user"])])
     sections.extend(["", _render_comparison_track("等级变化", comparison["assistant"])])
     return "\n".join(sections).strip() + "\n"
 
@@ -127,7 +137,7 @@ def _render_cultivation_judgement(insights: dict[str, object]) -> str:
     breakthrough_lines = _string_list(insights.get("breakthrough_lines"))
     lines = [
         "## 层级判断",
-        f"- 境界：`{insights.get('realm', '凡人')}`",
+        f"- 阶段：`{_stage_label(str(insights.get('rank', 'L1')))}`",
         f"- 等级：`{insights.get('rank', 'L1')}`",
         f"- vibecoding 判断：{insights.get('ability_text', '仍在引气试手。')}",
     ]
@@ -177,9 +187,9 @@ def render_coaching_markdown(
         f"# {title}",
         "",
         "## 当前定位",
-        f"- 命主：`{display_name or '道友'}`",
+        f"- 用户：`{display_name or '用户'}`",
         f"- 来源：`{source}`",
-        f"- 境界：`{insights.get('realm', '凡人')}`",
+        f"- 阶段：`{_stage_label(str(insights.get('rank', 'L1')))}`",
         f"- 等级：`{insights.get('rank', 'L1')}`",
     ]
     if generated_at:
@@ -206,19 +216,6 @@ def _render_coaching_section(insights: dict[str, object]) -> str:
         for item in values:
             lines.append(f"- {item}")
     return "\n".join(lines) if has_content else ""
-
-
-def _render_xianxia_profile(payload: dict[str, object]) -> str:
-    profile = derive_xianxia_profile(payload)
-    if not profile:
-        return ""
-    lines = ["## 补充信息"]
-    for item in profile[:8]:
-        detail = f"，{item['detail']}" if item.get("detail") else ""
-        lines.append(f"- {item['term']}：`{item['value']}`{detail}")
-    return "\n".join(lines)
-
-
 def _render_metrics(title: str, metrics: list[MetricScore]) -> str:
     lines = [f"### {title}"]
     for item in metrics:
@@ -235,7 +232,7 @@ def _render_memory_summary(memory_summary: dict[str, object]) -> str:
         lines.append(f"- 上次评测：`{_format_memory_time(str(memory_summary['previous_at']))}`")
     if memory_summary.get("scope_label"):
         lines.append(f"- 记忆分组：`{memory_summary['scope_label']}`")
-    lines.append(f"- 境界：{_render_memory_track(memory_summary['user'])}")
+    lines.append(f"- 阶段：{_render_memory_track(memory_summary['user'])}")
     lines.append(f"- 等级：{_render_memory_track(memory_summary['assistant'])}")
     return "\n".join(lines)
 
@@ -243,19 +240,23 @@ def _render_memory_summary(memory_summary: dict[str, object]) -> str:
 def _render_memory_track(track: dict[str, object]) -> str:
     delta = int(track["score_delta"])
     delta_text = f"{delta:+d}"
+    before_level = str(track.get("display_before_level") or track["before_level"])
+    after_level = str(track.get("display_after_level") or track["after_level"])
     return (
-        f"`{track['before_level']} {track['before_score']}/100 -> "
-        f"{track['after_level']} {track['after_score']}/100`，"
+        f"`{before_level} {track['before_score']}/100 -> "
+        f"{after_level} {track['after_score']}/100`，"
         f"{track['outcome']}（{delta_text}）"
     )
 
 
 def _render_comparison_track(title: str, data: dict[str, object]) -> str:
+    before_level = str(data.get("display_before_level") or data["before_level"])
+    after_level = str(data.get("display_after_level") or data["after_level"])
     lines = [
         f"## {title}",
         f"- 结果：{data['outcome']}",
-        f"- 前次：`{data['before_level']}`（`{data['before_score']}/100`）",
-        f"- 本次：`{data['after_level']}`（`{data['after_score']}/100`）",
+        f"- 前次：`{before_level}`（`{data['before_score']}/100`）",
+        f"- 本次：`{after_level}`（`{data['after_score']}/100`）",
         f"- 分数变化：`{data['score_delta']:+d}`",
         "",
         "### 关键变化",
@@ -290,30 +291,6 @@ def _render_token_lines(token_usage, label: str) -> list[str]:
         f"- {label}：`{_fmt_int(total)} token`",
         f"- token 明细：`输入 {_fmt_int(input_tokens)} / 缓存 {_fmt_int(cached_input_tokens)} / 输出 {_fmt_int(output_tokens)} / 推理 {_fmt_int(reasoning_output_tokens)}`",
     ]
-
-
-def _analysis_xianxia_payload(analysis: Analysis) -> dict[str, object]:
-    return {
-        "transcript": {
-            "source": analysis.transcript.source,
-            "message_count": len(analysis.transcript.messages),
-            "tool_calls": analysis.transcript.tool_calls,
-            "models": analysis.transcript.models,
-            "providers": analysis.transcript.providers,
-            "token_usage": {
-                "total_tokens": analysis.transcript.token_usage.total_tokens,
-            },
-        },
-        "user_metrics": [{"name": item.name, "score": item.score, "rationale": item.rationale} for item in analysis.user_metrics],
-        "user_certificate": {
-            "persona": {
-                "subtitle": analysis.user_certificate.persona.subtitle,
-            },
-            "growth_plan": analysis.user_certificate.growth_plan,
-        },
-    }
-
-
 def _token_value(token_usage, key: str) -> int:
     if isinstance(token_usage, dict):
         value = token_usage.get(key, 0)
@@ -334,3 +311,7 @@ def _string_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item) for item in value if str(item).strip()]
+
+
+def _stage_label(rank: str) -> str:
+    return STAGE_LABELS.get(rank, "试手期")
