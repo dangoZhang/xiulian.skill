@@ -157,7 +157,15 @@ def render_vibecoding_card(payload: dict[str, object], *, style: str = "default"
     data = build_card_data(payload, style=style, locale=locale)
     palette = get_luogu_level_palette(data.palette_level)
     summary_lines = _wrap_text(data.summary, max_units=18.5, limit=2)
-    summary_y = 746 if len(summary_lines) > 1 else 778
+    summary_y = 772 if len(summary_lines) > 1 else 804
+
+    title_size = 59
+    section_label_size = 48
+    summary_size = 52
+    summary_line_height = 69
+    primary_value_size = 63
+    username_size = 79
+    time_value_size = 52
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -205,29 +213,29 @@ def render_vibecoding_card(payload: dict[str, object], *, style: str = "default"
   </g>
 
   <rect x="140" y="108" width="920" height="2" rx="1" fill="{_escape(_mix_hex(palette['glow'], '#FFFFFF', 0.20))}" fill-opacity="0.88"/>
-  <text x="160" y="188" fill="#FFFFFF" font-size="54" font-family="{_display_font()}" font-weight="700">{_escape(data.title)}</text>
+  <text x="160" y="194" fill="#FFFFFF" font-size="{title_size}" font-family="{_display_font()}" font-weight="700">{_escape(data.title)}</text>
 
   <g>
-    <rect x="438" y="254" width="324" height="78" rx="39" fill="url(#glass)" stroke="{_escape(_with_alpha(palette['line'], 0.60))}"/>
-    <text x="600" y="306" fill="#FFFFFF" font-size="44" text-anchor="middle" font-family="{_body_font()}" font-weight="600">{_escape(data.level_label)}</text>
+    <rect x="426" y="248" width="348" height="84" rx="42" fill="url(#glass)" stroke="{_escape(_with_alpha(palette['line'], 0.60))}"/>
+    <text x="600" y="304" fill="#FFFFFF" font-size="{section_label_size}" text-anchor="middle" font-family="{_body_font()}" font-weight="600">{_escape(data.level_label)}</text>
   </g>
 
   <text x="600" y="612" fill="#FFFFFF" font-size="320" text-anchor="middle" font-family="{_display_font()}" font-weight="700" letter-spacing="-10">{_escape(data.level)}</text>
-  {_text_lines(summary_lines, x=600, y=summary_y, font_size=48, line_height=64, fill="#F5F7FA", anchor="middle", family=_body_font(), weight="600")}
+  {_text_lines(summary_lines, x=600, y=summary_y, font_size=summary_size, line_height=summary_line_height, fill="#F5F7FA", anchor="middle", family=_body_font(), weight="600")}
 
-  <line x1="170" y1="948" x2="1030" y2="948" stroke="{_escape(_with_alpha(palette['line'], 0.42))}" stroke-width="1.5"/>
+  <line x1="170" y1="982" x2="1030" y2="982" stroke="{_escape(_with_alpha(palette['line'], 0.42))}" stroke-width="1.5"/>
 
-  <text x="170" y="1036" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.platform_model_label)}</text>
-  <text x="170" y="1112" fill="#FFFFFF" font-size="58" font-family="{_display_font()}" font-weight="650">{_escape(data.platform_model)}</text>
+  <text x="170" y="1076" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.platform_model_label)}</text>
+  <text x="170" y="1158" fill="#FFFFFF" font-size="{primary_value_size}" font-family="{_display_font()}" font-weight="650">{_escape(data.platform_model)}</text>
 
-  <line x1="170" y1="1188" x2="1030" y2="1188" stroke="{_escape(_with_alpha(palette['line'], 0.28))}"/>
+  <line x1="170" y1="1224" x2="1030" y2="1224" stroke="{_escape(_with_alpha(palette['line'], 0.28))}"/>
 
   {_render_constellation(data, palette)}
 
-  <text x="670" y="1260" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.user_label)}</text>
-  <text x="670" y="1336" fill="#FFFFFF" font-size="72" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
-  <text x="670" y="1416" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
-  <text x="670" y="1480" fill="#FFFFFF" font-size="48" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
+  <text x="670" y="1298" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.user_label)}</text>
+  <text x="670" y="1382" fill="#FFFFFF" font-size="{username_size}" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
+  <text x="670" y="1466" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
+  <text x="670" y="1530" fill="#FFFFFF" font-size="{time_value_size}" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
 
 </svg>
 """
@@ -298,7 +306,7 @@ def _text_lines(
 
 def _render_constellation(data: CardData, palette: dict[str, str]) -> str:
     left = 156
-    top = 1260
+    top = 1298
     width = 414
     height = 188
     path_points = []
@@ -324,7 +332,7 @@ def _render_constellation(data: CardData, palette: dict[str, str]) -> str:
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius:.1f}" fill="{_escape(_with_alpha("#FFFFFF", max(0.42, opacity)))}"/>'
         )
     return (
-        f'<text x="{left}" y="1232" fill="{_escape(_with_alpha(palette["glow"], 0.92))}" font-size="44" font-family="{_body_font()}" font-weight="600">{_escape(data.constellation_label)}</text>'
+        f'<text x="{left}" y="1270" fill="{_escape(_with_alpha(palette["glow"], 0.92))}" font-size="48" font-family="{_body_font()}" font-weight="600">{_escape(data.constellation_label)}</text>'
         f'<ellipse cx="{left + width * 0.46:.1f}" cy="{top + height * 0.56:.1f}" rx="{width * 0.46:.1f}" ry="{height * 0.50:.1f}" fill="{_escape(_with_alpha(palette["base"], 0.08))}"/>'
         f'<ellipse cx="{left + width * 0.30:.1f}" cy="{top + height * 0.70:.1f}" rx="{width * 0.22:.1f}" ry="{height * 0.22:.1f}" fill="{_escape(_with_alpha(palette["glow"], 0.05))}"/>'
         f'<polyline points="{" ".join(path_points)}" fill="none" stroke="{_escape(_with_alpha(palette["base"], 0.22))}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 14"/>'
