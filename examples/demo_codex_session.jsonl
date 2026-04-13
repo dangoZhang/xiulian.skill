@@ -1,4 +1,4 @@
-{"timestamp":"2026-04-09T10:00:00Z","type":"session_meta","payload":{"id":"demo","cwd":"/demo/project","originator":"Codex Desktop"}}
+{"timestamp":"2026-04-09T10:00:00Z","type":"session_meta","payload":{"id":"demo","cwd":"/demo/project","originator":"Codex Desktop","model":"openai/gpt-5.4","model_provider":"openai"}}
 {"timestamp":"2026-04-09T10:00:01Z","type":"event_msg","payload":{"type":"user_message","message":"我们做一个新的 skill。目标是解析 codex 日志并生成一张修仙修为卡。约束：纯本地、独立 git、README 要像爆款 skill 项目。输出物：CLI、SKILL.md、README、示例。"}}
 {"timestamp":"2026-04-09T10:00:03Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"我先确认日志格式和仓库结构，再搭一个独立目录，把解析、打分和单卡输出接起来。"}]}}
 {"timestamp":"2026-04-09T10:00:05Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"rg --files\"}"}}

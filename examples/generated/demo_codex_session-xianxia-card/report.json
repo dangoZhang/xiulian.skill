@@ -5,8 +5,12 @@
     "path": "~/my-project/xiuxianLLM/side-projects/portrait.skill/examples/demo_codex_session.jsonl",
     "message_count": 4,
     "tool_calls": 2,
-    "models": [],
-    "providers": [],
+    "models": [
+      "openai/gpt-5.4"
+    ],
+    "providers": [
+      "openai"
+    ],
     "display_name": "码奸",
     "token_usage": {
       "input_tokens": 2480,
@@ -232,16 +236,19 @@
       "传播层重点是：大字等级、一眼能看懂的判断，以及下一轮最该补的动作。"
     ]
   },
-  "generated_at": "2026-04-14 01:16",
+  "generated_at": "2026-04-14 01:58",
+  "style_signals": {
+    "xianxia_requested": true
+  },
   "xianxia_profile": [
     {
       "term": "灵根",
-      "value": "未显灵根",
-      "detail": "资质未明"
+      "value": "天灵根",
+      "detail": "上品资质"
     },
     {
       "term": "宗门",
-      "value": "Codex",
+      "value": "Codex · openai/gpt-5.4",
       "detail": "常驻宗门与本命法宝"
     },
     {
@@ -287,12 +294,14 @@
     "result_skill_title": "码奸.skill",
     "source": "codex",
     "rank": "L4",
-    "generated_at": "2026-04-14 01:16",
+    "generated_at": "2026-04-14 01:58",
     "compression_mode": "first_two_sentences",
     "message_count": 4,
     "user_message_count": 2,
     "assistant_message_count": 2,
-    "models": [],
+    "models": [
+      "openai/gpt-5.4"
+    ],
     "fields": [
       {
         "id": "goal_framing",
@@ -893,6 +902,7 @@
       ]
     }
   },
+  "card_style": "xianxia",
   "cards": {
     "card_svg": "/Users/zty/my-project/xiuxianLLM/side-projects/portrait.skill/examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.svg",
     "card_png": "/Users/zty/my-project/xiuxianLLM/side-projects/portrait.skill/examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.png"

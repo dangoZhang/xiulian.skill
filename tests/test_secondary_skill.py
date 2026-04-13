@@ -156,7 +156,7 @@ class SecondarySkillDistillationTests(unittest.TestCase):
             },
         }
         svg = render_vibecoding_card(payload, style="default")
-        self.assertIn("十六维星图 · 天鹅座", svg)
+        self.assertIn("十六维星图 · 奎宿", svg)
         self.assertIn("亮度随 16 维得分变化", svg)
         self.assertIn("stroke-dasharray", svg)
 

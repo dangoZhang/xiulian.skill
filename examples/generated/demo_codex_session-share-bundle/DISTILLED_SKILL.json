@@ -5,12 +5,14 @@
   "result_skill_title": "码奸.skill",
   "source": "codex",
   "rank": "L4",
-  "generated_at": "2026-04-14 01:50",
+  "generated_at": "2026-04-14 01:58",
   "compression_mode": "first_two_sentences",
   "message_count": 4,
   "user_message_count": 2,
   "assistant_message_count": 2,
-  "models": [],
+  "models": [
+    "openai/gpt-5.4"
+  ],
   "fields": [
     {
       "id": "goal_framing",

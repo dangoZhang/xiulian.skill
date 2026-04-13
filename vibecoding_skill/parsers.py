@@ -165,14 +165,9 @@ def parse_codex(path: Path) -> Transcript:
         raw_event_count += 1
         event_type = item.get("type")
         payload = item.get("payload") or {}
-        if event_type == "session_meta" and isinstance(payload, dict):
-            if isinstance(payload.get("model_provider"), str):
-                providers.append(payload["model_provider"])
-            if isinstance(payload.get("model"), str):
-                models.append(payload["model"])
-        elif event_type == "turn_context" and isinstance(payload, dict):
-            if isinstance(payload.get("model"), str):
-                models.append(payload["model"])
+        model_hits, provider_hits = _collect_models(item)
+        models.extend(model_hits)
+        providers.extend(provider_hits)
         if event_type == "event_msg" and payload.get("type") == "user_message":
             text = payload.get("message") or _flatten_text(payload.get("text_elements"))
             if text:
@@ -604,11 +599,21 @@ def _collect_models(node) -> tuple[list[str], list[str]]:
 def _extract_model_info(obj: dict[str, object]) -> tuple[list[str], list[str]]:
     models: list[str] = []
     providers: list[str] = []
-    for key in ("model", "modelName", "model_name", "modelId", "model_id", "modelID", "modelSlug"):
+    for key in (
+        "model",
+        "modelName",
+        "model_name",
+        "modelId",
+        "model_id",
+        "modelID",
+        "modelSlug",
+        "selectedModel",
+        "defaultModel",
+    ):
         value = obj.get(key)
         if isinstance(value, str) and value.strip():
             models.append(value.strip())
-    for key in ("provider", "modelProvider", "providerName", "providerID"):
+    for key in ("provider", "modelProvider", "model_provider", "providerName", "providerID", "provider_id"):
         value = obj.get(key)
         if isinstance(value, str) and value.strip():
             providers.append(value.strip())

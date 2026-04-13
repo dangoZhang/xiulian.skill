@@ -5,8 +5,12 @@
     "path": "~/my-project/xiuxianLLM/side-projects/portrait.skill/examples/demo_codex_session.jsonl",
     "message_count": 4,
     "tool_calls": 2,
-    "models": [],
-    "providers": [],
+    "models": [
+      "openai/gpt-5.4"
+    ],
+    "providers": [
+      "openai"
+    ],
     "display_name": "码奸",
     "token_usage": {
       "input_tokens": 2480,
@@ -232,19 +236,19 @@
       "传播层重点是：大字等级、一眼能看懂的判断，以及下一轮最该补的动作。"
     ]
   },
-  "generated_at": "2026-04-14 01:50",
+  "generated_at": "2026-04-14 01:58",
   "style_signals": {
     "xianxia_requested": true
   },
   "xianxia_profile": [
     {
       "term": "灵根",
-      "value": "未显灵根",
-      "detail": "资质未明"
+      "value": "天灵根",
+      "detail": "上品资质"
     },
     {
       "term": "宗门",
-      "value": "Codex",
+      "value": "Codex · openai/gpt-5.4",
       "detail": "常驻宗门与本命法宝"
     },
     {
@@ -290,12 +294,14 @@
     "result_skill_title": "码奸.skill",
     "source": "codex",
     "rank": "L4",
-    "generated_at": "2026-04-14 01:50",
+    "generated_at": "2026-04-14 01:58",
     "compression_mode": "first_two_sentences",
     "message_count": 4,
     "user_message_count": 2,
     "assistant_message_count": 2,
-    "models": [],
+    "models": [
+      "openai/gpt-5.4"
+    ],
     "fields": [
       {
         "id": "goal_framing",
@@ -894,32 +900,6 @@
         "先读相关文件并给我可验证结果，不要只讲方案。",
         "如果发现偏差，只补一条最关键修正，然后继续推进。"
       ]
-    }
-  },
-  "memory": {
-    "has_previous": true,
-    "memory_key": "codex:path",
-    "previous_at": "2026-04-14T01:42:51+08:00",
-    "scope_label": "codex:单次记录",
-    "user": {
-      "before_level": "金丹",
-      "after_level": "金丹",
-      "display_before_level": "复用期",
-      "display_after_level": "复用期",
-      "before_score": 55,
-      "after_score": 55,
-      "score_delta": 0,
-      "outcome": "与上次持平"
-    },
-    "assistant": {
-      "before_level": "L4",
-      "after_level": "L4",
-      "display_before_level": "L4",
-      "display_after_level": "L4",
-      "before_score": 46,
-      "after_score": 46,
-      "score_delta": 0,
-      "outcome": "与上次持平"
     }
   },
   "card_style": "xianxia"

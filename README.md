@@ -204,24 +204,84 @@ Prompt
 > 检测到关键字“修仙 / 境界”，卡片已切到修仙模式。
 > 这次的主卡字段会换成 `境界 / 宗门和法宝 / 出关时间`，其中 `L4` 会显示成 `金丹`。
 
-实测彩蛋卡：
+<table>
+<tr>
+<td width="58%" valign="top">
 
-<img src="./examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.png" alt="vibecoding.skill 修仙彩蛋卡" width="420" />
+实测彩蛋卡会把主字段切到修仙叙事，但底层仍然对应同一份能力判断和 16 维得分。
+
+- `等级` 切成 `境界`
+- `常用平台和模型` 切成 `宗门和法宝`
+- `时间` 切成 `出关时间`
+
+</td>
+<td width="42%" valign="top">
+
+<img src="./examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.png" alt="vibecoding.skill 修仙彩蛋卡" width="280" />
+
+</td>
+</tr>
+</table>
 
 ## 四、等级表
 
-| 等级 | 境界 | 典型状态 |
-| --- | --- |
-| L1 | 炼气 | 还停在随手问答，缺少稳定方法。 |
-| L2 | 筑基 | 知道提问方式会影响结果。 |
-| L3 | 虚丹 | 能稳定完成简单任务。 |
-| L4 | 金丹 | 神识强大，可同时控制多个傀儡干活（常见任务可以推进到多步完成）。 |
-| L5 | 元婴 | 开始把顺手打法沉成 skill、模板或模块。 |
-| L6 | 化神 | 已经有能替自己先干一段活的分身。 |
-| L7 | 炼虚 | 能调多 agent、多工具协同完成任务。 |
-| L8 | 合体 | 开始做能力层和长期工作流设计。 |
-| L9 | 大乘 | 人负责判断和担责，agent 负责执行和回流。 |
-| L10 | 渡劫 | 能把自己的方法稳定复制给团队或客户。 |
+<table>
+<tr>
+<th>等级</th>
+<th>境界</th>
+<th>典型状态</th>
+</tr>
+<tr>
+<td><code>L1</code></td>
+<td><strong>炼气</strong></td>
+<td>还停在随手问答，缺少稳定方法。</td>
+</tr>
+<tr>
+<td><code>L2</code></td>
+<td><strong>筑基</strong></td>
+<td>知道提问方式会影响结果。</td>
+</tr>
+<tr>
+<td><code>L3</code></td>
+<td><strong>虚丹</strong></td>
+<td>能稳定完成简单任务。</td>
+</tr>
+<tr>
+<td><code>L4</code></td>
+<td><strong>金丹</strong></td>
+<td>神识强大，可同时控制多个傀儡干活（常见任务可以推进到多步完成）。</td>
+</tr>
+<tr>
+<td><code>L5</code></td>
+<td><strong>元婴</strong></td>
+<td>开始把顺手打法沉成 skill、模板或模块。</td>
+</tr>
+<tr>
+<td><code>L6</code></td>
+<td><strong>化神</strong></td>
+<td>已经有能替自己先干一段活的分身。</td>
+</tr>
+<tr>
+<td><code>L7</code></td>
+<td><strong>炼虚</strong></td>
+<td>能调多 agent、多工具协同完成任务。</td>
+</tr>
+<tr>
+<td><code>L8</code></td>
+<td><strong>合体</strong></td>
+<td>开始做能力层和长期工作流设计。</td>
+</tr>
+<tr>
+<td><code>L9</code></td>
+<td><strong>大乘</strong></td>
+<td>人负责判断和担责，agent 负责执行和回流。</td>
+</tr>
+<tr>
+<td><code>L10</code></td>
+<td><strong>渡劫</strong></td>
+<td>能把自己的方法稳定复制给团队或客户。</td>
+</tr>
+</table>
 
 ## 五、开源证书和项目结构树图
 
@@ -232,16 +292,16 @@ Prompt
 ```text
 portrait.skill
 ├── .cursor
-│   └── rules
-│       └── vibecoding-skill.mdc
-├── AGENTS.md
-├── README.md
-├── README_EN.md
-├── SKILL.md
-├── LICENSE
-├── pyproject.toml
+│   └── rules                              # Cursor 原生规则入口
+│       └── vibecoding-skill.mdc           # 主规则文件
+├── AGENTS.md                              # 通用 agent 说明
+├── README.md                              # 中文发布页
+├── README_EN.md                           # 英文发布页
+├── SKILL.md                               # skill 入口说明
+├── LICENSE                                # 开源证书
+├── pyproject.toml                         # 包配置与依赖
 ├── assets
-│   └── readme
+│   └── readme                             # README 展示图资源
 │       ├── vibecoding-card.png
 │       ├── vibecoding-card.svg
 │       ├── vibecoding-card-xianxia.png
@@ -251,18 +311,18 @@ portrait.skill
 │   ├── latest-agent-terms.md
 │   └── latest-agent-terms.prompt.md
 ├── examples
-│   ├── demo_codex_session.jsonl
-│   └── generated
+│   ├── demo_codex_session.jsonl           # Codex 示例日志
+│   └── generated                          # 示例生成结果
 │       ├── demo-coach.md
-│       ├── demo_codex_session-share-bundle
+│       ├── demo_codex_session-share-bundle # 导出的可分享能力包
 │       │   ├── DISTILLED_SKILL.json
 │       │   ├── PROFILE.md
 │       │   ├── README.md
 │       │   ├── REPORT.md
 │       │   ├── SKILL.md
-│       │   ├── assets
-│       │   └── snapshot.json
-│       ├── demo_codex_session-xianxia-card
+│       │   ├── assets                     # 分享卡资源
+│       │   └── snapshot.json              # 完整分析快照
+│       ├── demo_codex_session-xianxia-card # 修仙风格卡片示例
 │       │   ├── report.json
 │       │   ├── report.md
 │       │   ├── vibecoding-card-xianxia.png
@@ -270,9 +330,10 @@ portrait.skill
 │       ├── demo-distilled.json
 │       ├── demo-distilled.md
 │       └── demo-report.md
-├── tests
+├── tests                                  # 单测与 CLI 端到端测试
+│   ├── test_cli_e2e.py
 │   └── test_secondary_skill.py
-└── vibecoding_skill
+└── vibecoding_skill                       # 核心实现
     ├── __init__.py
     ├── analyzer.py
     ├── cards.py

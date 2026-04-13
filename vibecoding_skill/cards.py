@@ -51,8 +51,8 @@ XIANXIA_COPY = {
     "L10": "大乘立宗，可将修行法门稳定传给众人（能把自己的方法稳定复制给团队或客户）",
 }
 
-# 16-star Cygnus-inspired path for the lower-left constellation panel.
-CONSTELLATION_POINTS = [
+# Stylized 16-star path for Kui (奎宿), a Chinese lunar mansion with 16 stars.
+KUI_ASTERISM_POINTS = [
     (0.06, 0.58),
     (0.16, 0.46),
     (0.28, 0.34),
@@ -217,7 +217,7 @@ def build_card_data(payload: dict[str, object], *, style: str = "default") -> Ca
             user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
             time_label="出关时间",
             generated_at=_format_generated_at(payload.get("generated_at")),
-            constellation_label="十六曜星图 · 天鹅座",
+            constellation_label="十六曜星图 · 奎宿",
             axis_scores=_axis_scores(payload),
         )
     return CardData(
@@ -231,7 +231,7 @@ def build_card_data(payload: dict[str, object], *, style: str = "default") -> Ca
         user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
         time_label="时间",
         generated_at=_format_generated_at(payload.get("generated_at")),
-        constellation_label="十六维星图 · 天鹅座",
+        constellation_label="十六维星图 · 奎宿",
         axis_scores=_axis_scores(payload),
     )
 
@@ -265,7 +265,7 @@ def _render_constellation(data: CardData, palette: dict[str, str]) -> str:
     height = 212
     path_points = []
     stars = []
-    for index, (px, py) in enumerate(CONSTELLATION_POINTS):
+    for index, (px, py) in enumerate(KUI_ASTERISM_POINTS):
         x = left + px * width
         y = top + py * height
         path_points.append(f"{x:.1f},{y:.1f}")
