@@ -6,6 +6,14 @@ Record how you work with AI, then turn it into a level, a profile, a share card,
 
 [中文](./README.md) · [English](./README_EN.md)
 
+Native support:
+<br />
+<img src="https://img.shields.io/badge/Codex-0B0B0F?style=for-the-badge&logo=openai&logoColor=white" alt="Codex" />
+<img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
+<img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" />
+<img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" />
+<img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" />
+
 </div>
 
 <table>
@@ -45,11 +53,30 @@ Install it into the host you actually use:
 npx skills add https://github.com/dangoZhang/vibecoding.skill -a codex
 ```
 
-OpenAI's public Codex docs describe `~/.codex/skills/<skill-name>/SKILL.md` as the native location. In this local environment, the `skills` installer targets the shared `~/.agents/skills/` directory, and Codex Desktop does load skills from there in practice. If you want the strictly documented layout, copy or symlink the repo into `~/.codex/skills/vibecoding-skill`.
+```bash
+npx skills add https://github.com/dangoZhang/vibecoding.skill -a claude-code
+```
 
-Native skill targets verified here: `codex`, `claude-code`, `opencode`, `openclaw`
+```bash
+npx skills add https://github.com/dangoZhang/vibecoding.skill -a opencode
+```
 
-`cursor` is not a native `SKILL.md` target in Cursor's own docs. Cursor uses `Rules`, `AGENTS.md`, and `Memories`. The `skills` installer can still copy this repo into a shared agent-skills directory, but that is not the same as a native Cursor Rules package yet.
+```bash
+npx skills add https://github.com/dangoZhang/vibecoding.skill -a openclaw
+```
+
+For Cursor:
+
+```bash
+mkdir -p .cursor/rules
+curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/.cursor/rules/vibecoding-skill.mdc -o .cursor/rules/vibecoding-skill.mdc
+```
+
+Fallback:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/AGENTS.md -o AGENTS.md
+```
 
 ---
 

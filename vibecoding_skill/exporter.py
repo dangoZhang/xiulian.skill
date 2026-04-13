@@ -30,20 +30,27 @@ def export_bundle(
     result_skill_title = result_skill_title_from_display(display_name)
     assets_dir = root / "assets"
     cards = write_cards(payload, assets_dir, style=card_style)
+    card_png_name = Path(cards["card_png"]).name
 
     report_path = root / "REPORT.md"
     profile_path = root / "PROFILE.md"
     skill_path = root / "SKILL.md"
+    agents_path = root / "AGENTS.md"
     readme_path = root / "README.md"
     json_path = root / "snapshot.json"
     secondary_path = root / "DISTILLED_SKILL.json"
+    cursor_rules_dir = root / ".cursor" / "rules"
+    cursor_rules_dir.mkdir(parents=True, exist_ok=True)
+    cursor_rule_path = cursor_rules_dir / f"{result_skill_name}.mdc"
 
     report_path.write_text(markdown, encoding="utf-8")
     profile_path.write_text(_render_profile(payload), encoding="utf-8")
     skill_path.write_text(_render_skill(payload, result_skill_name), encoding="utf-8")
-    readme_path.write_text(_render_readme(payload, result_skill_name, result_skill_title), encoding="utf-8")
+    agents_path.write_text(_render_agents(payload, result_skill_name), encoding="utf-8")
+    readme_path.write_text(_render_readme(payload, result_skill_name, result_skill_title, card_png_name), encoding="utf-8")
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     secondary_path.write_text(json.dumps(_secondary_skill(payload), ensure_ascii=False, indent=2), encoding="utf-8")
+    cursor_rule_path.write_text(_render_cursor_rule(payload, result_skill_name), encoding="utf-8")
 
     result = {
         "export_dir": str(root),
@@ -55,6 +62,8 @@ def export_bundle(
         "share_report": str(report_path),
         "share_json": str(json_path),
         "distilled_skill_json": str(secondary_path),
+        "agents_md": str(agents_path),
+        "cursor_rule": str(cursor_rule_path),
         "card_svg": cards["card_svg"],
         "card_png": cards["card_png"],
     }
@@ -65,7 +74,7 @@ def export_bundle(
     return result
 
 
-def _render_readme(payload: dict[str, object], result_skill_name: str, result_skill_title: str) -> str:
+def _render_readme(payload: dict[str, object], result_skill_name: str, result_skill_title: str, card_png_name: str) -> str:
     name = _display_name(payload)
     rank = _insight(payload, "rank", "L1")
     ability = _insight(payload, "ability_text", "这套协作还在试手期。")
@@ -102,7 +111,7 @@ def _render_readme(payload: dict[str, object], result_skill_name: str, result_sk
             "</td>",
             '<td width="46%" valign="top">',
             "",
-            '<img src="./assets/vibecoding-card.png" alt="vibecoding 分享卡" width="100%" />',
+            f'<img src="./assets/{card_png_name}" alt="vibecoding 分享卡" width="100%" />',
             "",
             "</td>",
             "</tr>",
@@ -113,11 +122,13 @@ def _render_readme(payload: dict[str, object], result_skill_name: str, result_sk
             "- 想让另一个也在用 vibecoding.skill 的人直接复用：分享整个目录，或压缩后的 zip。",
             "- 想让别人快速看懂这套做法：分享 `PROFILE.md`。",
             "- 想让别人看完整判断依据：分享 `REPORT.md`。",
-            "- 想发群或发社交平台：分享 `assets/vibecoding-card.png`。",
+            f"- 想发群或发社交平台：分享 `assets/{card_png_name}`。",
             "",
             "## 这包里有什么",
             "",
             f"- `SKILL.md`：蒸馏结果 skill，本包核心入口。调用名是 `{result_skill_name}`，显示标题是 `{result_skill_title}`。",
+            "- `AGENTS.md`：给支持 AGENTS 的宿主直接读取。",
+            f"- `.cursor/rules/{result_skill_name}.mdc`：给 Cursor 原生读取。",
             "- `PROFILE.md`：压缩后的习惯画像，适合转发和快速阅读。",
             "- `REPORT.md`：完整报告，包含判断依据和突破建议。",
             "- `snapshot.json`：结构化结果，方便二次开发。",
@@ -181,6 +192,59 @@ def _render_skill(payload: dict[str, object], result_skill_name: str) -> str:
         f"- 当 `vibecoding.skill` 收到这份导出包时，应先读取 `PROFILE.md`、`REPORT.md`、`DISTILLED_SKILL.json`，再调用 `{result_skill_name}`。",
         "- 如果当前仓库指令和这份结果 skill 冲突，以更高优先级指令为准。",
     ]
+    return "\n".join(lines).strip() + "\n"
+
+
+def _render_agents(payload: dict[str, object], result_skill_name: str) -> str:
+    secondary = _secondary_skill(payload)
+    contract = secondary.get("secondary_skill_contract") if isinstance(secondary, dict) else {}
+    if not isinstance(contract, dict):
+        contract = {}
+    lines = [
+        f"# {result_skill_name}",
+        "",
+        "按这份导出包里的 vibecoding 习惯推进任务，不做人设扮演。",
+        "",
+        "## Default Behavior",
+        "",
+    ]
+    for item in contract.get("default_behavior", []):
+        lines.append(f"- {item}")
+    lines.extend(["", "## Guardrails", ""])
+    for item in contract.get("guardrails", []):
+        lines.append(f"- {item}")
+    lines.extend(["", "## Prompt Examples", ""])
+    for item in contract.get("prompt_examples", []):
+        lines.append(f"- {item}")
+    return "\n".join(lines).strip() + "\n"
+
+
+def _render_cursor_rule(payload: dict[str, object], result_skill_name: str) -> str:
+    secondary = _secondary_skill(payload)
+    contract = secondary.get("secondary_skill_contract") if isinstance(secondary, dict) else {}
+    if not isinstance(contract, dict):
+        contract = {}
+    lines = [
+        "---",
+        f"description: Use {result_skill_name} as a native Cursor project rule for this distilled vibecoding style.",
+        "alwaysApply: false",
+        "---",
+        "",
+        f"# {result_skill_name}",
+        "",
+        "按这份导出包里的 vibecoding 习惯推进任务，不做人设扮演。",
+        "",
+        "## Default Behavior",
+        "",
+    ]
+    for item in contract.get("default_behavior", []):
+        lines.append(f"- {item}")
+    lines.extend(["", "## Guardrails", ""])
+    for item in contract.get("guardrails", []):
+        lines.append(f"- {item}")
+    lines.extend(["", "## Prompt Examples", ""])
+    for item in contract.get("prompt_examples", []):
+        lines.append(f"- {item}")
     return "\n".join(lines).strip() + "\n"
 
 

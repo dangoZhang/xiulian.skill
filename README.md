@@ -13,8 +13,6 @@
 <img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
 <img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" />
 <img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" />
-<br />
-待补原生适配：
 <img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" />
 
 </div>
@@ -23,15 +21,15 @@
 <tr>
 <td width="52%" valign="top">
 
-### skill 信息提取的关键字和特征
+### skill 信息提取的关键字和特征（画像）
 
 `L4` `稳定期` `目标先收束` `上下文给够` `结果可验证` `证据优先`
 
-这是用 `examples/demo_codex_session.jsonl` 重新实测生成的画像。整体看，这类 vibecoding 很像一个先把场子铺平再开工的人：任务开始前，会先把目标、边界和交付物钉住，再把路径、文件和背景一次性交代清楚，让 agent 接手时几乎不用猜。
+你和 AI 对话时，起手就像在写一条可执行的 prompt：先把目标、边界、验收和交付物钉住，再把上下文一次给够，让 code agent 一上来就知道该先读什么、先做什么。
 
-真正开始推进后，节奏又会立刻切到务实模式。它更信文件、命令和日志里的证据，不爱空讲；能直接动手的地方就先推进，收尾时会盯住验证结果，避免停在“看起来差不多”。
+真正开始推进后，你给 code agent 的指令偏短、偏硬、偏落地。凡是能读文件、跑命令、查日志的地方，都会先让 agent 动手，再根据结果补 prompt，不喜欢把对话拖进大段空讲。
 
-给人的感觉是主线清楚，推进不拖泥带水，合作一开始就很容易进入有效工作状态。下一步如果还想更像成熟的 vibecoding 老手，重点要补的是偏了之后的修正速度，以及更长链路里的连续推进能力。
+整体看，你已经很会驱动 AI 干活，强在先收束任务、上下文给得足、对结果有验收；下一步最该补的是偏了之后的修正速度，以及更长链路里的连续推进能力。
 
 </td>
 <td width="48%" valign="top">
@@ -46,46 +44,20 @@
 
 ## 一、能做什么
 
-`vibecoding.skill` 直接读真实日志，不做问卷，不做自评。
-
-它现在能做五件事：
-
-- 读代码代理日志，从 16 个维度提取 vibecoding 能力。
-- 给出等级、阶段和人话画像。
-- 把能力导出成共享包，包含 `README.md`、`REPORT.md`、`PROFILE.md`、`DISTILLED_SKILL.json` 和结果 `skill`。
-- 读取他人分享的导出包，先读画像，再接管对应的二级 `skill`。
-- 根据当前等级和短板，给出下一轮升级建议。
-
-风格切换也内置好了：
-
-- 提到 `修仙` 或 `境界`，卡片和相关文案会自动切到修仙模式。
-- 修仙模式下，等级会换成境界名，比如 `L4 -> 金丹`。
-- 关键 AI 含义会保留在括号里，避免只剩氛围词。
-
-16 个维度按四层组织：
-
-- 任务定义层：目标 framing、上下文供给、约束治理、沟通压缩度
-- 执行控制层：执行默认、任务拆解、工具编排、上下文承接、迭代修正、失败恢复
-- 结果闭环层：验证闭环、产物落地、交接与记忆、抽象复用
-- 杠杆放大量：自主推进深度、并行与工作流化
+- 读日志。
+- 分 16 个维度提取 vibecoding 能力：
+  目标 framing、上下文供给、约束治理、沟通压缩度、执行默认、任务拆解、工具编排、上下文承接、迭代修正、失败恢复、验证闭环、产物落地、交接与记忆、抽象复用、自主推进深度、并行与工作流化。
+- 判断等级和阶段，生成人话画像。
+- 导出能力共享包，包含 `README.md`、`REPORT.md`、`PROFILE.md`、`DISTILLED_SKILL.json`、结果 `skill` 和宣传卡。
+- 读取并使用他人分享的能力，先读画像，再接管对应的二级 `skill`。
+- 给出升级建议。
 
 ## 二、如何安装
 
-按你实际在用的宿主安装：
-
 ### Codex
-
-OpenAI 公开文档写的是 `~/.codex/skills/<skill-name>/SKILL.md`。当前这台机器上的 `skills` 安装器会装到共享目录 `~/.agents/skills/`，而本机 Codex Desktop 也能实际读取这个目录。
 
 ```bash
 npx skills add https://github.com/dangoZhang/vibecoding.skill -a codex
-```
-
-如果你想严格按公开文档落盘，也可以手动复制或软链到：
-
-```bash
-mkdir -p ~/.codex/skills
-ln -s "$(pwd)" ~/.codex/skills/vibecoding-skill
 ```
 
 ### Claude Code
@@ -108,31 +80,32 @@ npx skills add https://github.com/dangoZhang/vibecoding.skill -a openclaw
 
 ### Cursor
 
-Cursor 官方走 `Rules / AGENTS.md / Memories`，当前仓库还没提供原生 Cursor 版包装。
-
 ```bash
-npx skills add https://github.com/dangoZhang/vibecoding.skill -a cursor
+mkdir -p .cursor/rules
+curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/.cursor/rules/vibecoding-skill.mdc -o .cursor/rules/vibecoding-skill.mdc
 ```
 
-这个命令可以通过 `skills` 装进共享目录，但还不等于 Cursor 官方原生 `Rules` 规范已经适配完成。
-
-本机 Codex 实测安装命令：
+可选兼容兜底：
 
 ```bash
-npx skills add . -a codex -g -y
+curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/AGENTS.md -o AGENTS.md
 ```
 
-实测安装结果：
+### 稳定复现
 
-```text
-Installed 1 skill
-✓ vibecoding-skill (copied)
-→ ~/.agents/skills/vibecoding-skill
+- 日志分析、等级判断、画像、报告、JSON、导出包：`macOS / Linux / Windows`
+- SVG 宣传卡：`macOS / Linux / Windows`
+- PNG 宣传卡：`macOS / Linux / Windows`，依赖 Python 包 `cairosvg`
+- 字体效果：安装 `SF Pro` 时最接近宣传稿；未安装时回退到 `PingFang SC / Helvetica Neue / Arial / sans-serif`
+- 环境自检：
+
+```bash
+python3 -m vibecoding_skill.cli doctor
 ```
 
 ## 三、示例 prompt 和回答
 
-下面 6 组示例，都来自本机安装到 Codex 后，对同一份输入 `examples/demo_codex_session.jsonl` 的实机调用。
+下面 6 组示例展示典型使用方式。
 
 ### 1. 蒸馏画像
 
@@ -152,10 +125,6 @@ Prompt
 > - 偏结果导向。你提的都是可落地输出物，没有停在泛讨论。
 > - 纠偏还不够强，所以“迭代修正”和“补救适配”是当前短板。
 
-产物路径：
-- `examples/generated/demo-report.md`
-  聚合分析报告，适合直接读结论。
-
 ### 2. 共享能力
 
 Prompt
@@ -170,12 +139,6 @@ Prompt
 > - 结果 skill 调用名：`vibecoding-profile-f11a0caa`
 > - 结果 skill 标题：`码奸.skill`
 > - 接收方下一句：`这是同事的导出包。先读他的画像，再调用 vibecoding-profile-f11a0caa 和我一起做当前任务。`
-
-产物路径：
-- `examples/generated/demo_codex_session-share-bundle/README.md`
-  给接收方看的导出包说明。
-- `examples/generated/demo_codex_session-share-bundle/DISTILLED_SKILL.json`
-  二级 skill 的结构化蒸馏结果。
 
 ### 3. 解压应用能力
 
@@ -228,10 +191,6 @@ Prompt
 > 2. 只补 `一条` 最关键修正，别一次加很多要求。
 > 3. 如果卡住，直接让 AI 给 `3 个缩范围方案`，只选最短路径继续。
 
-产物路径：
-- `examples/generated/demo-coach.md`
-  升级建议和下一轮训练动作。
-
 ### 6. 修仙彩蛋
 
 Prompt
@@ -244,14 +203,6 @@ Prompt
 
 > 检测到关键字“修仙 / 境界”，卡片已切到修仙模式。
 > 这次的主卡字段会换成 `境界 / 宗门和法宝 / 出关时间`，其中 `L4` 会显示成 `金丹`。
->
-> 主文件在：
-> - `examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.png`
-> - `examples/generated/demo_codex_session-xianxia-card/vibecoding-card-xianxia.svg`
->
-> 同目录还生成了：
-> - `examples/generated/demo_codex_session-xianxia-card/report.md`
-> - `examples/generated/demo_codex_session-xianxia-card/report.json`
 
 实测彩蛋卡：
 
@@ -274,41 +225,43 @@ Prompt
 
 ## 五、开源证书和项目结构树图
 
-开源证书：
-
 - [MIT License](./LICENSE)
 
 项目结构：
 
 ```text
 portrait.skill
-├── README.md                      # 中文主文档，安装、示例、等级表
-├── README_EN.md                   # 英文简版说明
-├── SKILL.md                       # 入口 skill 规则，宿主实际读取这里
-├── LICENSE                        # MIT 许可证
-├── pyproject.toml                 # Python 包与 CLI 入口配置
+├── .cursor
+│   └── rules
+│       └── vibecoding-skill.mdc
+├── AGENTS.md
+├── README.md
+├── README_EN.md
+├── SKILL.md
+├── LICENSE
+├── pyproject.toml
 ├── assets
-│   └── readme                     # README 展示用静态卡片
+│   └── readme
 │       ├── vibecoding-card.png
 │       ├── vibecoding-card.svg
 │       ├── vibecoding-card-xianxia.png
 │       └── vibecoding-card-xianxia.svg
-├── docs                           # 联网刷新后的术语缓存
+├── docs
 │   ├── latest-agent-terms.json
 │   ├── latest-agent-terms.md
 │   └── latest-agent-terms.prompt.md
 ├── examples
-│   ├── demo_codex_session.jsonl   # 最小可复现实测输入
-│   └── generated                  # README 里展示的真实生成结果
+│   ├── demo_codex_session.jsonl
+│   └── generated
 │       ├── demo-coach.md
 │       ├── demo_codex_session-share-bundle
-│       │   ├── DISTILLED_SKILL.json   # 二级 skill 结构化结果
-│       │   ├── PROFILE.md             # 接收方先读的人话画像
-│       │   ├── README.md              # 导出包使用说明
-│       │   ├── REPORT.md              # 完整分析报告
-│       │   ├── SKILL.md               # 可安装的二级 skill
-│       │   ├── assets                 # 导出包自带卡片
-│       │   └── snapshot.json          # 全量快照，方便二次开发
+│       │   ├── DISTILLED_SKILL.json
+│       │   ├── PROFILE.md
+│       │   ├── README.md
+│       │   ├── REPORT.md
+│       │   ├── SKILL.md
+│       │   ├── assets
+│       │   └── snapshot.json
 │       ├── demo_codex_session-xianxia-card
 │       │   ├── report.json
 │       │   ├── report.md
@@ -318,22 +271,22 @@ portrait.skill
 │       ├── demo-distilled.md
 │       └── demo-report.md
 ├── tests
-│   └── test_secondary_skill.py    # 二级 skill 打分与命名回归测试
+│   └── test_secondary_skill.py
 └── vibecoding_skill
     ├── __init__.py
-    ├── analyzer.py                # 原始评分、等级判定、能力分析
-    ├── cards.py                   # 分享卡与修仙卡绘制
-    ├── cli.py                     # analyze / export / coach / distill-skill 命令入口
-    ├── distill.py                 # 长日志分块蒸馏与聚合
-    ├── exporter.py                # 导出包写盘与 README/SKILL 生成
-    ├── insights.py                # 人话画像、宣传文案、升级建议
-    ├── luogu_palette.py           # 洛谷等级配色表
-    ├── memory.py                  # 本地快照与前后轮对比
-    ├── models.py                  # 消息、转录等数据结构
-    ├── parsers.py                 # 多平台日志解析
-    ├── renderer.py                # Markdown 报告渲染
-    ├── secondary_skill.py         # 16 维二级 skill 蒸馏
-    ├── terms.py                   # 术语刷新来源与词表
-    ├── themes.py                  # 主题与视觉参数
-    └── xianxia.py                 # 修仙术语与画像映射
+    ├── analyzer.py
+    ├── cards.py
+    ├── cli.py
+    ├── distill.py
+    ├── exporter.py
+    ├── insights.py
+    ├── luogu_palette.py
+    ├── memory.py
+    ├── models.py
+    ├── parsers.py
+    ├── renderer.py
+    ├── secondary_skill.py
+    ├── terms.py
+    ├── themes.py
+    └── xianxia.py
 ```

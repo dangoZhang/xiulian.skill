@@ -397,7 +397,7 @@ def build_readme_profile_panel(distillation: dict[str, object]) -> dict[str, obj
     rank = str(distillation.get("rank") or "L1")
 
     return {
-        "title": "这套 vibecoding 像什么",
+        "title": "你怎么和 AI 协作",
         "tags": _readme_tags(axis_map),
         "paragraphs": [
             item
@@ -552,17 +552,16 @@ def _compose_profile_paragraph(rank: str, axis_map: dict[str, dict[str, object]]
     opening = f"当前大致处在 `{rank}`。"
     if framing and context and execute and verify:
         return (
-            f"{opening} 这类 vibecoding 很像一个先把场子铺平再开工的人："
-            "开局会先把目标、边界和验收说清，再把路径、文件和背景一次给够，"
-            "让 agent 接手时几乎不用猜。真正开始做事后，又明显偏向先推进、后回报，"
-            "而且会盯住验证结果，要求每一步都能落到看得见的证据上。"
+            f"{opening} 你和 AI 对话时，起手就像在写一条可执行的 prompt："
+            "先把目标、边界、验收和交付物钉住，再把路径、文件、背景和样例交给 code agent，"
+            "让它接手时不用反复猜上下文。"
         )
     if framing and context:
         return (
-            f"{opening} 这类人最突出的地方是起手很稳。"
-            "任务开始前会先把目标和上下文摆好，让协作一上来就有主线，不容易跑偏。"
+            f"{opening} 你最突出的地方是 prompt 起手很稳。"
+            "给 AI 下任务前，会先把目标和上下文摆好，让 code agent 一上来就知道先做什么。"
         )
-    return f"{opening} 这套 vibecoding 更看重先把任务主线抓住，再沿着结果继续收束。"
+    return f"{opening} 你的习惯是先把任务主线说清，再让 AI 顺着结果继续往下做。"
 
 
 def _compose_workflow_paragraph(axis_map: dict[str, dict[str, object]]) -> str:
@@ -576,13 +575,13 @@ def _compose_workflow_paragraph(axis_map: dict[str, dict[str, object]]) -> str:
         if autonomous:
             tail = "遇到偏差时，会补一条关键修正继续推，而且通常希望 agent 少追问、多干活。"
         return (
-            "具体到执行层，这套习惯不爱空转。"
-            "它会催着 agent 去读文件、跑命令、查日志，把任务拆成连续的小步，"
+            "具体到执行层，你给 code agent 的指令偏短、偏硬、偏落地。"
+            "你会催着 agent 去读文件、跑命令、查日志，把任务拆成连续的小步，"
             f"{tail}"
         )
     if tool:
-        return "具体到执行层，它明显更信证据而不是口头判断，凡是能读文件、跑命令、查日志的地方，都会先让 agent 动手。"
-    return "具体到执行层，整体节奏偏短回合、重落地，重点是先把结果做出来，再根据反馈继续收束。"
+        return "具体到执行层，你明显更信证据而不是空讲。凡是能读文件、跑命令、查日志的地方，都会先让 code agent 动手，再根据结果补 prompt。"
+    return "具体到执行层，你的对话节奏偏短回合、重落地，重点是先让 AI 做出结果，再按反馈继续改 prompt。"
 
 
 def _compose_impression_paragraph(axis_map: dict[str, dict[str, object]]) -> str:
@@ -608,9 +607,9 @@ def _compose_impression_paragraph(axis_map: dict[str, dict[str, object]]) -> str
             weak.append(label)
 
     if strong and weak:
-        return f"整体给人的感觉是，主线很清楚，推进也很务实，强在{'、'.join(strong[:3])}；如果还要更像一个成熟的 vibecoding 老手，下一步要补的通常是{'、'.join(weak[:2])}。"
+        return f"整体看，你很会驱动 AI 干活，强在{'、'.join(strong[:3])}；如果还想把这套 prompt 习惯继续打磨，下一步最该补的是{'、'.join(weak[:2])}。"
     if strong:
-        return f"整体给人的感觉是很会带着 agent 做事，强在{'、'.join(strong[:3])}，所以合作时很容易快速进入有效工作状态。"
+        return f"整体看，你已经很会带着 code agent 往前做事，强在{'、'.join(strong[:3])}，所以合作时很容易快速进入有效工作状态。"
     return ""
 
 
@@ -638,13 +637,13 @@ def _readme_tags(axis_map: dict[str, dict[str, object]]) -> list[str]:
 def _readme_bullets(axis_map: dict[str, dict[str, object]]) -> list[str]:
     lines: list[str] = []
     if _axis_score(axis_map, "goal_framing") >= 2:
-        lines.append("开局先把目标、边界和验收钉住。")
+        lines.append("写 prompt 时会先把目标、边界和验收钉住。")
     if _axis_score(axis_map, "context_supply") >= 2:
-        lines.append("路径、文件和背景通常会一次性交代清楚。")
+        lines.append("给 code agent 下指令时，路径、文件和背景通常会一次性交代清楚。")
     if _axis_score(axis_map, "tool_orchestration") >= 2:
-        lines.append("更信文件、命令和日志里的证据，不爱空讲。")
+        lines.append("更信文件、命令和日志里的证据，不爱把 prompt 写成空话。")
     if _axis_score(axis_map, "verification_loop") >= 2:
-        lines.append("收尾会盯住验证结果，不满足于“看起来差不多”。")
+        lines.append("收尾会追问验证结果和未验证项，不满足于“看起来差不多”。")
     return lines[:3]
 
 

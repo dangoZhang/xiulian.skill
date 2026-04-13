@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 
 from .analyzer import aggregate_analyses, analyze_transcript, compare_analyses
-from .cards import write_cards
+from .cards import card_render_environment, write_cards
 from .distill import analyze_many_with_chunking, analyze_with_chunking
 from .exporter import export_bundle
 from .insights import build_aggregate_insights, build_analysis_insights
@@ -57,7 +57,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze.add_argument("--output", help="Write markdown report to a file.")
     analyze.add_argument("--json-output", help="Write structured JSON summary to a file.")
     analyze.add_argument("--card-dir", help="Write shareable SVG cards to this directory.")
-    analyze.add_argument("--card-style", choices=["default", "xianxia"], default="default", help="Card style. Use xianxia only as an easter egg.")
+    analyze.add_argument("--card-style", choices=["auto", "default", "xianxia"], default="auto", help="Card style. Auto switches to xianxia when the transcript clearly asks for 修仙 / 境界.")
     analyze.add_argument("--refresh-terms", action="store_true", help="Refresh the latest agent terminology input from official docs before analysis.")
     analyze.add_argument("--terms-dir", default="docs", help="Directory for refreshed terminology files.")
 
@@ -74,7 +74,7 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--memory-key", help="Custom memory group key. Reuse it across cycles to compare with the previous evaluation.")
     export.add_argument("--no-memory", action="store_true", help="Do not read or write local evaluation memory.")
     export.add_argument("--target-level", choices=[f"L{i}" for i in range(1, 11)], help="Optional target vibecoding level for upgrade coaching.")
-    export.add_argument("--card-style", choices=["default", "xianxia"], default="default", help="Card style. Use xianxia only as an easter egg.")
+    export.add_argument("--card-style", choices=["auto", "default", "xianxia"], default="auto", help="Card style. Auto switches to xianxia when the transcript clearly asks for 修仙 / 境界.")
     export.add_argument("--export-dir", required=True, help="Directory to write the shareable skill bundle into.")
     export.add_argument("--slug", help="Optional exported skill slug.")
     export.add_argument("--zip", action="store_true", help="Also create a zip archive next to the export directory.")
@@ -121,6 +121,9 @@ def build_parser() -> argparse.ArgumentParser:
     refresh_terms.add_argument("--output-dir", default="docs", help="Directory to write latest terminology markdown/json/prompt files.")
     refresh_terms.add_argument("--json-output", help="Write the refresh result metadata to a JSON file.")
 
+    doctor = subparsers.add_parser("doctor", help="Show render and host support information for stable local reproduction.")
+    doctor.add_argument("--json-output", help="Write doctor result to a JSON file.")
+
     return parser
 
 
@@ -148,14 +151,20 @@ def main() -> None:
         _handle_refresh_terms(args)
         return
 
+    if args.command == "doctor":
+        _handle_doctor(args)
+        return
+
     payload, markdown = _build_analysis_result(args)
+    resolved_card_style = _resolve_card_style(args.card_style, payload)
+    payload["card_style"] = resolved_card_style
 
     if args.command == "export":
         exported = export_bundle(
             payload=payload,
             markdown=markdown,
             output_dir=args.export_dir,
-            card_style=args.card_style,
+            card_style=resolved_card_style,
             archive=args.zip,
             slug=args.slug,
         )
@@ -170,7 +179,7 @@ def main() -> None:
         print(markdown)
 
     if args.card_dir:
-        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate, style=args.card_style)
+        payload["cards"] = write_cards(payload, args.card_dir, certificate_choice=args.certificate, style=resolved_card_style)
 
     if args.json_output:
         output_path = Path(args.json_output).expanduser().resolve()
@@ -262,6 +271,9 @@ def _build_analysis_result(args):
         scope_label = f"{source}:最近一次"
 
     payload["generated_at"] = generated_at
+    payload["style_signals"] = {
+        "xianxia_requested": any(any(keyword in message.text for keyword in ("修仙", "境界")) for message in distill_messages),
+    }
     payload["xianxia_profile"] = derive_xianxia_profile(payload)
     insight_payload = payload.get("insights") if isinstance(payload.get("insights"), dict) else {}
     secondary_display_name = distill_display_name or str(payload.get("display_name") or "码奸")
@@ -327,6 +339,32 @@ def _handle_distill_skill(args) -> None:
         output_path.write_text(json.dumps(secondary, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+def _handle_doctor(args) -> None:
+    info = {
+        "hosts": {
+            "codex": "native",
+            "claude-code": "native",
+            "opencode": "native",
+            "openclaw": "native",
+            "cursor": "native-project-rule",
+        },
+        "card_render": card_render_environment(),
+        "stable_reproduction": {
+            "analysis_and_export_json_markdown": ["macOS", "Linux", "Windows"],
+            "svg_card": ["macOS", "Linux", "Windows"],
+            "png_card": ["macOS", "Linux", "Windows"] if card_render_environment()["png_supported"] else [],
+            "cursor_rule": True,
+        },
+    }
+    text = json.dumps(info, ensure_ascii=False, indent=2)
+    if args.json_output:
+        output_path = Path(args.json_output).expanduser().resolve()
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(text, encoding="utf-8")
+    else:
+        print(text)
+
+
 def _handle_compare(args) -> None:
     generated_at = _generated_at()
     source = normalize_source(args.source)
@@ -359,6 +397,36 @@ def _handle_compare(args) -> None:
         output_path = Path(args.json_output).expanduser().resolve()
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(comparison, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _resolve_card_style(requested_style: str, payload: dict[str, object]) -> str:
+    if requested_style in {"default", "xianxia"}:
+        return requested_style
+    return "xianxia" if _payload_requests_xianxia(payload) else "default"
+
+
+def _payload_requests_xianxia(payload: dict[str, object]) -> bool:
+    style_signals = payload.get("style_signals")
+    if isinstance(style_signals, dict) and bool(style_signals.get("xianxia_requested")):
+        return True
+    keywords = ("修仙", "境界")
+    transcript = payload.get("transcript")
+    if isinstance(transcript, dict):
+        messages = transcript.get("messages")
+        if isinstance(messages, list):
+            for item in messages:
+                if isinstance(item, dict):
+                    text = str(item.get("text") or "")
+                    if any(keyword in text for keyword in keywords):
+                        return True
+    insights = payload.get("insights")
+    if isinstance(insights, dict):
+        for value in insights.values():
+            if isinstance(value, str) and any(keyword in value for keyword in keywords):
+                return True
+            if isinstance(value, list) and any(any(keyword in str(part) for keyword in keywords) for part in value):
+                return True
+    return False
 
 
 def _handle_coach(args) -> None:

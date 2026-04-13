@@ -232,7 +232,10 @@
       "传播层重点是：大字等级、一眼能看懂的判断，以及下一轮最该补的动作。"
     ]
   },
-  "generated_at": "2026-04-14 01:16",
+  "generated_at": "2026-04-14 01:50",
+  "style_signals": {
+    "xianxia_requested": true
+  },
   "xianxia_profile": [
     {
       "term": "灵根",
@@ -287,7 +290,7 @@
     "result_skill_title": "码奸.skill",
     "source": "codex",
     "rank": "L4",
-    "generated_at": "2026-04-14 01:16",
+    "generated_at": "2026-04-14 01:50",
     "compression_mode": "first_two_sentences",
     "message_count": 4,
     "user_message_count": 2,
@@ -896,7 +899,7 @@
   "memory": {
     "has_previous": true,
     "memory_key": "codex:path",
-    "previous_at": "2026-04-14T01:14:22+08:00",
+    "previous_at": "2026-04-14T01:42:51+08:00",
     "scope_label": "codex:单次记录",
     "user": {
       "before_level": "金丹",
@@ -918,5 +921,6 @@
       "score_delta": 0,
       "outcome": "与上次持平"
     }
-  }
+  },
+  "card_style": "xianxia"
 }

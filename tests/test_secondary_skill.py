@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
+import tempfile
 import unittest
 
 from vibecoding_skill.models import Message
 from vibecoding_skill.cards import build_card_data, render_vibecoding_card
+from vibecoding_skill.exporter import export_bundle
 from vibecoding_skill.secondary_skill import (
     build_readme_profile_panel,
     build_secondary_skill_distillation,
@@ -68,6 +71,9 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         self.assertTrue(panel["paragraphs"])
         self.assertTrue(panel["bullets"])
         self.assertLessEqual(len(panel["tags"]), 4)
+        self.assertEqual(panel["title"], "你怎么和 AI 协作")
+        self.assertIn("你", panel["paragraphs"][0])
+        self.assertIn("prompt", "".join(panel["paragraphs"]))
 
     def test_large_corpus_uses_coverage_ratio_instead_of_raw_count(self) -> None:
         messages = []
@@ -150,9 +156,40 @@ class SecondarySkillDistillationTests(unittest.TestCase):
             },
         }
         svg = render_vibecoding_card(payload, style="default")
-        self.assertIn("十六维星图 · 天龙座", svg)
+        self.assertIn("十六维星图 · 天鹅座", svg)
         self.assertIn("亮度随 16 维得分变化", svg)
         self.assertIn("stroke-dasharray", svg)
+
+    def test_export_bundle_emits_cursor_rule_and_agents(self) -> None:
+        payload = {
+            "generated_at": "2026-04-14 13:00",
+            "display_name": "码奸",
+            "insights": {"rank": "L4", "ability_text": "你已经能稳定推进常见任务。"},
+            "transcript": {
+                "display_name": "码奸",
+                "source": "codex",
+                "models": ["gpt-5.4"],
+            },
+            "secondary_skill": {
+                "secondary_skill_contract": {
+                    "default_behavior": ["先收束目标、边界、验收，再直接开始做。"],
+                    "guardrails": ["如果事实不够，先补文件、日志或命令结果，不要硬猜。"],
+                    "prompt_examples": ["按这套 vibecoding 习惯和我一起推进这个任务。"],
+                }
+            },
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exported = export_bundle(
+                payload=payload,
+                markdown="# report\n",
+                output_dir=tmpdir,
+            )
+            agents_path = Path(exported["agents_md"])
+            cursor_rule_path = Path(exported["cursor_rule"])
+            self.assertTrue(agents_path.exists())
+            self.assertTrue(cursor_rule_path.exists())
+            self.assertIn("Default Behavior", agents_path.read_text(encoding="utf-8"))
+            self.assertIn("alwaysApply: false", cursor_rule_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

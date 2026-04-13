@@ -2,8 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from html import escape
+import platform
 from pathlib import Path
+import shutil
 import subprocess
+import sys
 
 from .luogu_palette import get_luogu_level_palette
 from .parsers import default_display_name
@@ -48,24 +51,24 @@ XIANXIA_COPY = {
     "L10": "大乘立宗，可将修行法门稳定传给众人（能把自己的方法稳定复制给团队或客户）",
 }
 
-# 16-star Draco-inspired path for the lower-left constellation panel.
+# 16-star Cygnus-inspired path for the lower-left constellation panel.
 CONSTELLATION_POINTS = [
-    (0.02, 0.78),
-    (0.10, 0.60),
-    (0.18, 0.42),
-    (0.28, 0.24),
-    (0.39, 0.16),
-    (0.52, 0.22),
-    (0.66, 0.14),
-    (0.80, 0.20),
-    (0.92, 0.34),
-    (0.84, 0.50),
-    (0.72, 0.60),
-    (0.58, 0.68),
-    (0.44, 0.80),
-    (0.30, 0.88),
-    (0.16, 0.94),
-    (0.06, 0.90),
+    (0.06, 0.58),
+    (0.16, 0.46),
+    (0.28, 0.34),
+    (0.40, 0.24),
+    (0.52, 0.14),
+    (0.58, 0.24),
+    (0.64, 0.36),
+    (0.70, 0.48),
+    (0.76, 0.60),
+    (0.70, 0.66),
+    (0.62, 0.70),
+    (0.52, 0.74),
+    (0.42, 0.82),
+    (0.30, 0.90),
+    (0.18, 0.96),
+    (0.10, 0.86),
 ]
 
 
@@ -83,6 +86,24 @@ class CardData:
     generated_at: str
     constellation_label: str
     axis_scores: list[int]
+
+
+DISPLAY_FONT_STACK = "SF Pro Display, PingFang SC, Helvetica Neue, Arial, sans-serif"
+BODY_FONT_STACK = "SF Pro Text, PingFang SC, Helvetica Neue, Arial, sans-serif"
+
+
+def card_render_environment() -> dict[str, object]:
+    backend = _detect_png_backend()
+    return {
+        "platform": platform.system(),
+        "python": sys.version.split()[0],
+        "svg_supported": True,
+        "png_supported": backend is not None,
+        "png_backend": backend or "none",
+        "display_font_stack": DISPLAY_FONT_STACK,
+        "body_font_stack": BODY_FONT_STACK,
+        "font_note": "Best fidelity with SF Pro installed. Fallbacks are PingFang SC, Helvetica Neue, Arial, and sans-serif.",
+    }
 
 
 def write_cards(
@@ -196,7 +217,7 @@ def build_card_data(payload: dict[str, object], *, style: str = "default") -> Ca
             user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
             time_label="出关时间",
             generated_at=_format_generated_at(payload.get("generated_at")),
-            constellation_label="十六曜星图 · 天龙座",
+            constellation_label="十六曜星图 · 天鹅座",
             axis_scores=_axis_scores(payload),
         )
     return CardData(
@@ -210,7 +231,7 @@ def build_card_data(payload: dict[str, object], *, style: str = "default") -> Ca
         user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
         time_label="时间",
         generated_at=_format_generated_at(payload.get("generated_at")),
-        constellation_label="十六维星图 · 天龙座",
+        constellation_label="十六维星图 · 天鹅座",
         axis_scores=_axis_scores(payload),
     )
 
@@ -399,11 +420,11 @@ def _format_generated_at(value: object) -> str:
 
 
 def _display_font() -> str:
-    return "SF Pro Display, PingFang SC, Helvetica Neue, Arial, sans-serif"
+    return DISPLAY_FONT_STACK
 
 
 def _body_font() -> str:
-    return "SF Pro Text, PingFang SC, Helvetica Neue, Arial, sans-serif"
+    return BODY_FONT_STACK
 
 
 def _mix_hex(left: str, right: str, ratio: float) -> str:
@@ -437,31 +458,52 @@ def _as_dict(value: object) -> dict[str, object]:
 
 
 def _render_png(svg_path: Path, png_path: Path) -> None:
-    subprocess.run(
-        [
-            "rsvg-convert",
-            "--dpi-x",
-            "300",
-            "--dpi-y",
-            "300",
-            str(svg_path),
-            "-o",
-            str(png_path),
-        ],
-        check=True,
+    backend = _detect_png_backend()
+    if backend == "cairosvg":
+        import cairosvg
+
+        cairosvg.svg2png(bytestring=svg_path.read_bytes(), write_to=str(png_path), dpi=300)
+        _normalize_png_dpi(png_path)
+        return
+    if backend == "rsvg-convert":
+        subprocess.run(
+            [
+                "rsvg-convert",
+                "--dpi-x",
+                "300",
+                "--dpi-y",
+                "300",
+                str(svg_path),
+                "-o",
+                str(png_path),
+            ],
+            check=True,
+        )
+        _normalize_png_dpi(png_path)
+        return
+    raise RuntimeError(
+        "PNG card rendering is unavailable. Install Python package 'cairosvg' or command 'rsvg-convert'. "
+        "SVG output remains available on all platforms."
     )
-    subprocess.run(
-        [
-            "sips",
-            "-s",
-            "dpiWidth",
-            "300",
-            "-s",
-            "dpiHeight",
-            "300",
-            str(png_path),
-        ],
-        check=True,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+
+
+def _detect_png_backend() -> str | None:
+    try:
+        import cairosvg  # noqa: F401
+
+        return "cairosvg"
+    except ImportError:
+        pass
+    if shutil.which("rsvg-convert"):
+        return "rsvg-convert"
+    return None
+
+
+def _normalize_png_dpi(png_path: Path) -> None:
+    try:
+        from PIL import Image
+
+        with Image.open(png_path) as image:
+            image.save(png_path, dpi=(300, 300))
+    except Exception:
+        pass

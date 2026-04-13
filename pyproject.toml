@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "Read code-agent traces, distill vibecoding habits, mimic a person's collaboration style, rate level, generate upgrade guidance, and export a shareable skill bundle."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "cairosvg>=2.7,<3",
+    "Pillow>=10,<12",
+]
 
 [project.scripts]
 vibecoding-skill = "vibecoding_skill.cli:main"
