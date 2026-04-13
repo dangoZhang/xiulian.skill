@@ -7,13 +7,13 @@
 语言选择：
 [中文](./README.md) · [English](./README_EN.md)
 
-原生支持：
+支持平台：
 <br />
-<img src="https://img.shields.io/badge/Codex-0B0B0F?style=for-the-badge&logo=openai&logoColor=white" alt="Codex" />
-<img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
-<img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" />
-<img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" />
-<img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" />
+<a href="#codex"><img src="https://img.shields.io/badge/Codex-0B0B0F?style=for-the-badge&logo=openai&logoColor=white" alt="Codex" /></a>
+<a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" /></a>
+<a href="#opencode"><img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" /></a>
+<a href="#openclaw"><img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" /></a>
+<a href="#cursor"><img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" /></a>
 
 </div>
 
@@ -47,9 +47,9 @@
 - 读日志。
 - 分 16 个维度提取 vibecoding 能力：
   目标 framing、上下文供给、约束治理、沟通压缩度、执行默认、任务拆解、工具编排、上下文承接、迭代修正、失败恢复、验证闭环、产物落地、交接与记忆、抽象复用、自主推进深度、并行与工作流化。
-- 判断等级和阶段，生成人话画像。
-- 导出能力共享包，包含 `README.md`、`REPORT.md`、`PROFILE.md`、`DISTILLED_SKILL.json`、结果 `skill` 和宣传卡。
-- 读取并使用他人分享的能力，先读画像，再接管对应的二级 `skill`。
+- 判断等级和阶段，生成专属的 vibecoding 能力画像。
+- 导出能力共享包，把你的协作风格打包成可分享、可展示、可直接接入的新能力。
+- 读取并使用他人分享的能力，让 AI 快速进入对方的工作节奏，直接按那套打法一起推进任务。
 - 给出升级建议。
 
 ## 二、如何安装
@@ -85,17 +85,18 @@ mkdir -p .cursor/rules
 curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/.cursor/rules/vibecoding-skill.mdc -o .cursor/rules/vibecoding-skill.mdc
 ```
 
-可选兼容兜底：
+### 环境配置
+
+- Python：`3.10+`
+- 安装项目与依赖：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/AGENTS.md -o AGENTS.md
+python3 -m pip install -e .
 ```
-
-### 稳定复现
 
 - 日志分析、等级判断、画像、报告、JSON、导出包：`macOS / Linux / Windows`
 - SVG 宣传卡：`macOS / Linux / Windows`
-- PNG 宣传卡：`macOS / Linux / Windows`，依赖 Python 包 `cairosvg`
+- PNG 宣传卡：优先使用 `rsvg-convert`；未提供该命令时回退到 Python 包 `cairosvg`
 - 字体效果：安装 `SF Pro` 时最接近宣传稿；未安装时回退到 `PingFang SC / Helvetica Neue / Arial / sans-serif`
 - 环境自检：
 
@@ -160,7 +161,7 @@ Prompt
 >
 > 识别到的结果 skill 调用名是 `vibecoding-profile-f11a0caa`，显示标题是 `码奸.skill`。后续协作默认按它执行：先收束目标、边界、验收，再直接动手；优先读文件、跑命令、落产物，不先堆方案。
 
-### 4. 利用二级 skill 修改 code 工作中的 prompt
+### 4. 利用 skill 修改 code 工作中的 prompt
 
 Prompt
 
@@ -169,6 +170,10 @@ Prompt
 ```
 
 实机回答
+
+> 我会先按 `vibecoding.skill` 读取并调用 `vibecoding-profile-f11a0caa`，再把你这条 code 工作 prompt 改成更贴合这套协作方式的一版。
+>
+> 改写结果如下：
 
 ```text
 按 `vibecoding.skill` 先读取并调用导出的 `vibecoding-profile-f11a0caa`，再按这套协作方式帮我修这个仓库里的 bug。先用两句话收束这次任务的目标、边界和验收标准，然后直接开始做：先读相关文件、跑必要命令、查日志，定位根因并完成修复，不要先讲大段方案。如果信息不够，先补文件、日志或命令结果，不要硬猜；如果发现偏差，只补一条最关键修正后继续推进。最后只按这三项回报：改了什么、怎么验证、还有什么没验证或仍有风险。
@@ -283,7 +288,6 @@ portrait.skill
 ├── .cursor
 │   └── rules                              # Cursor 原生规则入口
 │       └── vibecoding-skill.mdc           # 主规则文件
-├── AGENTS.md                              # 通用 agent 说明
 ├── README.md                              # 中文发布页
 ├── README_EN.md                           # 英文发布页
 ├── SKILL.md                               # skill 入口说明

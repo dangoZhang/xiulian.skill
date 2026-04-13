@@ -7,13 +7,13 @@ Distill the way you work with AI into a reusable capability.
 Language:
 [中文](./README.md) · [English](./README_EN.md)
 
-Native support:
+Supported platforms:
 <br />
-<img src="https://img.shields.io/badge/Codex-0B0B0F?style=for-the-badge&logo=openai&logoColor=white" alt="Codex" />
-<img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" />
-<img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" />
-<img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" />
-<img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" />
+<a href="#codex"><img src="https://img.shields.io/badge/Codex-0B0B0F?style=for-the-badge&logo=openai&logoColor=white" alt="Codex" /></a>
+<a href="#claude-code"><img src="https://img.shields.io/badge/Claude_Code-1A1716?style=for-the-badge&logo=anthropic&logoColor=white" alt="Claude Code" /></a>
+<a href="#opencode"><img src="https://img.shields.io/badge/OpenCode-111827?style=for-the-badge&logo=gnubash&logoColor=white" alt="OpenCode" /></a>
+<a href="#openclaw"><img src="https://img.shields.io/badge/OpenClaw-0F172A?style=for-the-badge&logo=git&logoColor=white" alt="OpenClaw" /></a>
+<a href="#cursor"><img src="https://img.shields.io/badge/Cursor-1F2937?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor" /></a>
 
 </div>
 
@@ -47,9 +47,9 @@ Overall, this is already a strong way to drive AI work. The current strengths ar
 - Read real collaboration logs.
 - Distill vibecoding ability across 16 dimensions:
   goal framing, context supply, constraint governance, communication compression, execution preference, task decomposition, tool orchestration, context carry, iteration repair, failure recovery, verification loop, deliverable packaging, handoff memory, abstraction reuse, autonomous push, workflow orchestration.
-- Judge level and stage, then write a human-readable profile.
-- Export a share bundle with `README.md`, `REPORT.md`, `PROFILE.md`, `DISTILLED_SKILL.json`, the result `skill`, and the share card.
-- Read someone else's exported capability, parse the profile first, then hand work over to the distilled secondary `skill`.
+- Judge level and stage, then generate a dedicated vibecoding capability profile.
+- Export a share bundle that turns your collaboration style into a capability others can share, showcase, and plug in immediately.
+- Load someone else's shared capability so AI can enter that working rhythm fast and keep the task moving in the same style.
 - Give an upgrade suggestion for the next cycle.
 
 ## 2. How To Install
@@ -85,17 +85,18 @@ mkdir -p .cursor/rules
 curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/.cursor/rules/vibecoding-skill.mdc -o .cursor/rules/vibecoding-skill.mdc
 ```
 
-Optional fallback:
+### Environment Configuration
+
+- Python: `3.10+`
+- Install the project and dependencies:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dangoZhang/vibecoding.skill/main/AGENTS.md -o AGENTS.md
+python3 -m pip install -e .
 ```
-
-### Stable Reproduction
 
 - Log analysis, level judgment, profile, report, JSON, and share bundle: `macOS / Linux / Windows`
 - SVG share card: `macOS / Linux / Windows`
-- PNG share card: `macOS / Linux / Windows`, with Python package `cairosvg`
+- PNG share card: prefer `rsvg-convert`; fall back to the Python package `cairosvg` when that command is unavailable
 - Best typography fidelity comes with `SF Pro`; fallback stack is `PingFang SC / Helvetica Neue / Arial / sans-serif`
 - Environment check:
 
@@ -160,7 +161,7 @@ Live response
 >
 > The detected result skill call name is `vibecoding-profile-f11a0caa`, and the visible title is `码奸.skill`. After that, collaboration defaults to that style: frame the goal, boundary, and acceptance first, then act; prefer reading files, running commands, and shipping artifacts instead of staying in abstract planning.
 
-### 4. Rewrite A Working Prompt With The Secondary Skill
+### 4. Use The Skill To Rewrite A Coding Prompt
 
 Prompt
 
@@ -169,6 +170,10 @@ Call `vibecoding-profile-f11a0caa` and rewrite my current coding prompt so it ma
 ```
 
 Live response
+
+> I will first load and call `vibecoding-profile-f11a0caa` through `vibecoding.skill`, then rewrite your coding prompt so it matches that collaboration style more closely.
+>
+> Rewritten prompt:
 
 ```text
 Use `vibecoding.skill` to load and call `vibecoding-profile-f11a0caa`, then help me fix the bug in this repo in that style. First use two short sentences to pin down the goal, boundary, and acceptance for this run, then start working right away: read the relevant files, run the necessary commands, inspect logs, locate the root cause, and finish the fix. Do not start with a long plan. If context is missing, pull files, logs, or command results first instead of guessing. If you spot drift, add only the single most important correction and continue. At the end, report only three things: what changed, how it was verified, and what is still unverified or risky.
@@ -251,7 +256,6 @@ portrait.skill
 ├── .cursor
 │   └── rules                              # Native Cursor rule entry
 │       └── vibecoding-skill.mdc           # Main Cursor rule
-├── AGENTS.md                              # Generic agent instructions
 ├── README.md                              # Chinese launch page
 ├── README_EN.md                           # English launch page
 ├── SKILL.md                               # Skill entry instructions

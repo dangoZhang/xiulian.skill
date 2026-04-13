@@ -57,7 +57,6 @@ class CliE2ETests(unittest.TestCase):
             )
             root = Path(tmpdir)
             self.assertTrue((root / "README.md").exists())
-            self.assertTrue((root / "AGENTS.md").exists())
             self.assertTrue((root / ".cursor" / "rules").exists())
             readme = (root / "README.md").read_text(encoding="utf-8")
             self.assertIn("assets/vibecoding-card-xianxia.png", readme)

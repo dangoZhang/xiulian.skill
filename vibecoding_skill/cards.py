@@ -232,10 +232,10 @@ def render_vibecoding_card(payload: dict[str, object], *, style: str = "default"
 
   {_render_constellation(data, palette)}
 
-  <text x="670" y="1298" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.user_label)}</text>
-  <text x="670" y="1382" fill="#FFFFFF" font-size="{username_size}" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
-  <text x="670" y="1466" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
-  <text x="670" y="1530" fill="#FFFFFF" font-size="{time_value_size}" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
+  <text x="670" y="1272" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.user_label)}</text>
+  <text x="670" y="1350" fill="#FFFFFF" font-size="{username_size}" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
+  <text x="670" y="1424" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="{section_label_size}" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
+  <text x="670" y="1488" fill="#FFFFFF" font-size="{time_value_size}" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
 
 </svg>
 """
@@ -258,7 +258,7 @@ def build_card_data(payload: dict[str, object], *, style: str = "default", local
             summary=(XIANXIA_COPY_EN if english else XIANXIA_COPY).get(rank, (XIANXIA_COPY_EN if english else XIANXIA_COPY)["L1"]),
             platform_model_label="Sect and Artifacts" if english else "宗门和法宝",
             platform_model=platform_model,
-            user_label="Username" if english else "用户名",
+            user_label="Dao Title" if english else "道号",
             user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
             time_label="Return Time" if english else "出关时间",
             generated_at=_format_generated_at(payload.get("generated_at")),

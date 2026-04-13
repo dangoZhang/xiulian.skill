@@ -35,7 +35,6 @@ def export_bundle(
     report_path = root / "REPORT.md"
     profile_path = root / "PROFILE.md"
     skill_path = root / "SKILL.md"
-    agents_path = root / "AGENTS.md"
     readme_path = root / "README.md"
     json_path = root / "snapshot.json"
     secondary_path = root / "DISTILLED_SKILL.json"
@@ -46,7 +45,6 @@ def export_bundle(
     report_path.write_text(markdown, encoding="utf-8")
     profile_path.write_text(_render_profile(payload), encoding="utf-8")
     skill_path.write_text(_render_skill(payload, result_skill_name), encoding="utf-8")
-    agents_path.write_text(_render_agents(payload, result_skill_name), encoding="utf-8")
     readme_path.write_text(_render_readme(payload, result_skill_name, result_skill_title, card_png_name), encoding="utf-8")
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     secondary_path.write_text(json.dumps(_secondary_skill(payload), ensure_ascii=False, indent=2), encoding="utf-8")
@@ -62,7 +60,6 @@ def export_bundle(
         "share_report": str(report_path),
         "share_json": str(json_path),
         "distilled_skill_json": str(secondary_path),
-        "agents_md": str(agents_path),
         "cursor_rule": str(cursor_rule_path),
         "card_svg": cards["card_svg"],
         "card_png": cards["card_png"],
@@ -127,7 +124,6 @@ def _render_readme(payload: dict[str, object], result_skill_name: str, result_sk
             "## 这包里有什么",
             "",
             f"- `SKILL.md`：蒸馏结果 skill，本包核心入口。调用名是 `{result_skill_name}`，显示标题是 `{result_skill_title}`。",
-            "- `AGENTS.md`：给支持 AGENTS 的宿主直接读取。",
             f"- `.cursor/rules/{result_skill_name}.mdc`：给 Cursor 原生读取。",
             "- `PROFILE.md`：压缩后的习惯画像，适合转发和快速阅读。",
             "- `REPORT.md`：完整报告，包含判断依据和突破建议。",
@@ -192,30 +188,6 @@ def _render_skill(payload: dict[str, object], result_skill_name: str) -> str:
         f"- 当 `vibecoding.skill` 收到这份导出包时，应先读取 `PROFILE.md`、`REPORT.md`、`DISTILLED_SKILL.json`，再调用 `{result_skill_name}`。",
         "- 如果当前仓库指令和这份结果 skill 冲突，以更高优先级指令为准。",
     ]
-    return "\n".join(lines).strip() + "\n"
-
-
-def _render_agents(payload: dict[str, object], result_skill_name: str) -> str:
-    secondary = _secondary_skill(payload)
-    contract = secondary.get("secondary_skill_contract") if isinstance(secondary, dict) else {}
-    if not isinstance(contract, dict):
-        contract = {}
-    lines = [
-        f"# {result_skill_name}",
-        "",
-        "按这份导出包里的 vibecoding 习惯推进任务，不做人设扮演。",
-        "",
-        "## Default Behavior",
-        "",
-    ]
-    for item in contract.get("default_behavior", []):
-        lines.append(f"- {item}")
-    lines.extend(["", "## Guardrails", ""])
-    for item in contract.get("guardrails", []):
-        lines.append(f"- {item}")
-    lines.extend(["", "## Prompt Examples", ""])
-    for item in contract.get("prompt_examples", []):
-        lines.append(f"- {item}")
     return "\n".join(lines).strip() + "\n"
 
 

@@ -349,7 +349,10 @@ def _handle_doctor(args) -> None:
             "cursor": "native-project-rule",
         },
         "card_render": card_render_environment(),
-        "stable_reproduction": {
+        "environment_config": {
+            "python_requirement": ">=3.10",
+            "install_command": "python3 -m pip install -e .",
+            "python_dependencies": ["cairosvg", "Pillow"],
             "analysis_and_export_json_markdown": ["macOS", "Linux", "Windows"],
             "svg_card": ["macOS", "Linux", "Windows"],
             "png_card": ["macOS", "Linux", "Windows"] if card_render_environment()["png_supported"] else [],

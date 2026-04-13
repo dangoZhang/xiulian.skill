@@ -139,7 +139,7 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         self.assertEqual(card.level_label, "境界")
         self.assertEqual(card.level, "金丹")
         self.assertEqual(card.platform_model_label, "宗门和法宝")
-        self.assertEqual(card.user_label, "用户名")
+        self.assertEqual(card.user_label, "道号")
         self.assertIn("多个傀儡", card.summary)
         self.assertEqual(len(card.axis_scores), 16)
 
@@ -179,7 +179,7 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         self.assertIn("16-Star Axis Map · Kui", svg)
         self.assertIn("Username", svg)
 
-    def test_export_bundle_emits_cursor_rule_and_agents(self) -> None:
+    def test_export_bundle_emits_cursor_rule(self) -> None:
         payload = {
             "generated_at": "2026-04-14 13:00",
             "display_name": "码奸",
@@ -203,11 +203,8 @@ class SecondarySkillDistillationTests(unittest.TestCase):
                 markdown="# report\n",
                 output_dir=tmpdir,
             )
-            agents_path = Path(exported["agents_md"])
             cursor_rule_path = Path(exported["cursor_rule"])
-            self.assertTrue(agents_path.exists())
             self.assertTrue(cursor_rule_path.exists())
-            self.assertIn("Default Behavior", agents_path.read_text(encoding="utf-8"))
             self.assertIn("alwaysApply: false", cursor_rule_path.read_text(encoding="utf-8"))
 
 
