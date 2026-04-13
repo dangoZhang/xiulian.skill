@@ -196,57 +196,46 @@ Live response
 <table>
 <tr>
 <th>Level</th>
-<th>Realm</th>
 <th>Typical State</th>
 </tr>
 <tr>
 <td><code>L1</code></td>
-<td><strong>Qi Sensing</strong></td>
 <td>Still mostly ad hoc prompting with no stable method.</td>
 </tr>
 <tr>
 <td><code>L2</code></td>
-<td><strong>Foundation</strong></td>
 <td>Already knows prompt wording changes results.</td>
 </tr>
 <tr>
 <td><code>L3</code></td>
-<td><strong>False Core</strong></td>
 <td>Can complete simple tasks with some consistency.</td>
 </tr>
 <tr>
 <td><code>L4</code></td>
-<td><strong>Golden Core</strong></td>
-<td>Strong enough to control multiple puppets at once (common tasks can be pushed through multi-step execution).</td>
+<td>Can push common tasks through stable multi-step execution.</td>
 </tr>
 <tr>
 <td><code>L5</code></td>
-<td><strong>Nascent Soul</strong></td>
 <td>Starts turning repeatable wins into skills, templates, or modules.</td>
 </tr>
 <tr>
 <td><code>L6</code></td>
-<td><strong>Spirit Severing</strong></td>
 <td>Already has an agent that can take a chunk of work first.</td>
 </tr>
 <tr>
 <td><code>L7</code></td>
-<td><strong>Void Refining</strong></td>
 <td>Can coordinate multiple agents and tools on the same task.</td>
 </tr>
 <tr>
 <td><code>L8</code></td>
-<td><strong>Body Integration</strong></td>
 <td>Starts designing capability layers and longer workflows.</td>
 </tr>
 <tr>
 <td><code>L9</code></td>
-<td><strong>Great Ascension</strong></td>
 <td>The human owns judgment and accountability; the agent owns execution and feedback.</td>
 </tr>
 <tr>
 <td><code>L10</code></td>
-<td><strong>Tribulation</strong></td>
 <td>The method can be copied reliably across a team or clients.</td>
 </tr>
 </table>

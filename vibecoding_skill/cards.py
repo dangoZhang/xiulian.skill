@@ -79,21 +79,21 @@ XIANXIA_COPY_EN = {
 
 # Stylized 16-star path for Kui (奎宿), a Chinese lunar mansion with 16 stars.
 KUI_ASTERISM_POINTS = [
-    (0.06, 0.58),
-    (0.16, 0.46),
-    (0.28, 0.34),
-    (0.40, 0.24),
-    (0.52, 0.14),
-    (0.58, 0.24),
-    (0.64, 0.36),
-    (0.70, 0.48),
-    (0.76, 0.60),
-    (0.70, 0.66),
-    (0.62, 0.70),
-    (0.52, 0.74),
-    (0.42, 0.82),
-    (0.30, 0.90),
-    (0.18, 0.96),
+    (0.08, 0.72),
+    (0.16, 0.56),
+    (0.28, 0.42),
+    (0.42, 0.30),
+    (0.58, 0.22),
+    (0.76, 0.18),
+    (0.90, 0.28),
+    (0.84, 0.44),
+    (0.72, 0.56),
+    (0.80, 0.70),
+    (0.92, 0.84),
+    (0.72, 0.88),
+    (0.54, 0.80),
+    (0.38, 0.88),
+    (0.20, 0.96),
     (0.10, 0.86),
 ]
 
@@ -107,11 +107,11 @@ class CardData:
     summary: str
     platform_model_label: str
     platform_model: str
+    user_label: str
     user_name: str
     time_label: str
     generated_at: str
     constellation_label: str
-    constellation_note: str
     axis_scores: list[int]
 
 
@@ -157,6 +157,7 @@ def render_vibecoding_card(payload: dict[str, object], *, style: str = "default"
     data = build_card_data(payload, style=style, locale=locale)
     palette = get_luogu_level_palette(data.palette_level)
     summary_lines = _wrap_text(data.summary, max_units=18.5, limit=2)
+    summary_y = 746 if len(summary_lines) > 1 else 778
 
     return f"""<svg width="1200" height="1600" viewBox="0 0 1200 1600" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -204,28 +205,29 @@ def render_vibecoding_card(payload: dict[str, object], *, style: str = "default"
   </g>
 
   <rect x="140" y="108" width="920" height="2" rx="1" fill="{_escape(_mix_hex(palette['glow'], '#FFFFFF', 0.20))}" fill-opacity="0.88"/>
-  <text x="160" y="174" fill="#FFFFFF" font-size="36" font-family="{_display_font()}" font-weight="700">{_escape(data.title)}</text>
+  <text x="160" y="188" fill="#FFFFFF" font-size="54" font-family="{_display_font()}" font-weight="700">{_escape(data.title)}</text>
 
   <g>
-    <rect x="487" y="260" width="226" height="54" rx="27" fill="url(#glass)" stroke="{_escape(_with_alpha(palette['line'], 0.60))}"/>
-    <text x="600" y="296" fill="#FFFFFF" font-size="28" text-anchor="middle" font-family="{_body_font()}" font-weight="600">{_escape(data.level_label)}</text>
+    <rect x="438" y="254" width="324" height="78" rx="39" fill="url(#glass)" stroke="{_escape(_with_alpha(palette['line'], 0.60))}"/>
+    <text x="600" y="306" fill="#FFFFFF" font-size="44" text-anchor="middle" font-family="{_body_font()}" font-weight="600">{_escape(data.level_label)}</text>
   </g>
 
-  <text x="600" y="598" fill="#FFFFFF" font-size="300" text-anchor="middle" font-family="{_display_font()}" font-weight="700" letter-spacing="-10">{_escape(data.level)}</text>
-  {_text_lines(summary_lines, x=600, y=704, font_size=44, line_height=56, fill="#F5F7FA", anchor="middle", family=_body_font(), weight="600")}
+  <text x="600" y="612" fill="#FFFFFF" font-size="320" text-anchor="middle" font-family="{_display_font()}" font-weight="700" letter-spacing="-10">{_escape(data.level)}</text>
+  {_text_lines(summary_lines, x=600, y=summary_y, font_size=48, line_height=64, fill="#F5F7FA", anchor="middle", family=_body_font(), weight="600")}
 
-  <line x1="170" y1="932" x2="1030" y2="932" stroke="{_escape(_with_alpha(palette['line'], 0.42))}" stroke-width="1.5"/>
+  <line x1="170" y1="948" x2="1030" y2="948" stroke="{_escape(_with_alpha(palette['line'], 0.42))}" stroke-width="1.5"/>
 
-  <text x="170" y="1010" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="24" font-family="{_body_font()}" font-weight="500">{_escape(data.platform_model_label)}</text>
-  <text x="170" y="1072" fill="#FFFFFF" font-size="40" font-family="{_display_font()}" font-weight="650">{_escape(data.platform_model)}</text>
+  <text x="170" y="1036" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.platform_model_label)}</text>
+  <text x="170" y="1112" fill="#FFFFFF" font-size="58" font-family="{_display_font()}" font-weight="650">{_escape(data.platform_model)}</text>
 
-  <line x1="170" y1="1164" x2="1030" y2="1164" stroke="{_escape(_with_alpha(palette['line'], 0.28))}"/>
+  <line x1="170" y1="1188" x2="1030" y2="1188" stroke="{_escape(_with_alpha(palette['line'], 0.28))}"/>
 
   {_render_constellation(data, palette)}
 
-  <text x="670" y="1266" fill="#FFFFFF" font-size="56" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
-  <text x="670" y="1332" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="24" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
-  <text x="670" y="1390" fill="#FFFFFF" font-size="34" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
+  <text x="670" y="1260" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.user_label)}</text>
+  <text x="670" y="1336" fill="#FFFFFF" font-size="72" font-family="{_display_font()}" font-weight="650">{_escape(data.user_name)}</text>
+  <text x="670" y="1416" fill="{_escape(_with_alpha(palette['glow'], 0.90))}" font-size="44" font-family="{_body_font()}" font-weight="500">{_escape(data.time_label)}</text>
+  <text x="670" y="1480" fill="#FFFFFF" font-size="48" font-family="{_body_font()}" font-weight="600">{_escape(data.generated_at)}</text>
 
 </svg>
 """
@@ -248,11 +250,11 @@ def build_card_data(payload: dict[str, object], *, style: str = "default", local
             summary=(XIANXIA_COPY_EN if english else XIANXIA_COPY).get(rank, (XIANXIA_COPY_EN if english else XIANXIA_COPY)["L1"]),
             platform_model_label="Sect and Artifacts" if english else "宗门和法宝",
             platform_model=platform_model,
+            user_label="Username" if english else "用户名",
             user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
             time_label="Return Time" if english else "出关时间",
             generated_at=_format_generated_at(payload.get("generated_at")),
             constellation_label="16-Star Map · Kui" if english else "十六曜星图 · 奎宿",
-            constellation_note="Brightness follows the 16 dimension scores" if english else "亮度随 16 维得分变化",
             axis_scores=_axis_scores(payload),
         )
     return CardData(
@@ -263,11 +265,11 @@ def build_card_data(payload: dict[str, object], *, style: str = "default", local
         summary=(LEVEL_COPY_EN if english else LEVEL_COPY).get(rank, (LEVEL_COPY_EN if english else LEVEL_COPY)["L1"]),
         platform_model_label="Platforms and Models" if english else "常用平台和模型",
         platform_model=platform_model,
+        user_label="Username" if english else "用户名",
         user_name=_truncate_text(str(transcript.get("display_name") or payload.get("display_name") or default_display_name("user")), 16),
         time_label="Time" if english else "时间",
         generated_at=_format_generated_at(payload.get("generated_at")),
-        constellation_label="16-Dimension Star Map · Kui" if english else "十六维星图 · 奎宿",
-        constellation_note="Brightness follows the 16 dimension scores" if english else "亮度随 16 维得分变化",
+        constellation_label="16-Star Axis Map · Kui" if english else "十六维星图 · 奎宿",
         axis_scores=_axis_scores(payload),
     )
 
@@ -295,10 +297,10 @@ def _text_lines(
 
 
 def _render_constellation(data: CardData, palette: dict[str, str]) -> str:
-    left = 162
-    top = 1226
-    width = 392
-    height = 212
+    left = 156
+    top = 1260
+    width = 414
+    height = 188
     path_points = []
     stars = []
     for index, (px, py) in enumerate(KUI_ASTERISM_POINTS):
@@ -322,13 +324,12 @@ def _render_constellation(data: CardData, palette: dict[str, str]) -> str:
             f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{radius:.1f}" fill="{_escape(_with_alpha("#FFFFFF", max(0.42, opacity)))}"/>'
         )
     return (
-        f'<text x="{left}" y="1210" fill="{_escape(_with_alpha(palette["glow"], 0.92))}" font-size="22" font-family="{_body_font()}" font-weight="600">{_escape(data.constellation_label)}</text>'
-        f'<ellipse cx="{left + width * 0.42:.1f}" cy="{top + height * 0.60:.1f}" rx="{width * 0.44:.1f}" ry="{height * 0.46:.1f}" fill="{_escape(_with_alpha(palette["base"], 0.08))}"/>'
-        f'<ellipse cx="{left + width * 0.32:.1f}" cy="{top + height * 0.72:.1f}" rx="{width * 0.22:.1f}" ry="{height * 0.18:.1f}" fill="{_escape(_with_alpha(palette["glow"], 0.05))}"/>'
+        f'<text x="{left}" y="1232" fill="{_escape(_with_alpha(palette["glow"], 0.92))}" font-size="44" font-family="{_body_font()}" font-weight="600">{_escape(data.constellation_label)}</text>'
+        f'<ellipse cx="{left + width * 0.46:.1f}" cy="{top + height * 0.56:.1f}" rx="{width * 0.46:.1f}" ry="{height * 0.50:.1f}" fill="{_escape(_with_alpha(palette["base"], 0.08))}"/>'
+        f'<ellipse cx="{left + width * 0.30:.1f}" cy="{top + height * 0.70:.1f}" rx="{width * 0.22:.1f}" ry="{height * 0.22:.1f}" fill="{_escape(_with_alpha(palette["glow"], 0.05))}"/>'
         f'<polyline points="{" ".join(path_points)}" fill="none" stroke="{_escape(_with_alpha(palette["base"], 0.22))}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 14"/>'
         f'<polyline points="{" ".join(path_points)}" fill="none" stroke="{_escape(_with_alpha(palette["line"], 0.64))}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 9"/>'
         + "".join(stars)
-        + f'<text x="{left}" y="1472" fill="{_escape(_with_alpha(palette["line"], 0.82))}" font-size="18" font-family="{_body_font()}" font-weight="500">{_escape(data.constellation_note)}</text>'
     )
 
 

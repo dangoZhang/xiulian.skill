@@ -139,6 +139,7 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         self.assertEqual(card.level_label, "境界")
         self.assertEqual(card.level, "金丹")
         self.assertEqual(card.platform_model_label, "宗门和法宝")
+        self.assertEqual(card.user_label, "用户名")
         self.assertIn("多个傀儡", card.summary)
         self.assertEqual(len(card.axis_scores), 16)
 
@@ -157,7 +158,7 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         }
         svg = render_vibecoding_card(payload, style="default")
         self.assertIn("十六维星图 · 奎宿", svg)
-        self.assertIn("亮度随 16 维得分变化", svg)
+        self.assertIn("用户名", svg)
         self.assertIn("stroke-dasharray", svg)
 
     def test_card_can_render_english_labels(self) -> None:
@@ -175,8 +176,8 @@ class SecondarySkillDistillationTests(unittest.TestCase):
         }
         svg = render_vibecoding_card(payload, style="default", locale="en")
         self.assertIn("Platforms and Models", svg)
-        self.assertIn("16-Dimension Star Map · Kui", svg)
-        self.assertIn("Brightness follows the 16 dimension scores", svg)
+        self.assertIn("16-Star Axis Map · Kui", svg)
+        self.assertIn("Username", svg)
 
     def test_export_bundle_emits_cursor_rule_and_agents(self) -> None:
         payload = {
